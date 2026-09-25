@@ -1,29 +1,30 @@
 -- BoutiqueCiseaux : panneau d'achat + outil ciseaux (tenue, animation de coupe, coupe de l'herbe)
 -- À mettre dans un Script dans ServerScriptService.
--- Il faut que les ciseaux posés sur l'étagère s'appellent "Ciseaux" dans le Workspace.
+-- Il faut que les ciseaux posés sur l'étagère s'appellent "Ciseaux" dans le Workspace,
+-- et que l'ajout "CISEAUX" soit collé en bas de GrassServer.
 
 local CONFIG = {
 	PRIX = 7.99,
-	MONNAIE = "Argent", -- nom de ta monnaie dans le leaderboard (ex : "Cash", "Money")
-	CREER_MONNAIE = true, -- crée la monnaie si ton jeu n'en a pas encore
-	ARGENT_DE_DEPART = 100,
 	NOM_AFFICHE = "Ciseaux de jardin",
 	VITRINE = "Ciseaux", -- le modèle posé sur l'étagère
-	RAYON_COUPE = 5, -- distance de coupe devant le joueur (studs)
-	REPOUSSE = 15, -- secondes avant que l'herbe repousse
-	GAIN_PAR_HERBE = 0, -- argent gagné par herbe coupée (0 = rien)
+	RAYON_COUPE = 4, -- rayon de coupe devant le joueur (studs)
+	MAX_PAR_COUPE = 6, -- nombre max de touffes coupées par coup de ciseaux
 	TOURNER_EN_MAIN = 0, -- degrés : tourne les ciseaux dans la main si besoin
 }
 
 local Players = game:GetService("Players")
 local ServerStorage = game:GetService("ServerStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
 
+-- Même monnaie que le système d'herbe (GrassConfig.MONEY_STAT, sinon détection auto)
+local moduleConfig = ReplicatedStorage:WaitForChild("GrassConfig", 10)
+local MONEY_STAT = moduleConfig and require(moduleConfig).MONEY_STAT or ""
+local NOMS_MONNAIE = { "Money", "Cash", "Argent", "Coins", "Dollars", "Pieces", "Pièces", "$" }
+
 local TAG_OUTIL = "OutilCiseaux"
-local TAG_HERBE = "Herbe"
-local NOMS_HERBE = { Herbe = true, Grass = true }
 local ANGLE_TENUE = math.rad(-15) -- bras légèrement baissé quand on tient les ciseaux
 local ANGLE_COUPE = math.rad(-55) -- bras baissé vers le sol pendant la coupe
 local FERMETURE = math.rad(11) -- rotation de chaque lame pour fermer les ciseaux
@@ -36,31 +37,13 @@ local JAUNE = Color3.fromRGB(255, 220, 110)
 
 local function trouverArgent(joueur)
 	local stats = joueur:FindFirstChild("leaderstats")
-	return stats and stats:FindFirstChild(CONFIG.MONNAIE)
-end
-
-local function preparerJoueur(joueur)
-	local stats = joueur:WaitForChild("leaderstats", 3)
-	if not stats and CONFIG.CREER_MONNAIE then
-		stats = Instance.new("Folder")
-		stats.Name = "leaderstats"
-		stats.Parent = joueur
+	if not stats then return nil end
+	if MONEY_STAT ~= "" then return stats:FindFirstChild(MONEY_STAT) end
+	for _, nom in NOMS_MONNAIE do
+		local valeur = stats:FindFirstChild(nom)
+		if valeur and (valeur:IsA("IntValue") or valeur:IsA("NumberValue")) then return valeur end
 	end
-	if stats and not stats:FindFirstChild(CONFIG.MONNAIE) then
-		if CONFIG.CREER_MONNAIE then
-			local argent = Instance.new("NumberValue")
-			argent.Name = CONFIG.MONNAIE
-			argent.Value = CONFIG.ARGENT_DE_DEPART
-			argent.Parent = stats
-		else
-			warn("[BoutiqueCiseaux] Monnaie \"" .. CONFIG.MONNAIE .. "\" introuvable dans leaderstats de " .. joueur.Name)
-		end
-	end
-end
-
-Players.PlayerAdded:Connect(preparerJoueur)
-for _, joueur in Players:GetPlayers() do
-	task.spawn(preparerJoueur, joueur)
+	return nil
 end
 
 local function message(joueur, texte, couleur)
@@ -222,78 +205,22 @@ local function lames(outil, fermees, duree)
 	end
 end
 
----------------------------------------------------------------- Coupe de l'herbe
+---------------------------------------------------------------- Coupe de l'herbe (via GrassServer)
 
-local function effetHerbe(position)
-	local point = Instance.new("Attachment")
-	point.Parent = workspace.Terrain
-	point.WorldPosition = position
-	local brins = Instance.new("ParticleEmitter")
-	brins.Color = ColorSequence.new(Color3.fromRGB(110, 210, 90), Color3.fromRGB(45, 140, 50))
-	brins.Size = NumberSequence.new(0.25, 0.05)
-	brins.Lifetime = NumberRange.new(0.5, 0.9)
-	brins.Speed = NumberRange.new(5, 9)
-	brins.SpreadAngle = Vector2.new(50, 50)
-	brins.Acceleration = Vector3.new(0, -25, 0)
-	brins.RotSpeed = NumberRange.new(-180, 180)
-	brins.Rate = 0
-	brins.Parent = point
-	brins:Emit(18)
-	Debris:AddItem(point, 1.5)
-end
+local avertiCoupe = false
 
-local function estHerbe(objet)
-	return CollectionService:HasTag(objet, TAG_HERBE) or NOMS_HERBE[objet.Name] == true
-end
-
-local function cibleHerbe(p)
-	if estHerbe(p) then return p end
-	local modele = p:FindFirstAncestorWhichIsA("Model")
-	if modele and estHerbe(modele) then return modele end
-	return nil
-end
-
-local function couperHerbe(joueur, perso, racine)
-	local centre = (racine.CFrame * CFrame.new(0, -2.5, -3.5)).Position
-	local params = OverlapParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = { perso }
-	local faites = {}
-	for _, p in workspace:GetPartBoundsInRadius(centre, CONFIG.RAYON_COUPE, params) do
-		local herbe = cibleHerbe(p)
-		if herbe and not faites[herbe] and not herbe:GetAttribute("Coupee") then
-			faites[herbe] = true
-			herbe:SetAttribute("Coupee", true)
-			local pieces = {}
-			if herbe:IsA("BasePart") then
-				table.insert(pieces, herbe)
-			else
-				for _, d in herbe:GetDescendants() do
-					if d:IsA("BasePart") then table.insert(pieces, d) end
-				end
-			end
-			local avant = {}
-			for _, bp in pieces do
-				avant[bp] = { bp.Transparency, bp.CanCollide }
-				bp.CanCollide = false
-				TweenService:Create(bp, TweenInfo.new(0.25), { Transparency = 1 }):Play()
-			end
-			effetHerbe(if herbe:IsA("Model") then herbe:GetPivot().Position else herbe.Position)
-			local argent = trouverArgent(joueur)
-			if argent and CONFIG.GAIN_PAR_HERBE ~= 0 then
-				argent.Value = math.round((argent.Value + CONFIG.GAIN_PAR_HERBE) * 100) / 100
-			end
-			task.delay(CONFIG.REPOUSSE, function()
-				for bp, valeurs in avant do
-					if bp.Parent then
-						bp.CanCollide = valeurs[2]
-						TweenService:Create(bp, TweenInfo.new(1), { Transparency = valeurs[1] }):Play()
-					end
-				end
-				herbe:SetAttribute("Coupee", nil)
-			end)
+local function couperHerbe(joueur, racine)
+	local couper = ServerStorage:FindFirstChild("CutGrassArea")
+	if not couper then
+		if not avertiCoupe then
+			avertiCoupe = true
+			warn("[BoutiqueCiseaux] CutGrassArea introuvable : colle l'ajout CISEAUX en bas de GrassServer.")
 		end
+		return
 	end
+	-- point au sol, un peu devant le joueur
+	local centre = (racine.CFrame * CFrame.new(0, -3, -3)).Position
+	couper:Invoke(joueur, centre, CONFIG.RAYON_COUPE, CONFIG.MAX_PAR_COUPE)
 end
 
 ---------------------------------------------------------------- Comportement de l'outil
@@ -338,7 +265,7 @@ local function brancherOutil(outil)
 			if not tenu() then break end
 			lames(outil, true, 0.07)
 			task.wait(0.08)
-			if coup == 1 then couperHerbe(joueur, perso, racine) end
+			if coup == 1 then task.spawn(couperHerbe, joueur, racine) end
 			lames(outil, false, 0.07)
 			task.wait(0.08)
 		end
@@ -421,14 +348,19 @@ invite.Triggered:Connect(function(joueur)
 	end
 	local argent = trouverArgent(joueur)
 	if not argent then
-		message(joueur, "Monnaie \"" .. CONFIG.MONNAIE .. "\" introuvable", ROUGE)
+		message(joueur, "Monnaie introuvable dans leaderstats", ROUGE)
 		return
 	end
-	if argent.Value < CONFIG.PRIX then
-		message(joueur, string.format("Pas assez d'argent : il te manque $%.2f", CONFIG.PRIX - argent.Value), ROUGE)
+	local solde = tonumber(argent.Value) or 0
+	if solde < CONFIG.PRIX then
+		message(joueur, string.format("Pas assez d'argent : il te manque $%.2f", CONFIG.PRIX - solde), ROUGE)
 		return
 	end
-	argent.Value = math.round((argent.Value - CONFIG.PRIX) * 100) / 100
+	if argent:IsA("IntValue") then
+		argent.Value = math.floor(solde - CONFIG.PRIX)
+	else
+		argent.Value = math.floor((solde - CONFIG.PRIX) * 100 + 0.5) / 100
+	end
 	local sac = joueur:FindFirstChildOfClass("Backpack")
 	if sac then modeleOutil:Clone().Parent = sac end
 	local equipement = joueur:FindFirstChild("StarterGear")
