@@ -1,0 +1,343 @@
+-- CiseauxServer (Script dans ServerScriptService)
+-- Donne les ciseaux à chaque joueur dès le spawn (déjà en main) + animations de tenue et de coupe.
+-- La coupe de l'herbe elle-même est faite par GrassServer, uniquement avec les ciseaux en main.
+
+local CONFIG = {
+	EQUIPER_AU_SPAWN = true, -- les ciseaux sont directement dans la main au spawn
+	TOURNER_EN_MAIN = 0, -- degrés : tourne les ciseaux dans la main si besoin
+}
+
+local Players = game:GetService("Players")
+local ServerStorage = game:GetService("ServerStorage")
+local StarterPack = game:GetService("StarterPack")
+local TweenService = game:GetService("TweenService")
+local CollectionService = game:GetService("CollectionService")
+
+local TAG_OUTIL = "OutilCiseaux"
+local ANGLE_TENUE = math.rad(-15) -- bras légèrement baissé quand on tient les ciseaux
+local ANGLE_COUPE = math.rad(-55) -- bras baissé vers le sol pendant la coupe
+local FERMETURE = math.rad(11) -- rotation de chaque lame pour fermer les ciseaux
+
+---------------------------------------------------------------- Modèle des ciseaux (même design que sur l'étagère)
+
+local function construireModele()
+	local S, OFF, V = 0.85, Vector3.new(0.00636, 0.017, -0.01891), Vector3.new
+	local ACIER, FIL, DOS = Color3.fromRGB(188, 194, 203), Color3.fromRGB(242, 244, 247), Color3.fromRGB(120, 126, 136)
+	local ROUGE, ROUGE_CLAIR = Color3.fromRGB(200, 30, 35), Color3.fromRGB(240, 90, 90)
+	local NOIR, LAITON, FENTE = Color3.fromRGB(38, 40, 46), Color3.fromRGB(201, 162, 72), Color3.fromRGB(60, 48, 22)
+	local METAL, LISSE = Enum.Material.Metal, Enum.Material.SmoothPlastic
+	local HAUT = CFrame.fromMatrix(Vector3.zero, V(0, 1, 0), V(-1, 0, 0), V(0, 0, 1)) -- cylindre vertical
+
+	local modele = Instance.new("Model")
+	modele.Name = "Ciseaux"
+	local rot = CFrame.identity -- rotation de la branche en cours
+
+	local function dossier(nom, parent)
+		local d = Instance.new("Folder")
+		d.Name = nom
+		d.Parent = parent
+		return d
+	end
+
+	local function piece(parent, nom, taille, c, couleur, mat, forme, reflet, classe)
+		local p = Instance.new(classe or "Part")
+		p.Name = nom
+		if forme then p.Shape = forme end
+		p.Size = taille * S
+		local w = rot * c
+		p.CFrame = CFrame.new(w.Position * S + OFF) * w.Rotation
+		p.Color, p.Material, p.Reflectance = couleur, mat or LISSE, reflet or 0
+		p.Anchored = true
+		p.TopSurface, p.BottomSurface = Enum.SurfaceType.Smooth, Enum.SurfaceType.Smooth
+		p.Parent = parent
+	end
+
+	local function tube(parent, nom, a, b, d, couleur, boule)
+		local ex = (b - a).Unit
+		local ey = (V(0, 1, 0) - ex * ex.Y).Unit
+		piece(parent, nom, V((b - a).Magnitude + 0.004, d, d), CFrame.fromMatrix((a + b) / 2, ex, ey, ex:Cross(ey)),
+			couleur, LISSE, Enum.PartType.Cylinder)
+		if boule ~= false then
+			piece(parent, nom .. "Joint", V(d, d, d), CFrame.new(a), couleur, LISSE, Enum.PartType.Ball)
+		end
+	end
+
+	local function anneau(parent, nom, cx, cz, y, a, b, d, couleur)
+		for i = 0, 23 do
+			local t1, t2 = math.pi * i / 12, math.pi * (i + 1) / 12
+			tube(parent, nom, V(cx + a * math.cos(t1), y, cz + b * math.sin(t1)),
+				V(cx + a * math.cos(t2), y, cz + b * math.sin(t2)), d, couleur)
+		end
+	end
+
+	local function branche(nom, s, y, ra, rb, angle)
+		rot = CFrame.Angles(0, angle, 0)
+		local g = dossier(nom, modele)
+		local lame, poignee = dossier("Lame", g), dossier("Poignee", g)
+		piece(lame, "CorpsLame", V(0.55, 0.08, 0.3), CFrame.new(0.275, y, s * 0.13), ACIER, METAL)
+		piece(lame, "Pointe", V(0.08, 0.3, 1.3), CFrame.fromMatrix(V(1.2, y, s * 0.13), V(0, -s, 0), V(0, 0, s), V(-1, 0, 0)),
+			ACIER, METAL, nil, 0, "WedgePart")
+		piece(lame, "FilDeCoupe", V(1.4, 0.086, 0.06), CFrame.new(0.85, y, s * 0.01), FIL, LISSE, nil, 0.45)
+		piece(lame, "DosLame", V(0.45, 0.084, 0.025), CFrame.new(0.325, y, s * 0.2675), DOS, METAL)
+		piece(lame, "Talon", V(0.08, 0.38, 0.38), CFrame.new(0, y, 0) * HAUT, ACIER, METAL, Enum.PartType.Cylinder)
+		piece(lame, "Tige", V(0.72, 0.08, 0.16), CFrame.new(-0.36, y, 0), ACIER, METAL)
+
+		local p0, p1 = V(-0.5, 0.09, 0), V(-0.78, 0.09, -s * 0.05)
+		local cx, cz = -0.86 - ra, -s * 0.16
+		local t0 = math.atan2((p1.Z - cz) / rb, (p1.X - cx) / ra)
+		local p2 = V(cx + ra * math.cos(t0), 0.09, cz + rb * math.sin(t0))
+		tube(poignee, "Manche", p0, p1, 0.19, ROUGE)
+		tube(poignee, "Manche", p1, p2, 0.18, ROUGE)
+		piece(poignee, "MancheJoint", V(0.18, 0.18, 0.18), CFrame.new(p2), ROUGE, LISSE, Enum.PartType.Ball)
+		tube(poignee, "Bague", V(-0.47, 0.09, 0), V(-0.53, 0.09, -s * 0.001), 0.22, ROUGE_CLAIR, false)
+		anneau(poignee, "Anneau", cx, cz, 0.09, ra, rb, 0.17, ROUGE)
+		anneau(poignee, "Grip", cx, cz, 0.09, ra - 0.075, rb - 0.075, 0.1, NOIR)
+	end
+
+	branche("BranchePouce", 1, 0.13, 0.3, 0.3, -math.rad(12))
+	branche("BrancheDoigts", -1, 0.05, 0.47, 0.3, math.rad(12))
+
+	rot = CFrame.identity
+	local vis = dossier("Vis", modele)
+	piece(vis, "Rondelle", V(0.025, 0.27, 0.27), CFrame.new(0, 0.1825, 0) * HAUT, ACIER, METAL, Enum.PartType.Cylinder, 0.2)
+	piece(vis, "TeteDeVis", V(0.05, 0.2, 0.2), CFrame.new(0, 0.22, 0) * HAUT, LAITON, LISSE, Enum.PartType.Cylinder, 0.35)
+	piece(vis, "Fente", V(0.16, 0.012, 0.028), CFrame.new(0, 0.2445, 0), FENTE)
+	return modele
+end
+
+---------------------------------------------------------------- Outil (Tool) à partir du modèle
+
+local function preparerPiece(p)
+	p.Anchored = false
+	p.CanCollide = false
+	p.CanTouch = false
+	p.CanQuery = false
+	p.Massless = true
+end
+
+local function souder(base, p)
+	local soudure = Instance.new("Weld")
+	soudure.Part0 = base
+	soudure.Part1 = p
+	soudure.C0 = base.CFrame:ToObjectSpace(p.CFrame)
+	soudure.Parent = p
+end
+
+local function construireOutil(source)
+	-- Repère des ciseaux : X vers les pointes, Y vers le haut, axe de la vis au centre
+	local axe = source:FindFirstChild("Fente", true).CFrame
+	local outil = Instance.new("Tool")
+	outil.Name = "Ciseaux"
+	outil.ToolTip = "Clique sur l'herbe pour la couper"
+	outil.CanBeDropped = false
+	-- Tenue façon épée classique : les pointes vers l'avant
+	outil.GripPos = Vector3.zero
+	outil.GripForward = Vector3.new(-1, 0, 0)
+	outil.GripRight = Vector3.new(0, 1, 0)
+	outil.GripUp = Vector3.new(0, 0, 1)
+	CollectionService:AddTag(outil, TAG_OUTIL)
+
+	local handle = Instance.new("Part")
+	handle.Name = "Handle"
+	handle.Size = Vector3.new(0.3, 0.3, 0.3)
+	handle.Transparency = 1
+	handle.CFrame = axe * CFrame.new(-1, -0.13, 0)
+		* CFrame.fromMatrix(Vector3.zero, Vector3.new(0, 0, -1), Vector3.new(0, 1, 0), Vector3.new(1, 0, 0))
+		* CFrame.Angles(0, 0, math.rad(CONFIG.TOURNER_EN_MAIN))
+	preparerPiece(handle)
+	handle.Parent = outil
+
+	for _, nom in { "BranchePouce", "BrancheDoigts", "Vis" } do
+		local branche = source:FindFirstChild(nom)
+		branche.Parent = outil
+		local base = handle
+		if nom ~= "Vis" then
+			-- Chaque branche tourne autour de la vis grâce à un Motor6D
+			base = Instance.new("Part")
+			base.Name = "Pivot"
+			base.Size = Vector3.new(0.1, 0.1, 0.1)
+			base.Transparency = 1
+			base.CFrame = axe
+			preparerPiece(base)
+			base.Parent = branche
+			local moteur = Instance.new("Motor6D")
+			moteur.Name = nom
+			moteur.Part0 = handle
+			moteur.Part1 = base
+			moteur.C0 = handle.CFrame:ToObjectSpace(axe)
+			moteur:SetAttribute("C0Origine", moteur.C0)
+			moteur:SetAttribute("Sens", if nom == "BranchePouce" then 1 else -1)
+			moteur.Parent = handle
+		end
+		for _, p in branche:GetDescendants() do
+			if p:IsA("BasePart") and p ~= base then
+				preparerPiece(p)
+				souder(base, p)
+			end
+		end
+	end
+	source:Destroy()
+	return outil
+end
+
+local modeleOutil = construireOutil(construireModele())
+
+---------------------------------------------------------------- Animations
+
+local function trouverEpaule(perso)
+	local bras = perso:FindFirstChild("RightUpperArm")
+	if bras then
+		return bras:FindFirstChild("RightShoulder") -- R15
+	end
+	local torse = perso:FindFirstChild("Torso")
+	return torse and torse:FindFirstChild("Right Shoulder") -- R6
+end
+
+local function bougerBras(epaule, angle, duree)
+	if not epaule then return end
+	local origine = epaule:GetAttribute("C0Origine")
+	if not origine then
+		origine = epaule.C0
+		epaule:SetAttribute("C0Origine", origine)
+	end
+	local cible = CFrame.new(origine.Position) * CFrame.Angles(angle, 0, 0) * origine.Rotation
+	TweenService:Create(epaule, TweenInfo.new(duree, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { C0 = cible }):Play()
+end
+
+local function remettreBras(epaule)
+	local origine = epaule and epaule:GetAttribute("C0Origine")
+	if origine then
+		TweenService:Create(epaule, TweenInfo.new(0.15), { C0 = origine }):Play()
+	end
+end
+
+local function lames(outil, fermees, duree)
+	local handle = outil:FindFirstChild("Handle")
+	if not handle then return end
+	for _, moteur in handle:GetChildren() do
+		if moteur:IsA("Motor6D") then
+			local angle = if fermees then FERMETURE * moteur:GetAttribute("Sens") else 0
+			local cible = moteur:GetAttribute("C0Origine") * CFrame.Angles(0, angle, 0)
+			TweenService:Create(moteur, TweenInfo.new(duree, Enum.EasingStyle.Sine), { C0 = cible }):Play()
+		end
+	end
+end
+
+---------------------------------------------------------------- Comportement de l'outil
+
+local coupes = {} -- [outil] = fonction qui joue l'animation de coupe
+
+local function brancherOutil(outil)
+	if not outil:IsA("Tool") or coupes[outil] then return end
+	local occupe = false
+	local perso = nil
+
+	local function tenu()
+		return perso ~= nil and outil.Parent == perso
+	end
+
+	-- bras vers le sol + deux coups de ciseaux (≈ 0,45 s)
+	coupes[outil] = function()
+		if occupe or not tenu() then return end
+		occupe = true
+		local epaule = trouverEpaule(perso)
+		bougerBras(epaule, ANGLE_COUPE, 0.12)
+		task.wait(0.12)
+		for _ = 1, 2 do
+			if not tenu() then break end
+			lames(outil, true, 0.06)
+			task.wait(0.07)
+			lames(outil, false, 0.06)
+			task.wait(0.07)
+		end
+		if tenu() then bougerBras(epaule, ANGLE_TENUE, 0.15) end
+		task.wait(0.05)
+		occupe = false
+	end
+
+	outil.Equipped:Connect(function()
+		perso = outil.Parent
+		bougerBras(trouverEpaule(perso), ANGLE_TENUE, 0.25)
+		-- petit "clic clac" quand on sort les ciseaux
+		lames(outil, true, 0.1)
+		task.delay(0.12, lames, outil, false, 0.12)
+	end)
+
+	outil.Unequipped:Connect(function()
+		if perso then remettreBras(trouverEpaule(perso)) end
+		lames(outil, false, 0.1)
+		perso = nil
+	end)
+
+	-- clic n'importe où : coup de ciseaux dans le vide
+	outil.Activated:Connect(function()
+		coupes[outil]()
+	end)
+
+	outil.Destroying:Connect(function()
+		coupes[outil] = nil
+	end)
+end
+
+CollectionService:GetInstanceAddedSignal(TAG_OUTIL):Connect(brancherOutil)
+for _, outil in CollectionService:GetTagged(TAG_OUTIL) do
+	brancherOutil(outil)
+end
+
+-- GrassServer déclenche l'animation quand une touffe est vraiment coupée (aussi avec "Maintenir")
+local signalCoupe = ServerStorage:FindFirstChild("CiseauxCoupe") or Instance.new("BindableEvent")
+signalCoupe.Name = "CiseauxCoupe"
+signalCoupe.Parent = ServerStorage
+signalCoupe.Event:Connect(function(joueur)
+	local outil = joueur.Character and joueur.Character:FindFirstChildOfClass("Tool")
+	local jouer = outil and coupes[outil]
+	if jouer then task.spawn(jouer) end
+end)
+
+---------------------------------------------------------------- Donner les ciseaux dès le spawn
+
+modeleOutil.Parent = StarterPack -- copié dans le sac à chaque apparition
+
+local function aLesCiseaux(joueur)
+	for _, endroit in { joueur:FindFirstChildOfClass("Backpack"), joueur.Character } do
+		if endroit and endroit:FindFirstChild(modeleOutil.Name) then return true end
+	end
+	return false
+end
+
+local function equiperAuSpawn(joueur, perso)
+	if not CONFIG.EQUIPER_AU_SPAWN then return end
+	local humain = perso:WaitForChild("Humanoid", 10)
+	for _ = 1, 50 do
+		if not humain or joueur.Character ~= perso then return end
+		if perso:FindFirstChild(modeleOutil.Name) then return end
+		local sac = joueur:FindFirstChildOfClass("Backpack")
+		local outil = sac and sac:FindFirstChild(modeleOutil.Name)
+		if outil then
+			humain:EquipTool(outil)
+			return
+		end
+		task.wait(0.1)
+	end
+end
+
+local function preparerJoueur(joueur)
+	joueur.CharacterAdded:Connect(function(perso)
+		equiperAuSpawn(joueur, perso)
+	end)
+	-- joueur déjà apparu avant ce script (ex : test dans Studio)
+	if joueur.Character then
+		local sac = joueur:FindFirstChildOfClass("Backpack")
+		if sac and not aLesCiseaux(joueur) then
+			modeleOutil:Clone().Parent = sac
+		end
+		task.spawn(equiperAuSpawn, joueur, joueur.Character)
+	end
+end
+
+Players.PlayerAdded:Connect(preparerJoueur)
+for _, joueur in Players:GetPlayers() do
+	preparerJoueur(joueur)
+end
+
+print("[Ciseaux] Prêts : chaque joueur apparaît avec les ciseaux en main.")

@@ -312,6 +312,12 @@ local function idFromRay(ray)
 	local hit=workspace:Raycast(ray.Origin,ray.Direction*250,rp)
 	if hit and hit.Instance.Parent==hitF then return hit.Instance:GetAttribute("Id") end
 end
+-- on ne coupe l'herbe qu'avec les ciseaux en main
+local function holdingScissors()
+	local ch=lp.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+end
 local function setHover(id)
 	hovered=id
 	local v=id and visible[id]
@@ -323,19 +329,23 @@ end
 Run.RenderStepped:Connect(function()
 	if UIS.MouseEnabled then
 		local m=UIS:GetMouseLocation()
-		local id=idFromRay(cam:ViewportPointToRay(m.X,m.Y))
+		local id=holdingScissors() and idFromRay(cam:ViewportPointToRay(m.X,m.Y)) or nil
 		if id~=hovered then setHover(id) end
 	end
 end)
--- clic = arrache l'herbe visée ; amélioration "Maintenir" = rester appuyé ramasse en continu là où tu vises
+-- clic avec les ciseaux = coupe l'herbe visée ; amélioration "Maintenir" = rester appuyé coupe en continu là où tu vises
 local holding,holdInput=false,nil
+local lastHint=0
 UIS.InputBegan:Connect(function(input,gp)
 	if gp then return end
 	local t=input.UserInputType
 	if t==Enum.UserInputType.MouseButton1 or t==Enum.UserInputType.Touch then
 		holding=true holdInput=input
 		local id=idFromRay(cam:ScreenPointToRay(input.Position.X,input.Position.Y))
-		if id then remotes.PickRequest:FireServer(id) end
+		if id then
+			if holdingScissors() then remotes.PickRequest:FireServer(id)
+			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
+		end
 	end
 end)
 UIS.InputEnded:Connect(function(input)
@@ -346,7 +356,7 @@ task.spawn(function()
 		local dex=lp:GetAttribute("Upg_Dexterite") or 0
 		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-.15*dex))
 		task.wait(cd+.05)
-		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 then
+		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingScissors() then
 			local pos=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and holdInput.Position or UIS:GetMouseLocation()
 			local ray=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and cam:ScreenPointToRay(pos.X,pos.Y) or cam:ViewportPointToRay(pos.X,pos.Y)
 			local id=idFromRay(ray)

@@ -64,6 +64,15 @@ local lastPick,lastFull,lastDep={},{},{}
 Players.PlayerRemoving:Connect(function(p) lastPick[p]=nil lastFull[p]=nil lastDep[p]=nil end)
 local function hrpOf(plr) return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") end
 
+-- ===== ciseaux : on ne peut couper l'herbe qu'avec les ciseaux en main =====
+local SCISSORS_EXTRA=CFG.SCISSORS_EXTRA or 4   -- touffes voisines coupées en plus à chaque coup
+local SCISSORS_RADIUS=CFG.SCISSORS_RADIUS or 4 -- rayon autour de la touffe visée (studs)
+local function holdsScissors(plr)
+	local ch=plr.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+end
+
 -- ===== composteur =====
 local composts={}
 local function deposit(plr,c)
@@ -244,6 +253,7 @@ end
 PickRequest.OnServerEvent:Connect(function(plr,id)
 	if typeof(id)~="number" then return end
 	local t=tufts[id] if not t then return end
+	if not holdsScissors(plr) then return end -- plus d'arrachage à la main
 	local hrp=hrpOf(plr)
 	if not hrp or (hrp.Position-t.p).Magnitude>CFG.CLICK_DIST+8 then return end
 	local now=os.clock()
@@ -265,13 +275,22 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 		plr:SetAttribute("Bag",(plr:GetAttribute("Bag") or 0)+tt.size)
 	end
 	take(id,t)
-	-- Saisir : attrape aussi 1 herbe proche de plus par niveau
-	local extra=plr:GetAttribute("Upg_Saisir") or 0
+	-- animation de coupe des ciseaux (script CiseauxServer)
+	local anim=game:GetService("ServerStorage"):FindFirstChild("CiseauxCoupe")
+	if anim then anim:Fire(plr) end
+	-- Ciseaux + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
+	local extra=SCISSORS_EXTRA+(plr:GetAttribute("Upg_Saisir") or 0)
 	if extra>0 then
-		local got=0
+		local near={}
 		for id2,t2 in tufts do
+			local d=(t2.p-t.p).Magnitude
+			if d<=SCISSORS_RADIUS then table.insert(near,{id2,t2,d}) end
+		end
+		table.sort(near,function(a,b) return a[3]<b[3] end)
+		local got=0
+		for _,e in near do
 			if got>=extra then break end
-			if (t2.p-t.p).Magnitude<=8 and (plr:GetAttribute("Bag") or 0)+t2.size<=max then take(id2,t2) got+=1 end
+			if tufts[e[1]] and (plr:GetAttribute("Bag") or 0)+e[2].size<=max then take(e[1],e[2]) got+=1 end
 		end
 	end
 end)
