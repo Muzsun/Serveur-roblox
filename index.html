@@ -2,10 +2,110 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=https://www.roblox.com/share?code=9c4e5f3d4ac8484d9e35e56dd99c4749&type=Server">
-    <title>Redirection Roblox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="5; url=https://www.roblox.com/share?code=9c4e5f3d4ac8484d9e35e56dd99c4749&type=Server">
+    <title>Serveur Roblox</title>
+    <style>
+        :root {
+            --bg: #0f1115;
+            --card: #1a1d24;
+            --text: #f2f4f8;
+            --muted: #a3a9b6;
+            --accent: #00a2ff;
+            --accent-hover: #33b5ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background: radial-gradient(circle at top, #1c2533 0%, var(--bg) 60%);
+            color: var(--text);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .carte {
+            width: 100%;
+            max-width: 420px;
+            padding: 32px 24px;
+            border-radius: 16px;
+            background: var(--card);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            border-radius: 12px;
+            background: var(--accent);
+            transform: rotate(15deg);
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 1.75rem;
+        }
+
+        p {
+            margin: 0 0 24px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .bouton {
+            display: block;
+            padding: 14px 20px;
+            border-radius: 10px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .bouton:hover {
+            background: var(--accent-hover);
+        }
+
+        .bouton:active {
+            transform: scale(0.98);
+        }
+
+        .compteur {
+            margin: 16px 0 0;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-    <p>Redirection en cours... Si ça ne fonctionne pas, <a href="https://www.roblox.com/share?code=9c4e5f3d4ac8484d9e35e56dd99c4749&type=Server">clique ici</a>.</p>
+    <main class="carte">
+        <div class="logo" aria-hidden="true"></div>
+        <h1>Serveur Roblox</h1>
+        <p>Rejoins-nous sur le serveur ! Clique sur le bouton ci-dessous pour entrer directement dans la partie.</p>
+        <a class="bouton" href="https://www.roblox.com/share?code=9c4e5f3d4ac8484d9e35e56dd99c4749&type=Server">Rejoindre le serveur</a>
+        <p class="compteur">Redirection automatique dans <span id="secondes">5</span> s…</p>
+    </main>
+
+    <script>
+        var secondes = 5;
+        var affichage = document.getElementById("secondes");
+        var minuteur = setInterval(function () {
+            secondes--;
+            affichage.textContent = Math.max(secondes, 0);
+            if (secondes <= 0) {
+                clearInterval(minuteur);
+            }
+        }, 1000);
+    </script>
 </body>
 </html>
