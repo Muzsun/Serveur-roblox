@@ -181,17 +181,22 @@ shown=realBag() refresh()
 
 -- ===== argent (en bas à droite) =====
 local COIN="rbxassetid://103593634628600"
-local mRoot=Instance.new("Frame") mRoot.Name="Argent" mRoot.AnchorPoint=Vector2.new(1,1)
-mRoot.Position=UDim2.new(1,-18,1,-14) mRoot.Size=UDim2.fromOffset(230,70) mRoot.BackgroundTransparency=1 mRoot.Parent=gui
+-- (placé juste au-dessus du sac, en bas à gauche)
+local mRoot=Instance.new("Frame") mRoot.Name="Argent" mRoot.AnchorPoint=Vector2.new(0,1)
+mRoot.Size=UDim2.fromOffset(230,70) mRoot.BackgroundTransparency=1 mRoot.Parent=gui
 local mScale=Instance.new("UIScale") mScale.Parent=mRoot
-local function mFit() local s=math.clamp(cam.ViewportSize.Y/950,.45,1) if UIS.TouchEnabled then s=math.min(s,.6) end mScale.Scale=s end
-mFit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(mFit)
+local function mFit()
+	local s=math.clamp(cam.ViewportSize.Y/950,.45,1) if UIS.TouchEnabled then s=math.min(s,.6) end mScale.Scale=s
+	local left=UIS.TouchEnabled and 10 or 16
+	mRoot.Position=UDim2.new(0,left,1,-(left+172*uiScale.Scale+4))
+end
+mFit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(mFit) uiScale:GetPropertyChangedSignal("Scale"):Connect(mFit)
 local mIcon=Instance.new("ImageLabel") mIcon.BackgroundTransparency=1 mIcon.Image=COIN mIcon.ScaleType=Enum.ScaleType.Fit
-mIcon.AnchorPoint=Vector2.new(1,.5) mIcon.Position=UDim2.fromScale(1,.5) mIcon.Size=UDim2.fromOffset(70,70) mIcon.ZIndex=3 mIcon.Parent=mRoot
+mIcon.AnchorPoint=Vector2.new(0,.5) mIcon.Position=UDim2.fromScale(0,.5) mIcon.Size=UDim2.fromOffset(70,70) mIcon.ZIndex=3 mIcon.Parent=mRoot
 local mPop=Instance.new("UIScale") mPop.Parent=mIcon
-local mText=Instance.new("TextLabel") mText.BackgroundTransparency=1 mText.AnchorPoint=Vector2.new(1,.5)
-mText.Position=UDim2.new(1,-76,.5,0) mText.Size=UDim2.fromOffset(160,54) mText.Font=Enum.Font.LuckiestGuy
-mText.TextScaled=true mText.TextXAlignment=Enum.TextXAlignment.Right mText.Text="$0.00" mText.TextColor3=WHITE mText.ZIndex=3 mText.Parent=mRoot
+local mText=Instance.new("TextLabel") mText.BackgroundTransparency=1 mText.AnchorPoint=Vector2.new(0,.5)
+mText.Position=UDim2.new(0,76,.5,0) mText.Size=UDim2.fromOffset(160,54) mText.Font=Enum.Font.LuckiestGuy
+mText.TextScaled=true mText.TextXAlignment=Enum.TextXAlignment.Left mText.Text="$0.00" mText.TextColor3=WHITE mText.ZIndex=3 mText.Parent=mRoot
 local mst=stroke(mText,4,Color3.fromRGB(26,22,28)) mst.LineJoinMode=Enum.LineJoinMode.Round
 local mg=Instance.new("UIGradient") mg.Rotation=90 mg.Color=ColorSequence.new(WHITE,Color3.fromRGB(255,228,140)) mg.Parent=mText
 local mTextPop=Instance.new("UIScale") mTextPop.Parent=mText
