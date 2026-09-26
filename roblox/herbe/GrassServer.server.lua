@@ -305,8 +305,10 @@ end)
 local UPGRADES={
 	Maintenir={price=1.25,max=1},  -- rester appuyé = coupe en continu avec les ciseaux
 	Dexterite={price=0.75,max=5},  -- les ciseaux coupent plus vite (-15% de délai par niveau)
-	Saisir={price=1.00,max=5},     -- +1 touffe voisine coupée en même temps par niveau
+	Saisir={price=1.00,max=2},     -- +1 touffe voisine coupée en même temps par niveau
 }
+local GROWTH=1.5 -- le prix est multiplié par ça à chaque niveau acheté
+local function cost(u,lvl) return math.floor(u.price*GROWTH^lvl*100+.5)/100 end
 local function applyUpgrades(plr)
 	plr:SetAttribute("BagMax",CFG.BAG_CAPACITY)
 end
@@ -315,14 +317,16 @@ for _,p in Players:GetPlayers() do task.spawn(applyUpgrades,p) end
 local BuyUpgrade=RS:FindFirstChild("BuyUpgrade") or Instance.new("RemoteEvent")
 BuyUpgrade.Name="BuyUpgrade" BuyUpgrade.Parent=RS
 for uid,u in UPGRADES do BuyUpgrade:SetAttribute("Price_"..uid,u.price) BuyUpgrade:SetAttribute("Max_"..uid,u.max) end
+BuyUpgrade:SetAttribute("Growth",GROWTH)
 local lastBuy={}
 BuyUpgrade.OnServerEvent:Connect(function(plr,uid)
 	local u=typeof(uid)=="string" and UPGRADES[uid] if not u then return end
 	local now=os.clock() if lastBuy[plr] and now-lastBuy[plr]<.3 then return end lastBuy[plr]=now
 	local lvl=plr:GetAttribute("Upg_"..uid) or 0
 	if lvl>=u.max then return end
-	local m=moneyStat(plr) if not m or (tonumber(m.Value) or 0)<u.price then return end
-	m.Value=math.floor(((tonumber(m.Value) or 0)-u.price)*100+.5)/100
+	local c=cost(u,lvl)
+	local m=moneyStat(plr) if not m or (tonumber(m.Value) or 0)<c then return end
+	m.Value=math.floor(((tonumber(m.Value) or 0)-c)*100+.5)/100
 	plr:SetAttribute("Upg_"..uid,lvl+1)
 	applyUpgrades(plr)
 end)
