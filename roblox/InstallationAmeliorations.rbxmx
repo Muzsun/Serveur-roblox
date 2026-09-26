@@ -711,6 +711,34 @@ local function arrivee(joueur)
 		donner(joueur, false)
 	end
 end
+-- sécurité : personne n'a la faucille sans l'avoir achetée (même si une copie traîne dans StarterPack)
+local function estFaucille(o) return o:IsA("Tool") and (o.Name == "Faucille" or CollectionService:HasTag(o, TAG)) end
+for _, o in game:GetService("StarterPack"):GetChildren() do
+	if estFaucille(o) then
+		warn("[Faucille] Une faucille était dans StarterPack : retirée (il faut l'acheter)")
+		o:Destroy()
+	end
+end
+local function surveiller(joueur)
+	local function verifier(o)
+		if estFaucille(o) and not joueur:GetAttribute("Faucille") then task.defer(function() o:Destroy() end) end
+	end
+	local function suivre(conteneur)
+		if not conteneur then return end
+		for _, o in conteneur:GetChildren() do verifier(o) end
+		conteneur.ChildAdded:Connect(verifier)
+	end
+	suivre(joueur:FindFirstChild("StarterGear") or joueur:WaitForChild("StarterGear", 10))
+	local function surPerso(perso)
+		suivre(perso)
+		suivre(joueur:FindFirstChildOfClass("Backpack") or joueur:WaitForChild("Backpack", 10))
+	end
+	if joueur.Character then surPerso(joueur.Character) end
+	joueur.CharacterAdded:Connect(surPerso)
+end
+Players.PlayerAdded:Connect(function(j) task.spawn(surveiller, j) end)
+for _, j in Players:GetPlayers() do task.spawn(surveiller, j) end
+
 Players.PlayerAdded:Connect(arrivee)
 for _, j in Players:GetPlayers() do task.spawn(arrivee, j) end
 Players.PlayerRemoving:Connect(function(joueur) enCours[joueur] = nil end)
