@@ -576,6 +576,25 @@ end
 local Picked,BagFull,Deposited,PickRequest=remote("Picked"),remote("BagFull"),remote("Deposited"),remote("PickRequest")
 local GetGrass=remote("GetGrass","RemoteFunction")
 local NewGrass=remote("NewGrass") -- une nouvelle zone vient de pousser
+-- fin du jeu : CONTINUER relance une partie toute neuve (nouveau serveur réservé rien que pour le joueur)
+local Relancer=remote("RelancerPartie")
+local relanceEnCours={}
+Relancer.OnServerEvent:Connect(function(plr)
+	if relanceEnCours[plr] then return end
+	relanceEnCours[plr]=true
+	local TPS=game:GetService("TeleportService")
+	local ok,err=pcall(function()
+		local code=TPS:ReserveServer(game.PlaceId)
+		local opt=Instance.new("TeleportOptions")
+		opt.ReservedServerAccessCode=code
+		TPS:TeleportAsync(game.PlaceId,{plr},opt)
+	end)
+	if not ok then
+		warn("[Relancer] Téléportation impossible ("..tostring(err).."), on déconnecte le joueur pour qu'il relance.")
+		relanceEnCours[plr]=nil
+		Relancer:FireClient(plr,"echec")
+	end
+end)
 local MONEY_PER_PLACE=CFG.MONEY_PER_PLACE or CFG.MONEY_PER_TUFT or 0
 local SPACING=CFG.SPACING or 3
 
