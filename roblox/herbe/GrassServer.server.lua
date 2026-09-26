@@ -70,7 +70,7 @@ Players.PlayerRemoving:Connect(function(p) lastPick[p]=nil lastFull[p]=nil lastD
 local function hrpOf(plr) return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") end
 
 -- ===== ciseaux : on ne peut couper l'herbe qu'avec les ciseaux en main =====
-local SCISSORS_EXTRA=CFG.SCISSORS_EXTRA or 4   -- touffes voisines coupées en plus à chaque coup
+local SCISSORS_EXTRA=CFG.SCISSORS_EXTRA or 0   -- touffes voisines coupées en plus à chaque coup (0 = une par une)
 local SCISSORS_RADIUS=CFG.SCISSORS_RADIUS or 4 -- rayon autour de la touffe visée (studs)
 local function holdsScissors(plr)
 	local ch=plr.Character

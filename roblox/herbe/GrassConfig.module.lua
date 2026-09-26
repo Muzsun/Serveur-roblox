@@ -11,7 +11,7 @@ return {
 	MONEY_PER_PLACE = 0.01,       -- argent gagné par place de sac compostée
 	PICK_SOUND = "",              -- optionnel : "rbxassetid://..."
 	DEPOSIT_SOUND = "",
-	SCISSORS_EXTRA = 4,           -- ciseaux : touffes voisines coupées en plus à chaque coup
+	SCISSORS_EXTRA = 0,           -- ciseaux : touffes voisines coupées en plus à chaque coup (0 = une par une)
 	SCISSORS_RADIUS = 4,          -- ciseaux : rayon autour de la touffe visée (studs)
 	-- raretés : chance (%) et place prise dans le sac
 	RARITIES = {
