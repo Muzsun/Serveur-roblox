@@ -1,4 +1,4 @@
--- CiseauxServer (Script dans ServerScriptService)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="Script" referent="RBX0"><Properties><string name="Name">CiseauxServer</string><ProtectedString name="Source"><![CDATA[-- CiseauxServer (Script dans ServerScriptService)
 -- Donne les ciseaux à chaque joueur dès le spawn (déjà en main) + animations de tenue et de coupe.
 -- La coupe de l'herbe elle-même est faite par GrassServer, uniquement avec les ciseaux en main.
 
@@ -368,3 +368,4 @@ for _, joueur in Players:GetPlayers() do
 end
 
 print("[Ciseaux] Prêts : chaque joueur apparaît avec les ciseaux en main.")
+]]></ProtectedString></Properties></Item></roblox>
