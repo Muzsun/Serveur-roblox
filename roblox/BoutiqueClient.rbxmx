@@ -1,7 +1,11 @@
 <roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="LocalScript" referent="RBX0"><Properties><string name="Name">BoutiqueClient</string><ProtectedString name="Source"><![CDATA[-- BoutiqueClient (LocalScript dans StarterPlayer > StarterPlayerScripts)
--- Les outils en vente sur l'établi (faucille, débroussailleuse) : panneau de prix (pièce + prix),
--- petite fête quand on achète, et la tête de la débroussailleuse qui tourne.
--- (remplace l'ancien script FaucilleClient)
+-- La boutique de l'établi :
+--  * au-dessus de chaque outil en vente : la pièce + le prix
+--  * la souris passe sur l'outil : il s'entoure de blanc
+--  * clic (ou E / appui) sur l'outil : la caméra se rapproche et une fiche "Notes" s'ouvre
+--    (nom, description, puissance), avec le prix à cliquer pour acheter, des flèches pour
+--    passer à l'autre outil, ton argent et une croix pour fermer.
+-- Et la tête de la débroussailleuse qui tourne.
 if not game:GetService("RunService"):IsClient() then
 	warn("[Boutique] BoutiqueClient doit être un LocalScript dans StarterPlayer > StarterPlayerScripts !")
 	return
@@ -9,14 +13,29 @@ end
 
 -- outils en vente : remote du serveur, modèle sur l'établi, attribut du joueur quand c'est acheté
 local ARTICLES = {
-	{ remote = "FaucilleAchat", vitrine = "FaucilleVitrine", attribut = "Faucille", titre = "FAUCILLE", nom = "faucille" },
-	{ remote = "DebroussailleuseAchat", vitrine = "DebroussailleuseVitrine", attribut = "Debroussailleuse", titre = "DÉBROUSSAILLEUSE", nom = "débroussailleuse" },
+	{
+		remote = "FaucilleAchat", vitrine = "FaucilleVitrine", attribut = "Faucille", nom = "Faucille", titre = "FAUCILLE",
+		desc = "Une lame en croissant bien affûtée. Fauche plusieurs touffes d'un seul coup.",
+		hauteur = 0.95, -- caméra : 0 = de face, 1 = bien au-dessus (la faucille est posée à plat)
+	},
+	{
+		remote = "DebroussailleuseAchat", vitrine = "DebroussailleuseVitrine", attribut = "Debroussailleuse", nom = "Débroussailleuse", titre = "DÉBROUSSAILLEUSE",
+		desc = "Un moteur qui rugit et un fil qui tourne à toute vitesse. Rien ne lui résiste !",
+		hauteur = 0.12, -- accrochée au mur : presque de face
+	},
+}
+local REGLAGES = {
+	TAILLE_PRIX = 0.75, -- hauteur du prix flottant (studs)
+	DISTANCE = 22, -- on peut cliquer sur un outil jusqu'à cette distance
+	DUREE_CAMERA = 0.6, -- durée du rapprochement de la caméra (secondes)
 }
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
 
 local COIN = "rbxassetid://103593634628600" -- l'icône des pièces
 local lp = Players.LocalPlayer
@@ -24,34 +43,24 @@ local pgui = lp:WaitForChild("PlayerGui")
 local cam = workspace.CurrentCamera
 
 local BLANC, ENCRE = Color3.new(1, 1, 1), Color3.fromRGB(26, 22, 28)
-local OR, VERT, ROUGE = Color3.fromRGB(255, 215, 70), Color3.fromRGB(150, 245, 90), Color3.fromRGB(255, 96, 80)
-local BOIS_A, BOIS_B, BOIS_BORD = Color3.fromRGB(170, 114, 64), Color3.fromRGB(122, 78, 42), Color3.fromRGB(72, 44, 22)
+local OR, VERT, ROUGE = Color3.fromRGB(255, 215, 70), Color3.fromRGB(110, 224, 74), Color3.fromRGB(232, 50, 58)
 
 local function argentTexte(v) return string.format("$%.2f", v) end
-
-local function coin(o, r) local c = Instance.new("UICorner") c.CornerRadius = r or UDim.new(1, 0) c.Parent = o end
+local function coin(o, r) local c = Instance.new("UICorner") c.CornerRadius = r or UDim.new(1, 0) c.Parent = o return c end
 local function contour(o, e, c, bord)
 	local s = Instance.new("UIStroke")
 	s.Thickness = e
-	s.Color = c
+	s.Color = c or ENCRE
 	s.LineJoinMode = Enum.LineJoinMode.Round
 	if bord then s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end
 	s.Parent = o
 	return s
 end
-local function texte(parent, t, police, pos, taille, couleur)
-	local l = Instance.new("TextLabel")
-	l.BackgroundTransparency = 1
-	l.Text = t
-	l.Font = police
-	l.TextScaled = true
-	l.TextColor3 = couleur or BLANC
-	l.AnchorPoint = Vector2.new(0.5, 0)
-	l.Position = pos
-	l.Size = taille
-	l.Parent = parent
-	contour(l, 3, ENCRE)
-	return l
+local function nouveau(classe, props, parent)
+	local o = Instance.new(classe)
+	for k, v in props do o[k] = v end
+	o.Parent = parent
+	return o
 end
 
 -- argent du joueur (même recherche que le reste du jeu)
@@ -71,162 +80,507 @@ local function argent()
 	return v and tonumber(v.Value) or 0
 end
 
----------------------------------------------------------------- Panneau au-dessus de la faucille
-local TAILLE_PANNEAU = 0.95 -- hauteur des panneaux de prix en studs
-local panneaux = {}
-local function creerPanneau(article, achat, vitrine)
-	local base = vitrine.PrimaryPart or vitrine:WaitForChild("Base", 10)
-	if not base then return end
-	local function prix() return achat:GetAttribute("Prix") or 0 end
-	local g = Instance.new("BillboardGui")
-	g.Name = "Prix_" .. article.attribut
-	-- taille fixe dans le monde (en studs) : il ne grossit pas quand on s'éloigne
-	g.Size = UDim2.fromScale(TAILLE_PANNEAU * 2.1, TAILLE_PANNEAU) -- en studs
-	local ancre = vitrine:FindFirstChild("PanneauPrix")
-	if ancre then
-		g.Adornee = ancre -- le panneau est centré sur ce repère
-	else
-		g.Adornee = base -- au-dessus de l'outil
-		g.SizeOffset = Vector2.new(0, 0.5)
-		g.StudsOffsetWorldSpace = Vector3.new(0, 0.55, 0) -- juste au-dessus de la faucille
-	end
-	g.AlwaysOnTop = true
-	g.LightInfluence = 0
-	g.MaxDistance = 70
-	g.ResetOnSpawn = false
-	local root = Instance.new("Frame")
-	root.AnchorPoint = Vector2.new(0.5, 0.5)
-	root.Position = UDim2.fromScale(0.5, 0.5)
-	root.Size = UDim2.fromOffset(420, 200)
-	root.BackgroundColor3 = BLANC
-	root.Parent = g
-	coin(root, UDim.new(0, 26))
-	local grad = Instance.new("UIGradient")
-	grad.Rotation = 90
-	grad.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(206, 150, 94)),
-		ColorSequenceKeypoint.new(0.12, BOIS_A),
-		ColorSequenceKeypoint.new(1, BOIS_B),
-	})
-	grad.Parent = root
-	local bord = contour(root, 6, BOIS_BORD, true)
-	local echelle = Instance.new("UIScale")
-	echelle.Parent = root
-	local pop = Instance.new("UIScale")
-	-- clous aux 4 coins
-	for _, c in { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } } do
-		local n = Instance.new("Frame")
-		n.AnchorPoint = Vector2.new(0.5, 0.5)
-		n.Size = UDim2.fromOffset(12, 12)
-		n.Position = UDim2.new(c[1], c[1] == 0 and 18 or -18, c[2], c[2] == 0 and 18 or -18)
-		n.BackgroundColor3 = Color3.fromRGB(64, 62, 66)
-		n.Parent = root
-		coin(n)
-	end
-	texte(root, article.titre, Enum.Font.FredokaOne, UDim2.new(0.5, 0, 0, 12), UDim2.fromOffset(#article.titre > 10 and 380 or 300, 52))
-	-- ligne du prix : [pièce] $7.99
-	local ligne = Instance.new("Frame")
-	ligne.BackgroundTransparency = 1
-	ligne.AnchorPoint = Vector2.new(0.5, 0)
-	ligne.Position = UDim2.new(0.5, 0, 0, 66)
-	ligne.Size = UDim2.fromOffset(380, 76)
-	ligne.Parent = root
-	pop.Parent = ligne
-	local liste = Instance.new("UIListLayout")
-	liste.FillDirection = Enum.FillDirection.Horizontal
-	liste.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	liste.VerticalAlignment = Enum.VerticalAlignment.Center
-	liste.Padding = UDim.new(0, 8)
-	liste.Parent = ligne
-	local piece = Instance.new("ImageLabel")
-	piece.BackgroundTransparency = 1
-	piece.Image = COIN
-	piece.ScaleType = Enum.ScaleType.Fit
-	piece.Size = UDim2.fromOffset(68, 68)
-	piece.LayoutOrder = 1
-	piece.Parent = ligne
-	local valeur = Instance.new("TextLabel")
-	valeur.BackgroundTransparency = 1
-	valeur.Font = Enum.Font.LuckiestGuy
-	valeur.TextSize = 60
-	valeur.Size = UDim2.fromOffset(0, 70)
-	valeur.AutomaticSize = Enum.AutomaticSize.X
-	valeur.TextColor3 = BLANC
-	valeur.Text = argentTexte(prix())
-	valeur.LayoutOrder = 2
-	valeur.Parent = ligne
-	contour(valeur, 4, ENCRE)
-	local vg = Instance.new("UIGradient")
-	vg.Rotation = 90
-	vg.Color = ColorSequence.new(BLANC, Color3.fromRGB(255, 228, 140))
-	vg.Parent = valeur
-	local info = texte(root, "Coupe " .. (achat:GetAttribute("Touffes") or 4) .. " touffes d'un coup !", Enum.Font.FredokaOne,
-		UDim2.new(0.5, 0, 0, 148), UDim2.fromOffset(360, 36), Color3.fromRGB(255, 240, 205))
-	g.Parent = pgui
-	local p = { g = g, root = root, echelle = echelle, pop = pop, bord = bord, piece = piece, valeur = valeur, vg = vg, info = info, base = base, article = article, prix = prix }
-	panneaux[article.attribut] = p
-	return p
-end
+---------------------------------------------------------------- Les outils sur l'établi
+local vitrines = {} -- liste des outils trouvés : { article, achat, modele, base, centre, taille, repere, etiquette, contour }
+local ouvert = false
 
-local function majPanneau(p, t)
-	if not p.g.Parent then return end
-	local prix = p.prix
-	p.echelle.Scale = p.g.AbsoluteSize.X / 420
-	if lp:GetAttribute(p.article.attribut) then
-		p.piece.Visible = false
-		p.vg.Enabled = false
-		p.valeur.Text = "✓ ACHETÉE"
-		p.valeur.TextColor3 = VERT
-		p.info.Text = "Elle est dans ta barre d'outils"
-		p.bord.Color = BOIS_BORD
-		p.pop.Scale = 1
-	else
-		local assez = argent() + 1e-6 >= prix()
-		p.piece.Visible = true
-		p.vg.Enabled = true
-		p.valeur.Text = argentTexte(prix())
-		p.valeur.TextColor3 = BLANC
-		-- tu as assez d'argent : le panneau brille doucement
-		p.bord.Color = assez and OR or BOIS_BORD
-		p.pop.Scale = assez and 1 + 0.05 * math.abs(math.sin(t * 3)) or 1
-	end
-end
-
--- on cache le bouton "Acheter" si on l'a déjà
-local function majBouton(p)
-	local prompt = p.base:FindFirstChildOfClass("ProximityPrompt")
-	if prompt then prompt.Enabled = not lp:GetAttribute(p.article.attribut) end
-end
-
-local reponse -- (plus bas)
-for _, article in ARTICLES do
-	task.spawn(function()
-		local achat = ReplicatedStorage:WaitForChild(article.remote, 30)
-		if not achat then return end -- cet outil n'est pas installé
-		achat.OnClientEvent:Connect(function(quoi, manque) reponse(article, quoi, manque) end)
-		local vitrine = workspace:FindFirstChild(article.vitrine, true)
-		for _ = 1, 30 do
-			if vitrine then break end
-			task.wait(1)
-			vitrine = workspace:FindFirstChild(article.vitrine, true)
+-- boîte autour des pièces visibles de l'outil (dans le repère de l'établi)
+local function mesurer(modele, base)
+	local rep = base.CFrame.Rotation
+	local mini, maxi = Vector3.new(math.huge, math.huge, math.huge), -Vector3.new(math.huge, math.huge, math.huge)
+	for _, p in modele:GetDescendants() do
+		if p:IsA("BasePart") and p.Transparency < 1 then
+			local l = rep:PointToObjectSpace(p.Position)
+			local r = p.Size.Magnitude / 2 * 0.6
+			mini = Vector3.new(math.min(mini.X, l.X - r), math.min(mini.Y, l.Y - r), math.min(mini.Z, l.Z - r))
+			maxi = Vector3.new(math.max(maxi.X, l.X + r), math.max(maxi.Y, l.Y + r), math.max(maxi.Z, l.Z + r))
 		end
-		if not vitrine then return end
-		local p = creerPanneau(article, achat, vitrine)
-		if not p then return end
-		majBouton(p)
-		p.base.ChildAdded:Connect(function() majBouton(p) end)
-		lp:GetAttributeChangedSignal(article.attribut):Connect(function() majBouton(p) end)
+	end
+	if mini.X == math.huge then return base.CFrame, base.Size end
+	return rep * CFrame.new((mini + maxi) / 2), maxi - mini
+end
+
+-- un rayon touche-t-il la boîte ? (renvoie la distance)
+local function rayonBoite(origine, direction, cf, taille)
+	local o = cf:PointToObjectSpace(origine)
+	local d = cf:VectorToObjectSpace(direction)
+	local tmin, tmax = 0, math.huge
+	for _, ax in { "X", "Y", "Z" } do
+		local h = taille[ax] / 2
+		if math.abs(d[ax]) < 1e-6 then
+			if o[ax] < -h or o[ax] > h then return nil end
+		else
+			local t1, t2 = (-h - o[ax]) / d[ax], (h - o[ax]) / d[ax]
+			if t1 > t2 then t1, t2 = t2, t1 end
+			tmin, tmax = math.max(tmin, t1), math.min(tmax, t2)
+			if tmin > tmax then return nil end
+		end
+	end
+	return tmin
+end
+
+-- le prix flottant au-dessus de l'outil : [pièce] $7.99
+local function creerEtiquette(v)
+	local at = Instance.new("Attachment")
+	at.Name = "Prix_" .. v.article.attribut
+	at.Parent = workspace.Terrain
+	local devant = v.base.CFrame.LookVector
+	at.WorldPosition = v.centre.Position + Vector3.new(0, v.taille.Y / 2 + 0.55, 0) + devant * 0.35
+	local g = nouveau("BillboardGui", {
+		Name = "Prix_" .. v.article.attribut, Adornee = at, AlwaysOnTop = true, LightInfluence = 0, MaxDistance = 45,
+		ResetOnSpawn = false, Size = UDim2.fromScale(REGLAGES.TAILLE_PRIX * 3.6, REGLAGES.TAILLE_PRIX),
+	}, pgui)
+	local root = nouveau("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(360, 100) }, g)
+	local echelle = nouveau("UIScale", {}, root)
+	nouveau("UIListLayout", {
+		FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder,
+	}, root)
+	local piece = nouveau("ImageLabel", { BackgroundTransparency = 1, Image = COIN, ScaleType = Enum.ScaleType.Fit, Size = UDim2.fromOffset(84, 84), LayoutOrder = 1 }, root)
+	local texte = nouveau("TextLabel", {
+		BackgroundTransparency = 1, Font = Enum.Font.LuckiestGuy, TextSize = 76, TextColor3 = BLANC, Text = argentTexte(v.prix()),
+		Size = UDim2.fromOffset(0, 90), AutomaticSize = Enum.AutomaticSize.X, LayoutOrder = 2,
+	}, root)
+	contour(texte, 6)
+	v.etiquette = { g = g, echelle = echelle, piece = piece, texte = texte, at = at }
+end
+
+local function majEtiquette(v)
+	local e = v.etiquette
+	e.g.Enabled = not ouvert and not lp:GetAttribute("IntroEnCours")
+	if not e.g.Enabled then return end
+	e.echelle.Scale = e.g.AbsoluteSize.Y / 100
+	if lp:GetAttribute(v.article.attribut) then
+		e.piece.Visible = false
+		e.texte.Text = "✓"
+		e.texte.TextColor3 = VERT
+	else
+		e.piece.Visible = true
+		e.texte.Text = argentTexte(v.prix())
+		e.texte.TextColor3 = BLANC
+	end
+end
+
+---------------------------------------------------------------- La fiche de l'outil (vue rapprochée)
+local ecran = nouveau("ScreenGui", { Name = "Boutique", ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = 30, Enabled = false }, pgui)
+local echelles = {} -- tout est dessiné pour un écran de 1080 px de haut, puis mis à l'échelle
+local function echelle(o) table.insert(echelles, nouveau("UIScale", {}, o)) return o end
+local function adapter()
+	local s = math.clamp(cam.ViewportSize.Y / 1080, 0.45, 1.25)
+	for _, u in echelles do u.Scale = s end
+end
+-- libère la souris (même en vue 1re personne) tant que la fiche est ouverte
+nouveau("TextButton", { Text = "", BackgroundTransparency = 1, Size = UDim2.fromOffset(0, 0), Modal = true }, ecran)
+
+-- la feuille "Notes"
+local notes = echelle(nouveau("Frame", {
+	Name = "Notes", AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 56, 0.48, 0), Size = UDim2.fromOffset(440, 640),
+	BackgroundColor3 = Color3.fromRGB(250, 246, 234),
+}, ecran))
+coin(notes, UDim.new(0, 14))
+contour(notes, 5, ENCRE, true)
+for i = 0, 8 do -- lignes du cahier
+	nouveau("Frame", { Position = UDim2.fromOffset(0, 150 + i * 56), Size = UDim2.new(1, 0, 0, 3), BackgroundColor3 = Color3.fromRGB(106, 166, 232), BorderSizePixel = 0, ZIndex = 2 }, notes)
+end
+nouveau("Frame", { Position = UDim2.fromOffset(64, 0), Size = UDim2.new(0, 4, 1, 0), BackgroundColor3 = Color3.fromRGB(224, 80, 106), BorderSizePixel = 0, ZIndex = 2 }, notes)
+for i = 0, 4 do -- les anneaux du carnet
+	local a = nouveau("Frame", { Position = UDim2.fromOffset(62 + i * 72, -30), Size = UDim2.fromOffset(38, 54), BackgroundTransparency = 1, ZIndex = 4 }, notes)
+	coin(a)
+	contour(a, 7, ENCRE, true)
+end
+local titreNotes = nouveau("TextLabel", {
+	BackgroundTransparency = 1, Position = UDim2.fromOffset(0, 44), Size = UDim2.new(1, 0, 0, 80), Font = Enum.Font.Cartoon, TextSize = 70,
+	TextColor3 = Color3.fromRGB(32, 36, 42), Text = "Notes", ZIndex = 3,
+}, notes)
+contour(titreNotes, 1.6, Color3.fromRGB(32, 36, 42))
+local nomOutil = nouveau("TextLabel", {
+	BackgroundTransparency = 1, Position = UDim2.fromOffset(20, 134), Size = UDim2.new(1, -40, 0, 64), Font = Enum.Font.FredokaOne, TextSize = 50,
+	TextScaled = false, TextColor3 = VERT, Text = "", ZIndex = 3,
+}, notes)
+contour(nomOutil, 5)
+nouveau("UITextSizeConstraint", { MaxTextSize = 50 }, nomOutil)
+local descOutil = nouveau("TextLabel", {
+	BackgroundTransparency = 1, Position = UDim2.fromOffset(82, 214), Size = UDim2.new(1, -100, 0, 250), Font = Enum.Font.PatrickHand, TextSize = 38,
+	LineHeight = 1.47, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top,
+	TextColor3 = Color3.fromRGB(42, 42, 48), Text = "", ZIndex = 3,
+}, notes)
+local puissance = nouveau("TextLabel", {
+	BackgroundTransparency = 1, Position = UDim2.fromOffset(0, 520), Size = UDim2.new(1, 0, 0, 70), Font = Enum.Font.LuckiestGuy, TextSize = 58,
+	TextColor3 = ROUGE, Text = "", ZIndex = 3,
+}, notes)
+contour(puissance, 6)
+
+-- bouton du prix (cliquer = acheter)
+local boutonPrix = echelle(nouveau("TextButton", {
+	Name = "Prix", Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -40),
+	Size = UDim2.fromOffset(300, 104), BackgroundColor3 = BLANC,
+}, ecran))
+coin(boutonPrix, UDim.new(0, 28))
+contour(boutonPrix, 7, ENCRE, true)
+local fondPrix = nouveau("UIGradient", { Rotation = 90 }, boutonPrix)
+local textePrix = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 5), Font = Enum.Font.LuckiestGuy, TextSize = 70, TextColor3 = BLANC, Text = "" }, boutonPrix)
+contour(textePrix, 6)
+local popPrix = nouveau("UIScale", {}, textePrix)
+
+-- flèches (outil précédent / suivant)
+local function fleche(txt, x)
+	local b = echelle(nouveau("TextButton", {
+		Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, x, 1, -48), Size = UDim2.fromOffset(130, 86),
+		BackgroundColor3 = BLANC, Rotation = x < 0 and -3 or 2,
+	}, ecran))
+	coin(b, UDim.new(0, 20))
+	contour(b, 3, Color3.fromRGB(210, 206, 196), true)
+	nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 4), Font = Enum.Font.LuckiestGuy, TextSize = 50, TextColor3 = ENCRE, Text = txt }, b)
+	return b
+end
+local gauche, droite = fleche("<", -300), fleche(">", 300)
+
+-- ton argent (en haut à droite, sur un coup de pinceau jaune)
+local cadreArgent = echelle(nouveau("Frame", {
+	AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -150, 0, 40), Size = UDim2.fromOffset(350, 78),
+	BackgroundColor3 = Color3.fromRGB(247, 215, 32), Rotation = -1.5,
+}, ecran))
+coin(cadreArgent, UDim.new(0, 30))
+nouveau("ImageLabel", { BackgroundTransparency = 1, Image = COIN, ScaleType = Enum.ScaleType.Fit, Position = UDim2.fromOffset(12, 5), Size = UDim2.fromOffset(68, 68) }, cadreArgent)
+local texteArgent = nouveau("TextLabel", {
+	BackgroundTransparency = 1, Position = UDim2.fromOffset(90, 8), Size = UDim2.new(1, -100, 1, -8), Font = Enum.Font.LuckiestGuy, TextSize = 52,
+	TextXAlignment = Enum.TextXAlignment.Left, TextColor3 = BLANC, Text = "$0.00",
+}, cadreArgent)
+contour(texteArgent, 5)
+
+-- fermer
+local boutonX = echelle(nouveau("TextButton", {
+	Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -36, 0, 34), Size = UDim2.fromOffset(88, 78),
+	BackgroundColor3 = ROUGE, Rotation = 4,
+}, ecran))
+coin(boutonX, UDim.new(0, 12))
+contour(boutonX, 4, Color3.fromRGB(150, 24, 30), true)
+local xt = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 4), Font = Enum.Font.LuckiestGuy, TextSize = 58, TextColor3 = BLANC, Text = "X" }, boutonX)
+contour(xt, 5)
+adapter()
+cam:GetPropertyChangedSignal("ViewportSize"):Connect(adapter)
+
+-- messages au centre de l'écran (achat réussi, argent qui manque)
+local messages = nouveau("ScreenGui", { Name = "BoutiqueMessages", ResetOnSpawn = false, DisplayOrder = 40 }, pgui)
+local function son(id, vol)
+	local s = nouveau("Sound", { SoundId = id, Volume = vol or 0.6 }, messages)
+	s:Play()
+	game:GetService("Debris"):AddItem(s, 4)
+end
+local function message(t, couleur, duree)
+	local l = nouveau("TextLabel", {
+		BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.3), Size = UDim2.fromScale(0.7, 0.1),
+		Font = Enum.Font.LuckiestGuy, TextScaled = true, Text = t, TextColor3 = couleur,
+	}, messages)
+	local st = contour(l, 5)
+	local sc = nouveau("UIScale", { Scale = 0 }, l)
+	TweenService:Create(sc, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+	task.delay(duree, function()
+		TweenService:Create(l, TweenInfo.new(0.3), { TextTransparency = 1, Position = UDim2.fromScale(0.5, 0.25) }):Play()
+		TweenService:Create(st, TweenInfo.new(0.3), { Transparency = 1 }):Play()
+		task.wait(0.35)
+		l:Destroy()
+	end)
+end
+local function trembler(o)
+	task.spawn(function()
+		local p0 = o.Position
+		for i = 1, 6 do
+			o.Position = p0 + UDim2.fromOffset(i % 2 == 0 and -8 or 8, 0)
+			task.wait(0.04)
+		end
+		o.Position = p0
 	end)
 end
 
-RunService.RenderStepped:Connect(function()
-	local t = os.clock()
-	for _, p in panneaux do
-		local proche = (cam.CFrame.Position - p.g.Adornee.Position).Magnitude < 80
-		p.g.Enabled = proche and not lp:GetAttribute("IntroEnCours")
-		if p.g.Enabled then majPanneau(p, t) end
+---------------------------------------------------------------- Caméra
+local tourCamera = 0
+local function bougerCamera(vers, duree, fin)
+	tourCamera += 1
+	local id = tourCamera
+	local depart = cam.CFrame
+	task.spawn(function()
+		local t0 = os.clock()
+		while tourCamera == id do
+			local a = math.min((os.clock() - t0) / duree, 1)
+			local e = if a < 0.5 then 4 * a * a * a else 1 - (-2 * a + 2) ^ 3 / 2 -- doux au début et à la fin
+			cam.CFrame = depart:Lerp(vers, e)
+			if a >= 1 then break end
+			RunService.RenderStepped:Wait()
+		end
+		if tourCamera == id and fin then fin() end
+	end)
+end
+-- où placer la caméra pour bien voir l'outil (un peu décalé : la fiche prend la gauche de l'écran)
+local function cadrage(v)
+	local centre = v.centre.Position
+	local devant = v.base.CFrame.LookVector
+	local ch = lp.Character
+	local hrp = ch and ch:FindFirstChild("HumanoidRootPart")
+	if hrp and (hrp.Position - centre):Dot(devant) < 0 then devant = -devant end -- du côté où se trouve le joueur
+	devant = Vector3.new(devant.X, 0, devant.Z).Unit
+	local largeur = math.max(v.taille.X, v.taille.Z, 1.5)
+	local distance = math.max(largeur * 0.95, 3)
+	local droite = (-devant):Cross(Vector3.yAxis).Unit -- la droite de l'écran
+	local cible = centre - droite * largeur * 0.3
+	local dir = (devant + Vector3.yAxis * v.article.hauteur).Unit
+	return CFrame.lookAt(cible + dir * distance, cible)
+end
+
+---------------------------------------------------------------- Ouvrir / fermer la fiche
+local courant = 1 -- outil affiché
+local etat = {}
+local fermeture = false
+
+local function styleBouton(v)
+	local possede = lp:GetAttribute(v.article.attribut)
+	local assez = argent() + 1e-6 >= v.prix()
+	if possede then
+		fondPrix.Color = ColorSequence.new(Color3.fromRGB(255, 232, 120), Color3.fromRGB(240, 160, 30))
+		textePrix.Text = "✓ ACHETÉE"
+		textePrix.TextSize = 48
+	else
+		fondPrix.Color = assez and ColorSequence.new(Color3.fromRGB(150, 236, 110), Color3.fromRGB(56, 170, 62))
+			or ColorSequence.new(Color3.fromRGB(150, 154, 160), Color3.fromRGB(98, 102, 108))
+		textePrix.Text = argentTexte(v.prix())
+		textePrix.TextSize = 70
+	end
+end
+
+local function remplir(v)
+	nomOutil.Text = v.article.nom
+	descOutil.Text = v.article.desc
+	puissance.Text = "PUISSANCE " .. tostring(v.achat:GetAttribute("Touffes") or "?")
+	styleBouton(v)
+	local multiple = #vitrines > 1
+	gauche.Visible, droite.Visible = multiple, multiple
+end
+
+local controles
+local function bloquerControles(bloquer)
+	if not controles then
+		pcall(function()
+			controles = require(lp:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls()
+		end)
+	end
+	if controles then pcall(function() if bloquer then controles:Disable() else controles:Enable() end end) end
+end
+
+local function ouvrir(v)
+	if ouvert or fermeture or not v then return end
+	ouvert = true
+	for i, x in vitrines do if x == v then courant = i end end
+	etat.cf, etat.type, etat.fov = cam.CFrame, cam.CameraType, cam.FieldOfView
+	-- on cache le reste de l'interface et on bloque le personnage
+	etat.guis = {}
+	for _, g in pgui:GetChildren() do
+		if g:IsA("ScreenGui") and g ~= ecran and g ~= messages and g.Enabled then
+			g.Enabled = false
+			table.insert(etat.guis, g)
+		end
+	end
+	pcall(function() game:GetService("ProximityPromptService").Enabled = false end)
+	lp:SetAttribute("MenuOuvert", true) -- pas de coupe pendant ce temps
+	bloquerControles(true)
+	for _, x in vitrines do x.contour.Enabled = false end
+	-- la caméra se rapproche de l'outil
+	cam.CameraType = Enum.CameraType.Scriptable
+	cam.FieldOfView = 70
+	bougerCamera(cadrage(v), REGLAGES.DUREE_CAMERA)
+	-- la fiche arrive
+	remplir(v)
+	ecran.Enabled = true
+	notes.Position = UDim2.new(0, -520, 0.48, 0)
+	boutonPrix.Position = UDim2.new(0.5, 0, 1, 180)
+	cadreArgent.Position = UDim2.new(1, -150, 0, -140)
+	boutonX.Position = UDim2.new(1, -36, 0, -140)
+	local info = TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+	task.delay(0.15, function()
+		TweenService:Create(notes, info, { Position = UDim2.new(0, 56, 0.48, 0) }):Play()
+		TweenService:Create(boutonPrix, info, { Position = UDim2.new(0.5, 0, 1, -40) }):Play()
+		TweenService:Create(cadreArgent, info, { Position = UDim2.new(1, -150, 0, 40) }):Play()
+		TweenService:Create(boutonX, info, { Position = UDim2.new(1, -36, 0, 34) }):Play()
+	end)
+	if UIS.GamepadEnabled then GuiService.SelectedObject = boutonPrix end
+end
+
+local function fermer()
+	if not ouvert or fermeture then return end
+	fermeture = true
+	GuiService.SelectedObject = nil
+	local info = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+	TweenService:Create(notes, info, { Position = UDim2.new(0, -520, 0.48, 0) }):Play()
+	TweenService:Create(boutonPrix, info, { Position = UDim2.new(0.5, 0, 1, 180) }):Play()
+	TweenService:Create(cadreArgent, info, { Position = UDim2.new(1, -150, 0, -140) }):Play()
+	TweenService:Create(boutonX, info, { Position = UDim2.new(1, -36, 0, -140) }):Play()
+	-- la caméra revient au joueur
+	bougerCamera(etat.cf, 0.45, function()
+		ecran.Enabled = false
+		cam.CameraType = etat.type or Enum.CameraType.Custom
+		cam.FieldOfView = etat.fov or 70
+		for _, g in etat.guis or {} do if g.Parent then g.Enabled = true end end
+		pcall(function() game:GetService("ProximityPromptService").Enabled = true end)
+		lp:SetAttribute("MenuOuvert", false)
+		bloquerControles(false)
+		ouvert, fermeture = false, false
+	end)
+end
+
+local function changer(delta)
+	if not ouvert or fermeture or #vitrines < 2 then return end
+	courant = (courant - 1 + delta) % #vitrines + 1
+	local v = vitrines[courant]
+	bougerCamera(cadrage(v), 0.5)
+	-- la fiche "se tourne" vers le nouvel outil
+	TweenService:Create(notes, TweenInfo.new(0.12), { Rotation = delta * 3 }):Play()
+	task.delay(0.12, function()
+		remplir(v)
+		TweenService:Create(notes, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Rotation = 0 }):Play()
+	end)
+end
+
+local function acheter()
+	local v = vitrines[courant]
+	if not v or lp:GetAttribute(v.article.attribut) then return end
+	if argent() + 1e-6 < v.prix() then
+		trembler(boutonPrix)
+		message("Il te manque " .. argentTexte(v.prix() - argent()), ROUGE, 1.6)
+		return
+	end
+	v.achat:FireServer("acheter")
+end
+
+boutonPrix.Activated:Connect(acheter)
+boutonX.Activated:Connect(fermer)
+gauche.Activated:Connect(function() changer(-1) end)
+droite.Activated:Connect(function() changer(1) end)
+for _, b in { boutonPrix, gauche, droite, boutonX } do
+	local s0 = b.Size
+	b.MouseEnter:Connect(function() b.Size = s0 + UDim2.fromOffset(8, 6) end)
+	b.MouseLeave:Connect(function() b.Size = s0 end)
+end
+
+UIS.InputBegan:Connect(function(input, gp)
+	if ouvert then
+		local k = input.KeyCode
+		if k == Enum.KeyCode.Left or k == Enum.KeyCode.A or k == Enum.KeyCode.DPadLeft then changer(-1)
+		elseif k == Enum.KeyCode.Right or k == Enum.KeyCode.D or k == Enum.KeyCode.DPadRight then changer(1)
+		elseif k == Enum.KeyCode.Backspace or k == Enum.KeyCode.ButtonB then fermer() end
+		return
+	end
+	if gp then return end
+	-- clic / appui sur un outil de l'établi
+	local t = input.UserInputType
+	if t == Enum.UserInputType.MouseButton1 or t == Enum.UserInputType.Touch then
+		local pos = if t == Enum.UserInputType.Touch then input.Position else nil
+		local cible
+		if pos then
+			local r = cam:ScreenPointToRay(pos.X, pos.Y)
+			cible = (function()
+				local ch = lp.Character
+				local hrp = ch and ch:FindFirstChild("HumanoidRootPart")
+				local meilleur, dmin = nil, math.huge
+				for _, v in vitrines do
+					if hrp and (hrp.Position - v.centre.Position).Magnitude < REGLAGES.DISTANCE then
+						local d = rayonBoite(r.Origin, r.Direction * 200, v.centre, v.taille + Vector3.new(0.5, 0.5, 0.5))
+						if d and d < dmin then meilleur, dmin = v, d end
+					end
+				end
+				return meilleur
+			end)()
+		end
+		cible = cible or etat.survol
+		if cible then ouvrir(cible) end
 	end
 end)
+
+-- si on meurt pendant que la fiche est ouverte
+lp.CharacterAdded:Connect(function() if ouvert then fermer() end end)
+
+---------------------------------------------------------------- Chaque image : survol (contour blanc), prix, fiche
+local function viser()
+	if not UIS.MouseEnabled then return nil end
+	local pos = if UIS.MouseBehavior == Enum.MouseBehavior.LockCenter then cam.ViewportSize / 2 else UIS:GetMouseLocation()
+	local r = cam:ViewportPointToRay(pos.X, pos.Y)
+	local ch = lp.Character
+	local hrp = ch and ch:FindFirstChild("HumanoidRootPart")
+	if not hrp then return nil end
+	local meilleur, dmin = nil, math.huge
+	for _, v in vitrines do
+		if (hrp.Position - v.centre.Position).Magnitude < REGLAGES.DISTANCE then
+			local d = rayonBoite(r.Origin, r.Direction * 200, v.centre, v.taille + Vector3.new(0.4, 0.4, 0.4))
+			if d and d < dmin then meilleur, dmin = v, d end
+		end
+	end
+	return meilleur
+end
+
+RunService.RenderStepped:Connect(function()
+	for _, v in vitrines do majEtiquette(v) end
+	if ouvert then
+		UIS.MouseBehavior = Enum.MouseBehavior.Default
+		UIS.MouseIconEnabled = true
+		texteArgent.Text = argentTexte(argent())
+		local v = vitrines[courant]
+		if v then styleBouton(v) end
+		return
+	end
+	local s = if lp:GetAttribute("IntroEnCours") then nil else viser()
+	if s ~= etat.survol then
+		if etat.survol then etat.survol.contour.Enabled = false end
+		etat.survol = s
+		if s then s.contour.Enabled = true end
+	end
+end)
+
+---------------------------------------------------------------- Chargement des outils de l'établi
+local function reponse(v, quoi, manque)
+	if quoi == "ok" then
+		son("rbxassetid://129348077985519", 0.7)
+		message("✨ " .. v.article.titre .. " ACHETÉE ! ✨", OR, 2.2)
+		if ouvert and vitrines[courant] == v then
+			popPrix.Scale = 1.4
+			TweenService:Create(popPrix, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+		end
+	elseif quoi == "manque" then
+		message("Il te manque " .. argentTexte(math.max(0, tonumber(manque) or 0)), ROUGE, 1.6)
+		if ouvert then trembler(boutonPrix) end
+	end
+end
+
+for ordre, article in ARTICLES do
+	task.spawn(function()
+		local achat = ReplicatedStorage:WaitForChild(article.remote, 30)
+		if not achat then return end -- cet outil n'est pas installé
+		local modele = workspace:FindFirstChild(article.vitrine, true)
+		for _ = 1, 30 do
+			if modele then break end
+			task.wait(1)
+			modele = workspace:FindFirstChild(article.vitrine, true)
+		end
+		if not modele then return end
+		local base = modele.PrimaryPart or modele:WaitForChild("Base", 10)
+		if not base then return end
+		task.wait(0.5) -- laisse toutes les pièces arriver
+		local centre, taille = mesurer(modele, base)
+		local v = { article = article, achat = achat, modele = modele, base = base, centre = centre, taille = taille, ordre = ordre }
+		v.prix = function() return achat:GetAttribute("Prix") or 0 end
+		v.contour = nouveau("Highlight", {
+			Name = "Survol", Adornee = modele, FillColor = BLANC, FillTransparency = 0.88, OutlineColor = BLANC,
+			OutlineTransparency = 0, DepthMode = Enum.HighlightDepthMode.Occluded, Enabled = false,
+		}, modele)
+		creerEtiquette(v)
+		achat.OnClientEvent:Connect(function(quoi, manque) reponse(v, quoi, manque) end)
+		-- E (clavier), bouton (manette / téléphone) : ouvre aussi la fiche
+		local function brancher(p)
+			if p:IsA("ProximityPrompt") then p.Triggered:Connect(function() ouvrir(v) end) end
+		end
+		for _, p in base:GetChildren() do brancher(p) end
+		base.ChildAdded:Connect(brancher)
+		table.insert(vitrines, v)
+		table.sort(vitrines, function(a, b) return a.ordre < b.ordre end)
+	end)
+end
 
 ---------------------------------------------------------------- La débroussailleuse : tête qui tourne, moteur qui accélère
 -- Au ralenti la tête tourne doucement. Quand on fauche ("EnCoupe" du serveur, ou tout de suite chez nous),
@@ -335,66 +689,4 @@ RunService.RenderStepped:Connect(function(dt)
 	end
 end)
 
----------------------------------------------------------------- Réponse du serveur
-local ecran = Instance.new("ScreenGui")
-ecran.Name = "BoutiqueMessages"
-ecran.ResetOnSpawn = false
-ecran.DisplayOrder = 20
-ecran.Parent = pgui
-
-local function son(id, vol)
-	local s = Instance.new("Sound")
-	s.SoundId = id
-	s.Volume = vol or 0.6
-	s.Parent = ecran
-	s:Play()
-	game:GetService("Debris"):AddItem(s, 4)
-end
-
-local function message(t, couleur, duree)
-	local l = Instance.new("TextLabel")
-	l.BackgroundTransparency = 1
-	l.AnchorPoint = Vector2.new(0.5, 0.5)
-	l.Position = UDim2.fromScale(0.5, 0.3)
-	l.Size = UDim2.fromScale(0.7, 0.1)
-	l.Font = Enum.Font.LuckiestGuy
-	l.TextScaled = true
-	l.Text = t
-	l.TextColor3 = couleur
-	l.Parent = ecran
-	local st = contour(l, 5, ENCRE)
-	local sc = Instance.new("UIScale")
-	sc.Scale = 0
-	sc.Parent = l
-	TweenService:Create(sc, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
-	task.delay(duree, function()
-		TweenService:Create(l, TweenInfo.new(0.3), { TextTransparency = 1, Position = UDim2.fromScale(0.5, 0.25) }):Play()
-		TweenService:Create(st, TweenInfo.new(0.3), { Transparency = 1 }):Play()
-		task.wait(0.35)
-		l:Destroy()
-	end)
-end
-
-reponse = function(article, quoi, manque)
-	local panneau = panneaux[article.attribut]
-	if quoi == "ok" then
-		son("rbxassetid://129348077985519", 0.7)
-		message("✨ " .. article.titre .. " ACHETÉE ! ✨", OR, 2.2)
-	elseif quoi == "manque" then
-		message("Il te manque " .. argentTexte(math.max(0, tonumber(manque) or 0)), ROUGE, 1.6)
-		-- le prix tremble en rouge
-		if panneau then
-			local p = panneau
-			task.spawn(function()
-				for i = 1, 8 do
-					p.valeur.TextColor3 = ROUGE
-					p.root.Rotation = (i % 2 == 0 and 3 or -3)
-					task.wait(0.04)
-				end
-				p.root.Rotation = 0
-				p.valeur.TextColor3 = BLANC
-			end)
-		end
-	end
-end
 ]]></ProtectedString></Properties></Item></roblox>

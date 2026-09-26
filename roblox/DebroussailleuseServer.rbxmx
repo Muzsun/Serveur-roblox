@@ -474,14 +474,21 @@ if v then
 	local base = v.PrimaryPart or v:FindFirstChild("Base")
 	local prompt = base:FindFirstChildOfClass("ProximityPrompt") or Instance.new("ProximityPrompt")
 	prompt.Name = "Acheter"
-	prompt.ActionText = string.format("Acheter  $%.2f", REGLAGES.PRIX)
+	prompt.ActionText = "Voir" -- ouvre la fiche de l'outil (BoutiqueClient) ; on achète en cliquant sur le prix
 	prompt.ObjectText = "Débroussailleuse"
-	prompt.HoldDuration = 0.35
+	prompt.HoldDuration = 0
 	prompt.MaxActivationDistance = 11
 	prompt.RequiresLineOfSight = false
 	prompt.KeyboardKeyCode = Enum.KeyCode.E
 	prompt.Parent = base
-	prompt.Triggered:Connect(acheter)
+	-- achat demandé depuis la fiche (bouton du prix) : il faut être près de l'établi
+	achat.OnServerEvent:Connect(function(joueur, action)
+		if action ~= "acheter" then return end
+		local perso = joueur.Character
+		local hrp = perso and perso:FindFirstChild("HumanoidRootPart")
+		if not hrp or (hrp.Position - base.Position).Magnitude > 35 then return end
+		acheter(joueur)
+	end)
 	print("[Débroussailleuse] En vente sur l'établi : $" .. REGLAGES.PRIX)
 end
 ]]></ProtectedString></Properties></Item></roblox>
