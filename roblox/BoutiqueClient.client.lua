@@ -475,13 +475,26 @@ local function remplir(v)
 end
 
 local controles
+local vitesseAvant
 local function bloquerControles(bloquer)
+	-- ton jeu n'a pas forcément le "PlayerModule" de Roblox : on ne l'attend pas (sinon tout se bloque)
 	if not controles then
-		pcall(function()
-			controles = require(lp:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls()
-		end)
+		local ps = lp:FindFirstChild("PlayerScripts")
+		local pm = ps and ps:FindFirstChild("PlayerModule")
+		if pm then pcall(function() controles = require(pm):GetControls() end) end
 	end
 	if controles then pcall(function() if bloquer then controles:Disable() else controles:Enable() end end) end
+	-- dans tous les cas : le personnage ne bouge plus pendant la fiche
+	local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+	if h then
+		if bloquer then
+			vitesseAvant = vitesseAvant or { h.WalkSpeed, h.JumpPower, h.JumpHeight }
+			h.WalkSpeed, h.JumpPower, h.JumpHeight = 0, 0, 0
+		elseif vitesseAvant then
+			h.WalkSpeed, h.JumpPower, h.JumpHeight = vitesseAvant[1], vitesseAvant[2], vitesseAvant[3]
+			vitesseAvant = nil
+		end
+	end
 end
 
 -- souris libre (même si le jeu est en vue 1re personne) : réglée après les scripts de caméra, à chaque image
