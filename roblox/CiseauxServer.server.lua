@@ -16,7 +16,7 @@ local CONFIG = {
 local Players = game:GetService("Players")
 local ServerStorage = game:GetService("ServerStorage")
 local StarterPack = game:GetService("StarterPack")
-local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 
 local TAG_OUTIL = "OutilCiseaux"
@@ -199,21 +199,39 @@ local function trouverEpaule(perso)
 	return torse and torse:FindFirstChild("Right Shoulder") -- R6
 end
 
+-- Anime le C0 d'une articulation image par image (TweenService refuse le C0 de certains avatars)
+local animations = setmetatable({}, { __mode = "k" })
+local function animerC0(joint, cible, duree)
+	local depart = joint.C0
+	local id = (animations[joint] or 0) + 1
+	animations[joint] = id
+	task.spawn(function()
+		local t0 = os.clock()
+		while animations[joint] == id do
+			local a = math.min((os.clock() - t0) / duree, 1)
+			local ok = pcall(function()
+				joint.C0 = depart:Lerp(cible, 1 - (1 - a) ^ 2)
+			end)
+			if not ok or a >= 1 then return end
+			RunService.Heartbeat:Wait()
+		end
+	end)
+end
+
 local function bougerBras(epaule, angle, duree)
-	if not epaule then return end
+	if not (epaule and epaule:IsA("Motor6D")) then return end
 	local origine = epaule:GetAttribute("C0Origine")
 	if not origine then
 		origine = epaule.C0
 		epaule:SetAttribute("C0Origine", origine)
 	end
-	local cible = CFrame.new(origine.Position) * CFrame.Angles(angle, 0, 0) * origine.Rotation
-	TweenService:Create(epaule, TweenInfo.new(duree, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { C0 = cible }):Play()
+	animerC0(epaule, CFrame.new(origine.Position) * CFrame.Angles(angle, 0, 0) * origine.Rotation, duree)
 end
 
 local function remettreBras(epaule)
 	local origine = epaule and epaule:GetAttribute("C0Origine")
-	if origine then
-		TweenService:Create(epaule, TweenInfo.new(0.15), { C0 = origine }):Play()
+	if origine and epaule:IsA("Motor6D") then
+		animerC0(epaule, origine, 0.15)
 	end
 end
 
@@ -223,8 +241,7 @@ local function lames(outil, fermees, duree)
 	for _, moteur in handle:GetChildren() do
 		if moteur:IsA("Motor6D") then
 			local angle = if fermees then FERMETURE * moteur:GetAttribute("Sens") else 0
-			local cible = moteur:GetAttribute("C0Origine") * CFrame.Angles(0, angle, 0)
-			TweenService:Create(moteur, TweenInfo.new(duree, Enum.EasingStyle.Sine), { C0 = cible }):Play()
+			animerC0(moteur, moteur:GetAttribute("C0Origine") * CFrame.Angles(0, angle, 0), duree)
 		end
 	end
 end
