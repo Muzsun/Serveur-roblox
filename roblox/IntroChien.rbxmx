@@ -1,4 +1,4 @@
--- IntroChien (LocalScript dans StarterPlayer > StarterPlayerScripts)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="LocalScript" referent="RBX0"><Properties><string name="Name">IntroChien</string><ProtectedString name="Source"><![CDATA[-- IntroChien (LocalScript dans StarterPlayer > StarterPlayerScripts)
 -- Cinématique d'intro : le chiot projette sa balle beaucoup trop loin... jusqu'à la dernière zone !
 -- Ensuite il suit le joueur, et une colonne de lumière montre où est tombée la balle.
 if not game:GetService("RunService"):IsClient() then
@@ -798,3 +798,4 @@ Run.RenderStepped:Connect(function(dt)
 	attendre += dt
 	if REGLAGES.CHIEN_SUIT_LE_JOUEUR and attendre > 0.8 then suivre(dt) else majChien(dt) end
 end)
+]]></ProtectedString></Properties></Item></roblox>
