@@ -1,4 +1,4 @@
--- BarreOutils (LocalScript dans StarterPlayer > StarterPlayerScripts)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="LocalScript" referent="RBX0"><Properties><string name="Name">BarreOutils</string><ProtectedString name="Source"><![CDATA[-- BarreOutils (LocalScript dans StarterPlayer > StarterPlayerScripts)
 -- Remplace la barre d'outils de Roblox par des bulles rondes avec l'image de l'outil
 -- et son numéro (touches 1 à 9). Clic / touche = sortir ou ranger l'outil.
 if not game:GetService("RunService"):IsClient() then
@@ -292,3 +292,4 @@ UserInputService.InputBegan:Connect(function(entree, occupe)
 	local n = TOUCHES[entree.KeyCode]
 	if n and ordre[n] then basculer(ordre[n]) end
 end)
+]]></ProtectedString></Properties></Item></roblox>
