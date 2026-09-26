@@ -584,6 +584,29 @@ local function stubble(cf,w,h,col)
 	end)
 end
 
+-- "+1" / "+5"... en blanc qui vient vers le joueur
+local function gainPopup(pos,n)
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(90,44) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
+	local t=Instance.new("TextLabel") t.Size=UDim2.fromScale(1,1) t.BackgroundTransparency=1 t.Text="+"..n
+	t.Font=Enum.Font.FredokaOne t.TextScaled=true t.TextColor3=WHITE t.Parent=g
+	local st=stroke(t,2,Color3.fromRGB(20,24,20)) st.Transparency=.3
+	local sc=Instance.new("UIScale") sc.Parent=t
+	g.Parent=pgui
+	task.spawn(function()
+		tween(.15,function(a) sc.Scale=.4+.8*outQuad(a) end) -- petit "pop"
+		local p0=at.WorldPosition
+		tween(.55,function(a)
+			local ch=lp.Character local hrp=ch and ch:FindFirstChild("HumanoidRootPart")
+			local tgt=hrp and hrp.Position+Vector3.new(0,1.5,0) or p0+Vector3.new(0,2,0)
+			at.WorldPosition=p0:Lerp(tgt,a*a)
+			sc.Scale=1.2-.5*a
+			local f=math.clamp((a-.6)/.4,0,1) t.TextTransparency=f st.Transparency=.3+.7*f
+		end)
+		g:Destroy() at:Destroy()
+	end)
+end
+
 -- ===== coupe d'une touffe =====
 remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rarity)
 	size=size or 1
@@ -596,7 +619,6 @@ remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rar
 	if mine then
 		snipT=os.clock() -- le curseur fait clic-clac
 		pendingPicks+=1
-		if RARITY_TEXT[rarity] then showBanner(rarity,size) end
 	end
 	local function arrived()
 		if not mine then return end
@@ -614,6 +636,7 @@ remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rar
 	local cutH=math.clamp(h*.18,.12,.4)          -- hauteur de la coupe
 	local cutPos=P.Position+Vector3.new(0,cutH,0)
 	local col=leafColor(fake)
+	if mine then gainPopup(cutPos+Vector3.new(0,.8,0),size) end
 	-- 1) les lames se referment : "snip"
 	snipSound(cutPos)
 	slash(cutPos,math.max(sz.X,sz.Z))
