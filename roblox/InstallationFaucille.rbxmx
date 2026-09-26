@@ -214,8 +214,9 @@ local function bras(epaule, tangage, lacet, duree)
 	end
 	animerC0(epaule, CFrame.new(origine.Position) * CFrame.Angles(math.rad(tangage), math.rad(lacet), 0) * origine.Rotation, duree)
 end
-local function delaiCoupe(qui)
-	local dex = qui and qui:GetAttribute("Upg_Dexterite") or 0
+local function delaiCoupe()
+	-- les améliorations des ciseaux (Dextérité...) ne comptent pas pour la faucille
+	local dex = 0
 	return math.max(0.2, (CFG.PICK_COOLDOWN or 0.9) * (1 - (CFG.DEX_PAR_NIVEAU or 0.08) * dex))
 end
 
@@ -226,7 +227,7 @@ local function coup(outil)
 	local joueur = perso and Players:GetPlayerFromCharacter(perso)
 	if not joueur or occupes[outil] then return end
 	-- pas de spam : un coup seulement quand le délai pour couper une herbe est passé
-	if os.clock() - (derniers[outil] or -math.huge) < delaiCoupe(joueur) * 0.85 then return end
+	if os.clock() - (derniers[outil] or -math.huge) < delaiCoupe() * 0.85 then return end
 	derniers[outil] = os.clock()
 	occupes[outil] = true
 	local epaule = trouverEpaule(perso)
@@ -688,7 +689,10 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 		return
 	end
 	-- Dextérité : chaque niveau réduit le délai de DEX_PAR_NIVEAU (8 % par défaut)
-	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*(plr:GetAttribute("Upg_Dexterite") or 0)))
+	-- les améliorations (Dextérité, Saisir, Maintenir) ne marchent qu'avec les ciseaux
+	local scissors=CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux"
+	local dex=scissors and (plr:GetAttribute("Upg_Dexterite") or 0) or 0
+	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 	if lastPick[plr] and now-lastPick[plr]<cd then return end
 	lastPick[plr]=now
 	local function take(tid,tt)
@@ -704,7 +708,7 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	local anim=game:GetService("ServerStorage"):FindFirstChild("CiseauxCoupe")
 	if anim then anim:Fire(plr) end
 	-- outil + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
-	local extra=SCISSORS_EXTRA+(plr:GetAttribute("Upg_Saisir") or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	local extra=SCISSORS_EXTRA+(scissors and (plr:GetAttribute("Upg_Saisir") or 0) or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
 	local radius=math.max(SCISSORS_RADIUS,tonumber(tool:GetAttribute("RayonCoupe")) or 0)
 	if extra>0 then
 		local near={}
@@ -1373,6 +1377,12 @@ local function holdingScissors()
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
 	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil)
 end
+-- les améliorations (Dextérité, Maintenir, Saisir) ne marchent qu'avec les ciseaux, pas avec la faucille
+local function holdingRealScissors()
+	local ch=lp.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+end
 local function setHover(id)
 	hovered=id
 	local v=id and visible[id]
@@ -1460,7 +1470,7 @@ UIS.InputBegan:Connect(function(input,gp)
 		if id then
 			if holdingScissors() then
 				-- pas de spam : on ne peut recouper qu'une fois le délai passé (même délai que le serveur)
-				local dex=lp:GetAttribute("Upg_Dexterite") or 0
+				local dex=holdingRealScissors() and (lp:GetAttribute("Upg_Dexterite") or 0) or 0
 				local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 				if os.clock()-lastCut>=cd then lastCut=os.clock() snipT=os.clock() remotes.PickRequest:FireServer(id) end
 			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
@@ -1472,10 +1482,10 @@ UIS.InputEnded:Connect(function(input)
 end)
 task.spawn(function()
 	while true do
-		local dex=lp:GetAttribute("Upg_Dexterite") or 0
+		local dex=holdingRealScissors() and (lp:GetAttribute("Upg_Dexterite") or 0) or 0
 		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 		task.wait(cd+.05)
-		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingScissors() then
+		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingRealScissors() and holdingScissors() then
 			local hi,ray=holdInput,nil
 			if hi and hi.KeyCode==Enum.KeyCode.ButtonR2 then local c=screenCenter() ray=cam:ViewportPointToRay(c.X,c.Y)
 			elseif hi and hi.UserInputType==Enum.UserInputType.Touch then ray=cam:ScreenPointToRay(hi.Position.X,hi.Position.Y)

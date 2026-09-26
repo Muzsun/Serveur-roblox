@@ -344,6 +344,12 @@ local function holdingScissors()
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
 	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil)
 end
+-- les améliorations (Dextérité, Maintenir, Saisir) ne marchent qu'avec les ciseaux, pas avec la faucille
+local function holdingRealScissors()
+	local ch=lp.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+end
 local function setHover(id)
 	hovered=id
 	local v=id and visible[id]
@@ -431,7 +437,7 @@ UIS.InputBegan:Connect(function(input,gp)
 		if id then
 			if holdingScissors() then
 				-- pas de spam : on ne peut recouper qu'une fois le délai passé (même délai que le serveur)
-				local dex=lp:GetAttribute("Upg_Dexterite") or 0
+				local dex=holdingRealScissors() and (lp:GetAttribute("Upg_Dexterite") or 0) or 0
 				local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 				if os.clock()-lastCut>=cd then lastCut=os.clock() snipT=os.clock() remotes.PickRequest:FireServer(id) end
 			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
@@ -443,10 +449,10 @@ UIS.InputEnded:Connect(function(input)
 end)
 task.spawn(function()
 	while true do
-		local dex=lp:GetAttribute("Upg_Dexterite") or 0
+		local dex=holdingRealScissors() and (lp:GetAttribute("Upg_Dexterite") or 0) or 0
 		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 		task.wait(cd+.05)
-		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingScissors() then
+		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingRealScissors() and holdingScissors() then
 			local hi,ray=holdInput,nil
 			if hi and hi.KeyCode==Enum.KeyCode.ButtonR2 then local c=screenCenter() ray=cam:ViewportPointToRay(c.X,c.Y)
 			elseif hi and hi.UserInputType==Enum.UserInputType.Touch then ray=cam:ScreenPointToRay(hi.Position.X,hi.Position.Y)

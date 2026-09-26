@@ -214,8 +214,9 @@ local function bras(epaule, tangage, lacet, duree)
 	end
 	animerC0(epaule, CFrame.new(origine.Position) * CFrame.Angles(math.rad(tangage), math.rad(lacet), 0) * origine.Rotation, duree)
 end
-local function delaiCoupe(qui)
-	local dex = qui and qui:GetAttribute("Upg_Dexterite") or 0
+local function delaiCoupe()
+	-- les améliorations des ciseaux (Dextérité...) ne comptent pas pour la faucille
+	local dex = 0
 	return math.max(0.2, (CFG.PICK_COOLDOWN or 0.9) * (1 - (CFG.DEX_PAR_NIVEAU or 0.08) * dex))
 end
 
@@ -226,7 +227,7 @@ local function coup(outil)
 	local joueur = perso and Players:GetPlayerFromCharacter(perso)
 	if not joueur or occupes[outil] then return end
 	-- pas de spam : un coup seulement quand le délai pour couper une herbe est passé
-	if os.clock() - (derniers[outil] or -math.huge) < delaiCoupe(joueur) * 0.85 then return end
+	if os.clock() - (derniers[outil] or -math.huge) < delaiCoupe() * 0.85 then return end
 	derniers[outil] = os.clock()
 	occupes[outil] = true
 	local epaule = trouverEpaule(perso)

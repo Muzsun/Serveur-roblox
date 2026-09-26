@@ -271,7 +271,10 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 		return
 	end
 	-- Dextérité : chaque niveau réduit le délai de DEX_PAR_NIVEAU (8 % par défaut)
-	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*(plr:GetAttribute("Upg_Dexterite") or 0)))
+	-- les améliorations (Dextérité, Saisir, Maintenir) ne marchent qu'avec les ciseaux
+	local scissors=CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux"
+	local dex=scissors and (plr:GetAttribute("Upg_Dexterite") or 0) or 0
+	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 	if lastPick[plr] and now-lastPick[plr]<cd then return end
 	lastPick[plr]=now
 	local function take(tid,tt)
@@ -287,7 +290,7 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	local anim=game:GetService("ServerStorage"):FindFirstChild("CiseauxCoupe")
 	if anim then anim:Fire(plr) end
 	-- outil + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
-	local extra=SCISSORS_EXTRA+(plr:GetAttribute("Upg_Saisir") or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	local extra=SCISSORS_EXTRA+(scissors and (plr:GetAttribute("Upg_Saisir") or 0) or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
 	local radius=math.max(SCISSORS_RADIUS,tonumber(tool:GetAttribute("RayonCoupe")) or 0)
 	if extra>0 then
 		local near={}
