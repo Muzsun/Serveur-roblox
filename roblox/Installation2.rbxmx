@@ -702,7 +702,13 @@ local testZone=game:GetService("ServerStorage"):FindFirstChild("TestFinirZone") 
 testZone.Name="TestFinirZone" testZone.Parent=game:GetService("ServerStorage")
 -- plus simple : dans Studio, appuie sur la touche K en jouant (ne marche PAS dans le vrai jeu publié)
 local testKey=remote("TestFinirZone")
-testKey.OnServerEvent:Connect(function() if game:GetService("RunService"):IsStudio() then testZone:Fire() end end)
+-- la touche K marche dans Studio, et dans le vrai jeu seulement pour le créateur du jeu
+local function estCreateur(plr)
+	if game.CreatorType==Enum.CreatorType.User then return plr.UserId==game.CreatorId end
+	local ok,rang=pcall(plr.GetRankInGroup,plr,game.CreatorId)
+	return ok and rang==255
+end
+testKey.OnServerEvent:Connect(function(plr) if game:GetService("RunService"):IsStudio() or estCreateur(plr) then testZone:Fire() end end)
 testZone.Event:Connect(function()
 	local n=0
 	for id,t in tufts do
@@ -1133,8 +1139,13 @@ task.spawn(function()
 	end)
 end)
 
--- TEST (seulement dans Studio) : touche K = finir la zone en cours d'un coup
-if Run:IsStudio() then
+-- TEST (Studio, ou le créateur dans le vrai jeu) : touche K = finir la zone en cours d'un coup
+local function estCreateur()
+	if game.CreatorType==Enum.CreatorType.User then return lp.UserId==game.CreatorId end
+	local ok,rang=pcall(lp.GetRankInGroup,lp,game.CreatorId)
+	return ok and rang==255
+end
+if Run:IsStudio() or estCreateur() then -- touche K : Studio, ou le créateur du jeu dans le vrai jeu
 	UIS.InputBegan:Connect(function(input,gp)
 		if gp or input.KeyCode~=Enum.KeyCode.K then return end
 		local r=remotes:FindFirstChild("TestFinirZone")

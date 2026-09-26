@@ -336,7 +336,13 @@ local testZone=game:GetService("ServerStorage"):FindFirstChild("TestFinirZone") 
 testZone.Name="TestFinirZone" testZone.Parent=game:GetService("ServerStorage")
 -- plus simple : dans Studio, appuie sur la touche K en jouant (ne marche PAS dans le vrai jeu publié)
 local testKey=remote("TestFinirZone")
-testKey.OnServerEvent:Connect(function() if game:GetService("RunService"):IsStudio() then testZone:Fire() end end)
+-- la touche K marche dans Studio, et dans le vrai jeu seulement pour le créateur du jeu
+local function estCreateur(plr)
+	if game.CreatorType==Enum.CreatorType.User then return plr.UserId==game.CreatorId end
+	local ok,rang=pcall(plr.GetRankInGroup,plr,game.CreatorId)
+	return ok and rang==255
+end
+testKey.OnServerEvent:Connect(function(plr) if game:GetService("RunService"):IsStudio() or estCreateur(plr) then testZone:Fire() end end)
 testZone.Event:Connect(function()
 	local n=0
 	for id,t in tufts do

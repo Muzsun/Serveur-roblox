@@ -1687,8 +1687,13 @@ task.spawn(function()
 	end)
 end)
 
--- TEST (seulement dans Studio) : touche K = finir la zone en cours d'un coup
-if Run:IsStudio() then
+-- TEST (Studio, ou le créateur dans le vrai jeu) : touche K = finir la zone en cours d'un coup
+local function estCreateur()
+	if game.CreatorType==Enum.CreatorType.User then return lp.UserId==game.CreatorId end
+	local ok,rang=pcall(lp.GetRankInGroup,lp,game.CreatorId)
+	return ok and rang==255
+end
+if Run:IsStudio() or estCreateur() then -- touche K : Studio, ou le créateur du jeu dans le vrai jeu
 	UIS.InputBegan:Connect(function(input,gp)
 		if gp or input.KeyCode~=Enum.KeyCode.K then return end
 		local r=remotes:FindFirstChild("TestFinirZone")
