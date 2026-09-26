@@ -1,4 +1,4 @@
--- FaucilleServer (Script dans ServerScriptService)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="Script" referent="RBX0"><Properties><string name="Name">FaucilleServer</string><ProtectedString name="Source"><![CDATA[-- FaucilleServer (Script dans ServerScriptService)
 -- La faucille est posée sur l'établi (modèle "FaucilleVitrine" sur le tapis vert).
 -- On l'achète avec E (ou en restant appuyé sur le bouton), elle arrive dans la barre d'outils
 -- et coupe plusieurs touffes d'un coup. À chaque nouvelle partie, il faut la racheter.
@@ -416,3 +416,4 @@ if v then
 	prompt.Triggered:Connect(acheter)
 	print("[Faucille] En vente sur l'établi : $" .. REGLAGES.PRIX)
 end
+]]></ProtectedString></Properties></Item></roblox>

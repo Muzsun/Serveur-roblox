@@ -347,7 +347,7 @@ end)
 ]]></ProtectedString></Properties></Item><Item class="Script" referent="RBX2"><Properties><string name="Name">FaucilleServer</string><ProtectedString name="Source"><![CDATA[-- FaucilleServer (Script dans ServerScriptService)
 -- La faucille est posée sur l'établi (modèle "FaucilleVitrine" sur le tapis vert).
 -- On l'achète avec E (ou en restant appuyé sur le bouton), elle arrive dans la barre d'outils
--- et coupe plusieurs touffes d'un coup. L'achat est gardé quand le joueur revient.
+-- et coupe plusieurs touffes d'un coup. À chaque nouvelle partie, il faut la racheter.
 if not game:GetService("RunService"):IsServer() then
 	warn("[Faucille] FaucilleServer doit être un Script dans ServerScriptService !")
 	return
@@ -361,7 +361,7 @@ local REGLAGES = {
 	TAILLE_EN_MAIN = 0.75, -- taille de la faucille dans la main
 	INCLINAISON = 0, -- degrés : penche la faucille dans la main si besoin (ex : 20 ou -20)
 	EQUIPER_APRES_ACHAT = true, -- la faucille arrive directement dans la main
-	SAUVEGARDER = true, -- garde l'achat quand le joueur revient (DataStore)
+	SAUVEGARDER = false, -- true = garde l'achat quand le joueur revient (DataStore). false = à racheter à chaque partie
 }
 
 local Players = game:GetService("Players")

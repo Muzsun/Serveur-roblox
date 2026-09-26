@@ -1,0 +1,1 @@
+local b=game.ServerStorage:FindFirstChild("AnciensScripts") or Instance.new("Folder",game.ServerStorage) b.Name="AnciensScripts" local p=game.ServerScriptService local v=p:FindFirstChild("FaucilleServer") while v do v.Enabled=false v.Name="FaucilleServer_ANCIEN" v.Parent=b v=p:FindFirstChild("FaucilleServer") end workspace.FaucilleServer.Parent=p print("Installation OK !")
