@@ -281,6 +281,21 @@ task.spawn(function()
 	end
 end)
 
+-- une zone est terminée : l'herbe pousse dans la suivante
+task.spawn(function()
+	local newGrass=remotes:WaitForChild("NewGrass",60)
+	if not newGrass then return end
+	newGrass.OnClientEvent:Connect(function(list)
+		for _,a in list do
+			local id=a[1]
+			if not gone[id] then
+				data[id]={id=id,p=Vector3.new(a[2],a[3],a[4]),yaw=a[5],s=a[6],r=a[7],seed=a[8],size=a[9]}
+			end
+		end
+		showToast("🌱 Zone terminée ! L'herbe a poussé dans la zone suivante")
+	end)
+end)
+
 -- toutes les 0.3 s : on affiche ce qui est proche, on retire ce qui est loin
 task.spawn(function()
 	while true do

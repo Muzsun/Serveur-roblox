@@ -23,6 +23,7 @@ local function remote(n,cls)
 end
 local Picked,BagFull,Deposited,PickRequest=remote("Picked"),remote("BagFull"),remote("Deposited"),remote("PickRequest")
 local GetGrass=remote("GetGrass","RemoteFunction")
+local NewGrass=remote("NewGrass") -- une nouvelle zone vient de pousser
 local MONEY_PER_PLACE=CFG.MONEY_PER_PLACE or CFG.MONEY_PER_TUFT or 0
 local SPACING=CFG.SPACING or 3
 
@@ -183,6 +184,14 @@ local function randomSpot()
 end
 
 local nextId,ready,total,doorTotal=0,false,0,0
+-- ===== zones une par une =====
+-- Au début, l'herbe ne pousse que dans la 1re zone. Quand elle est toute coupée, la zone suivante pousse, etc.
+-- Ordre : GrassConfig.ZONES_ORDER = {"Zone","ZonePorte",...} si tu le mets, sinon de la plus proche du spawn à la plus loin.
+local PROGRESSIVE=CFG.ZONES_UNE_PAR_UNE~=false
+local reserve={}          -- toutes les touffes créées (pas encore poussées)
+local stages,stage={},0   -- ordre des zones, zone en cours
+local stageLeft=0         -- touffes restantes dans la zone en cours
+local nextStage -- (plus bas)
 local groupTotal={}
 local MIN2=(SPACING*.6)^2
 task.spawn(function()
@@ -226,7 +235,7 @@ task.spawn(function()
 				local rar=rollRarity()
 				local isDoor=zone.Name=="ZonePorte"
 				local group=zone.Name -- Zone, ZonePorte, ZoneLabyrinthe...
-				tufts[nextId]={id=nextId,p=p,yaw=math.random()*math.pi*2,s=tuftScale(),r=rar,
+				reserve[#reserve+1]={id=nextId,p=p,yaw=math.random()*math.pi*2,s=tuftScale(),r=rar,
 					seed=math.random(1,1000000000),size=RAR[rar].size,door=isDoor,group=group}
 				if isDoor then doorTotal+=1 end
 				if group then groupTotal[group]=(groupTotal[group] or 0)+1 end
@@ -236,6 +245,34 @@ task.spawn(function()
 		end
 		if i%40==0 then task.wait() end
 	end
+	-- ordre des zones
+	local byGroup,center={},{}
+	for _,t in reserve do
+		local g=t.group or "Zone"
+		byGroup[g]=byGroup[g] or {}
+		table.insert(byGroup[g],t)
+		center[g]=(center[g] or Vector3.zero)+t.p
+	end
+	local spawnLoc=workspace:FindFirstChildWhichIsA("SpawnLocation",true)
+	local origin=spawnLoc and spawnLoc.Position or Vector3.zero
+	local rank={}
+	if typeof(CFG.ZONES_ORDER)=="table" then for i,n in CFG.ZONES_ORDER do rank[n]=i end end
+	for g,list in byGroup do table.insert(stages,{name=g,list=list,dist=(center[g]/#list-origin).Magnitude}) end
+	table.sort(stages,function(a,b)
+		local ra,rb=rank[a.name] or math.huge,rank[b.name] or math.huge
+		if ra~=rb then return ra<rb end
+		return a.dist<b.dist
+	end)
+	if not PROGRESSIVE then stages={{name="Tout",list=reserve}} end
+	local noms={} for i,s in stages do noms[i]=s.name.." ("..#s.list..")" end
+	print("[Herbe] Ordre des zones :",table.concat(noms," -> "))
+	-- la 1re zone pousse tout de suite
+	stage=1
+	for _,t in stages[1] and stages[1].list or {} do tufts[t.id]=t end
+	stageLeft=stages[1] and #stages[1].list or 0
+	remotes:SetAttribute("ZoneEnCours",stages[1] and stages[1].name or "")
+	remotes:SetAttribute("ZoneNumero",1)
+	remotes:SetAttribute("ZonesTotal",#stages)
 	ready=true
 	-- compteur d'herbe (utilisé par la porte à cadenas)
 	remotes:SetAttribute("GrassTotal",total)
@@ -245,6 +282,28 @@ task.spawn(function()
 	for g,n in groupTotal do remotes:SetAttribute("Total_"..g,n) remotes:SetAttribute("Left_"..g,n) end
 	print("[Herbe] Zones trouvées :",#zones," | Touffes créées :",total)
 end)
+
+-- zone terminée : la suivante pousse (on saute les zones vides)
+nextStage=function()
+	if stageLeft>0 then return end
+	while stage<#stages do
+		stage+=1
+		local s=stages[stage]
+		if #s.list>0 then
+			local out={}
+			for _,t in s.list do
+				tufts[t.id]=t
+				table.insert(out,{t.id,t.p.X,t.p.Y,t.p.Z,t.yaw,t.s,t.r,t.seed,t.size})
+			end
+			stageLeft=#s.list
+			remotes:SetAttribute("ZoneEnCours",s.name)
+			remotes:SetAttribute("ZoneNumero",stage)
+			NewGrass:FireAllClients(out,s.name)
+			print("[Herbe] Zone terminée ! L'herbe pousse dans :",s.name,"("..#s.list.." touffes)")
+			return
+		end
+	end
+end
 
 -- chaque joueur récupère la liste au démarrage
 GetGrass.OnServerInvoke=function()
@@ -281,6 +340,8 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	lastPick[plr]=now
 	local function take(tid,tt)
 		tufts[tid]=nil -- ramassée pour de bon : elle ne repousse pas
+		stageLeft-=1
+		if stageLeft<=0 then task.defer(nextStage) end
 		remotes:SetAttribute("GrassLeft",math.max(0,(remotes:GetAttribute("GrassLeft") or 1)-1))
 		if tt.door then remotes:SetAttribute("DoorLeft",math.max(0,(remotes:GetAttribute("DoorLeft") or 1)-1)) end
 		if tt.group then local k="Left_"..tt.group remotes:SetAttribute(k,math.max(0,(remotes:GetAttribute(k) or 1)-1)) end
@@ -1079,6 +1140,21 @@ task.spawn(function()
 			data[id]={id=id,p=Vector3.new(a[2],a[3],a[4]),yaw=a[5],s=a[6],r=a[7],seed=a[8],size=a[9]}
 		end
 	end
+end)
+
+-- une zone est terminée : l'herbe pousse dans la suivante
+task.spawn(function()
+	local newGrass=remotes:WaitForChild("NewGrass",60)
+	if not newGrass then return end
+	newGrass.OnClientEvent:Connect(function(list)
+		for _,a in list do
+			local id=a[1]
+			if not gone[id] then
+				data[id]={id=id,p=Vector3.new(a[2],a[3],a[4]),yaw=a[5],s=a[6],r=a[7],seed=a[8],size=a[9]}
+			end
+		end
+		showToast("🌱 Zone terminée ! L'herbe a poussé dans la zone suivante")
+	end)
 end)
 
 -- toutes les 0.3 s : on affiche ce qui est proche, on retire ce qui est loin
