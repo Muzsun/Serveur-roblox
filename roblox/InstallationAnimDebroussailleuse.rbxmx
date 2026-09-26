@@ -9,7 +9,7 @@ end
 print("[Débroussailleuse] DebroussailleuseServer démarré")
 
 local REGLAGES = {
-	PRIX = 19.99,
+	PRIX = 24.99,
 	TOUFFES_EN_PLUS = 5, -- touffes voisines coupées en plus à chaque coup : 5 = 6 touffes au début
 	COUPE_PAR_NIVEAU = 2, -- "Coupe supplémentaire" : +2 touffes par niveau (6 -> 8 -> 10)
 	RAYON = 7, -- rayon autour de la touffe visée (studs)

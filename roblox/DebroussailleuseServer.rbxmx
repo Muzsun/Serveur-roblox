@@ -1,4 +1,4 @@
--- DebroussailleuseServer (Script dans ServerScriptService)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="Script" referent="RBX0"><Properties><string name="Name">DebroussailleuseServer</string><ProtectedString name="Source"><![CDATA[-- DebroussailleuseServer (Script dans ServerScriptService)
 -- La débroussailleuse est accrochée au panneau de l'établi (modèle "DebroussailleuseVitrine").
 -- On l'achète avec E, elle arrive dans la barre d'outils et fauche beaucoup de touffes d'un coup.
 -- Sa tête tourne (BoutiqueClient). À chaque nouvelle partie, il faut la racheter.
@@ -484,3 +484,4 @@ if v then
 	prompt.Triggered:Connect(acheter)
 	print("[Débroussailleuse] En vente sur l'établi : $" .. REGLAGES.PRIX)
 end
+]]></ProtectedString></Properties></Item></roblox>
