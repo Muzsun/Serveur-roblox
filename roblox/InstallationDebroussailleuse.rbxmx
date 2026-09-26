@@ -984,6 +984,12 @@ local COIN = "rbxassetid://103593634628600" -- l'icône des pièces
 local HERBE = "rbxassetid://90182525256912" -- l'image d'une touffe d'herbe
 local lp = Players.LocalPlayer
 local pgui = lp:WaitForChild("PlayerGui")
+-- si le script est installé 2 fois, les 2 copies se cachent l'une l'autre : on n'en garde qu'une
+if pgui:FindFirstChild("Boutique") or lp:GetAttribute("BoutiqueLancee") then
+	warn("[Boutique] BoutiqueClient est installé 2 fois ! Garde un seul BoutiqueClient dans StarterPlayer > StarterPlayerScripts (et plus de FaucilleClient).")
+	return
+end
+lp:SetAttribute("BoutiqueLancee", true)
 local cam = workspace.CurrentCamera
 
 local BLANC, ENCRE = Color3.new(1, 1, 1), Color3.fromRGB(26, 22, 28)
@@ -1449,7 +1455,7 @@ local function ouvrirInterne(v)
 	-- on cache le reste de l'interface et on bloque le personnage
 	etat.guis = {}
 	for _, g in pgui:GetChildren() do
-		if g:IsA("ScreenGui") and g ~= ecran and g ~= messages and g.Enabled then
+		if g:IsA("ScreenGui") and g ~= ecran and g ~= messages and g.Name ~= "Boutique" and g.Name ~= "BoutiqueMessages" and g.Enabled then
 			g.Enabled = false
 			table.insert(etat.guis, g)
 		end
