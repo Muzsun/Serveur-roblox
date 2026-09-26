@@ -504,6 +504,12 @@ for _, ct in coreTypes do
 end
 local fovAvant = cam.FieldOfView
 cam.CameraType = Enum.CameraType.Scriptable
+-- l'herbe est cachée pendant la cinématique (elle bouchait la vue sur les petits chemins)
+local herbeCachee = {}
+for _, n in { "GrassVisuals", "GrassFX" } do
+	local f = workspace:FindFirstChild(n)
+	if f then f.Parent = nil table.insert(herbeCachee, f) end
+end
 
 local flou = Instance.new("DepthOfFieldEffect")
 flou.Name = "FlouIntro"
@@ -770,6 +776,7 @@ connPasser:Disconnect()
 passer:Destroy()
 flou:Destroy()
 cam.FieldOfView = fovAvant
+for _, f in herbeCachee do f.Parent = workspace end -- l'herbe revient
 cam.CameraType = Enum.CameraType.Custom
 cam.CameraSubject = humanoid
 TS:Create(barreHaut, TweenInfo.new(0.4), { Position = UDim2.fromScale(0, 0) }):Play()
