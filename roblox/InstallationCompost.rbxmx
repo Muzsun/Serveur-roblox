@@ -759,16 +759,22 @@ local function chevron(parent)
 end
 
 local hints={}
-local function addHint(c)
-	local hb=c:WaitForChild("GrassDepositHitbox",15) if not hb then return end
+-- position du panneau : au-dessus du tas "Compost" (sinon au-dessus du modèle)
+local function hintPos(c)
 	local top=c:FindFirstChild("Compost",true)
-	local g=Instance.new("BillboardGui") g.Name="CompostHint"
-	if top and top:IsA("BasePart") then g.Adornee=top g.StudsOffsetWorldSpace=Vector3.new(0,top.Size.Y/2+2.2,0)
-	else g.Adornee=hb g.StudsOffsetWorldSpace=Vector3.new(0,hb.Size.Y/2+.4,0) end
+	if top and top:IsA("BasePart") then return top.Position+Vector3.new(0,top.Size.Y/2+2.2,0) end
+	local ok,cf,size=pcall(c.GetBoundingBox,c)
+	if ok and cf and size.Magnitude>.1 then return cf.Position+Vector3.new(0,size.Y/2+.4,0) end
+	return nil
+end
+local function makeHint(c)
+	-- le panneau est accroché à un point invisible (marche même si le modèle charge en retard)
+	local at=Instance.new("Attachment") at.Name="CompostHintPoint" at.Parent=workspace.Terrain
+	local g=Instance.new("BillboardGui") g.Name="CompostHint" g.Adornee=at
 	g.Size=UDim2.fromOffset(px(360),px(196)) g.SizeOffset=Vector2.new(0,.5) -- le bas du panneau (la flèche) pointe sur le composteur
-	g.AlwaysOnTop=true g.MaxDistance=90 g.LightInfluence=0 g.ResetOnSpawn=false g.Enabled=false
+	g.AlwaysOnTop=true g.MaxDistance=120 g.LightInfluence=0 g.ResetOnSpawn=false g.Enabled=false
 	local root=Instance.new("Frame") root.BackgroundTransparency=1 root.Size=UDim2.fromScale(1,1) root.Parent=g
-	-- panneau principal : [touffe] = [pièce] $0.01
+	-- panneau principal : [herbe] = [pièce] $0.01
 	local main=board(root,72,0)
 	iconImg(main,HERB_IMAGE,66,1)
 	word(main,"=",40,2)
@@ -784,10 +790,22 @@ local function addHint(c)
 	local gTx=word(gain,"+$0",28,4,GOLD)
 	local arrow=chevron(root) arrow.Position=UDim2.new(.5,0,1,0)
 	g.Parent=pgui
-	table.insert(hints,{g=g,top=top or hb,gain=gain,gst=gst,gScale=gScale,nTx=nTx,gTx=gTx,arrow=arrow})
+	table.insert(hints,{c=c,at=at,g=g,gain=gain,gst=gst,gScale=gScale,nTx=nTx,gTx=gTx,arrow=arrow})
+	print("[Herbe] Panneau du composteur créé :",c:GetFullName())
 end
-for _,c in CS:GetTagged("GrassCompost") do task.spawn(addHint,c) end
+local function addHint(c)
+	if not c:IsA("Model") then return end
+	for _,h in hints do if h.c==c then return end end
+	local ok,err=pcall(makeHint,c)
+	if not ok then warn("[Herbe] Panneau du composteur : erreur ->",err) end
+end
+-- le serveur marque les composteurs (tag) ; on les cherche aussi nous-mêmes par leur nom
+for _,c in CS:GetTagged("GrassCompost") do addHint(c) end
 CS:GetInstanceAddedSignal("GrassCompost"):Connect(addHint)
+local COMPOST_NAME=CFG.COMPOST_NAME or "Composteur"
+for _,d in workspace:GetDescendants() do if d.Name==COMPOST_NAME then addHint(d) end end
+workspace.DescendantAdded:Connect(function(d) if d.Name==COMPOST_NAME then addHint(d) end end)
+task.delay(20,function() if #hints==0 then warn("[Herbe] Aucun composteur trouvé : le modèle doit s'appeler '"..COMPOST_NAME.."' dans Workspace") end end)
 
 local hintAcc=0
 Run.RenderStepped:Connect(function(dt)
@@ -800,7 +818,9 @@ Run.RenderStepped:Connect(function(dt)
 	local hide=lp:GetAttribute("IntroEnCours")==true
 	for _,h in hints do
 		if slow then
-			h.g.Enabled=not hide and h.top.Parent~=nil
+			local pos=h.c.Parent and hintPos(h.c)
+			if pos then h.at.WorldPosition=pos end
+			h.g.Enabled=not hide and pos~=nil
 			h.gain.Visible=hasBag h.arrow.Visible=hasBag
 			if hasBag then
 				h.nTx.Text=tostring(shown)
@@ -810,11 +830,9 @@ Run.RenderStepped:Connect(function(dt)
 			end
 		end
 		-- animations seulement si le panneau est proche (pas de calcul pour rien)
-		if h.g.Enabled and (cam.CFrame.Position-h.top.Position).Magnitude<95 then
-			if hasBag then
-				h.arrow.Position=UDim2.new(.5,0,1,-px(math.abs(math.sin(t*4.5))*9))
-				h.gScale.Scale=isFull and 1+.06*math.abs(math.sin(t*5)) or 1
-			end
+		if hasBag and h.g.Enabled and (cam.CFrame.Position-h.at.WorldPosition).Magnitude<125 then
+			h.arrow.Position=UDim2.new(.5,0,1,-px(math.abs(math.sin(t*4.5))*9))
+			h.gScale.Scale=isFull and 1+.06*math.abs(math.sin(t*5)) or 1
 		end
 	end
 end)
