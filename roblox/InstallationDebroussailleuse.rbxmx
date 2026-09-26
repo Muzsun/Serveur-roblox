@@ -1001,7 +1001,7 @@ local function argent()
 end
 
 ---------------------------------------------------------------- Panneau au-dessus de la faucille
-local TAILLE_PANNEAU = 1.4 -- hauteur des panneaux de prix en studs (avant : 2)
+local TAILLE_PANNEAU = 0.95 -- hauteur des panneaux de prix en studs
 local panneaux = {}
 local function creerPanneau(article, achat, vitrine)
 	local base = vitrine.PrimaryPart or vitrine:WaitForChild("Base", 10)
@@ -1017,7 +1017,7 @@ local function creerPanneau(article, achat, vitrine)
 	else
 		g.Adornee = base -- au-dessus de l'outil
 		g.SizeOffset = Vector2.new(0, 0.5)
-		g.StudsOffsetWorldSpace = Vector3.new(0, 1, 0)
+		g.StudsOffsetWorldSpace = Vector3.new(0, 0.55, 0) -- juste au-dessus de la faucille
 	end
 	g.AlwaysOnTop = true
 	g.LightInfluence = 0
