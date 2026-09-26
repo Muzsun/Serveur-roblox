@@ -7,11 +7,11 @@ if not game:GetService("RunService"):IsClient() then
 end
 print("[Outils] BarreOutils démarré")
 
--- Images des outils : mets l'identifiant de ton image entre les guillemets.
--- Exemple : Ciseaux = "rbxassetid://1234567890",
+-- Images des outils : identifiant de l'image, inclinaison (degrés) et taille dans la bulle (1 = toute la bulle).
+-- Pour un nouvel outil, ajoute une ligne : NomDeLOutil = { image = "rbxassetid://...", rotation = 0, taille = 0.85 },
 -- Sans image, la bulle montre l'outil en 3D. (Un outil avec une TextureId l'utilise aussi.)
 local IMAGES = {
-	Ciseaux = "",
+	Ciseaux = { image = "rbxassetid://98821470151953", rotation = -20, taille = 0.85 },
 }
 
 local Players = game:GetService("Players")
@@ -184,16 +184,21 @@ local function creerBulle(outil)
 	rond(reflet)
 
 	-- image de l'outil (ou l'outil en 3D)
-	local image = IMAGES[outil.Name]
-	if not image or image == "" then image = outil.TextureId end
+	local reglage = IMAGES[outil.Name]
+	if type(reglage) == "string" then reglage = { image = reglage } end
+	reglage = reglage or {}
+	local image = if reglage.image and reglage.image ~= "" then reglage.image else outil.TextureId
+	local icone = nil
 	if image ~= "" then
-		local icone = Instance.new("ImageLabel")
+		icone = Instance.new("ImageLabel")
 		icone.BackgroundTransparency = 1
 		icone.Image = image
 		icone.ScaleType = Enum.ScaleType.Fit
 		icone.AnchorPoint = Vector2.new(0.5, 0.5)
 		icone.Position = UDim2.fromScale(0.5, 0.5)
-		icone.Size = UDim2.fromScale(0.78, 0.78)
+		icone.Size = UDim2.fromScale(reglage.taille or 0.85, reglage.taille or 0.85)
+		icone.Rotation = reglage.rotation or 0
+		icone:SetAttribute("Rotation0", icone.Rotation)
 		icone.ZIndex = 3
 		icone.Parent = bulle
 	else
@@ -229,7 +234,7 @@ local function creerBulle(outil)
 	end)
 
 	slot.Parent = barre
-	bulles[outil] = { slot = slot, bulle = bulle, contour = contour, taille = taille, numero = numero }
+	bulles[outil] = { slot = slot, bulle = bulle, contour = contour, taille = taille, numero = numero, icone = icone, tenu = false }
 end
 
 local function rafraichir()
@@ -250,6 +255,13 @@ local function rafraichir()
 		b.numero.Text = if i <= 9 then tostring(i) else ""
 		-- l'outil tenu : bulle plus claire, plus nette et un peu plus grande
 		local tenu = outil.Parent == perso
+		if tenu and not b.tenu and b.icone then
+			-- petit coup de ciseaux de l'icône quand on sort l'outil
+			local r0 = b.icone:GetAttribute("Rotation0")
+			b.icone.Rotation = r0 - 18
+			TweenService:Create(b.icone, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Rotation = r0 }):Play()
+		end
+		b.tenu = tenu
 		local info = TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 		TweenService:Create(b.taille, info, { Scale = if tenu then 1.1 else 1 }):Play()
 		TweenService:Create(b.bulle, TweenInfo.new(0.15), { BackgroundTransparency = if tenu then 0.25 else 0.6 }):Play()
