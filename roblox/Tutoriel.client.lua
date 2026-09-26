@@ -186,11 +186,18 @@ local function nearestCompost()
 	end
 	return best
 end
+-- cherche un écran (ScreenGui) par son nom : le script InventoryUI porte le même nom que son menu !
+local function findScreen(name)
+	for _,g in pgui:GetChildren() do
+		if g:IsA("ScreenGui") and g.Name==name then return g end
+	end
+	return nil
+end
 local buttonsCache={}
 local function buyButtons()
 	if #buttonsCache>0 and buttonsCache[1].Parent then return buttonsCache end
 	table.clear(buttonsCache)
-	local inv=pgui:FindFirstChild("InventoryUI")
+	local inv=findScreen("InventoryUI")
 	if inv then
 		for _,d in inv:GetDescendants() do
 			if d:IsA("GuiButton") and d:GetAttribute("UpgradeId") then table.insert(buttonsCache,d) end
@@ -304,12 +311,12 @@ local function enterStep(s)
 	elseif s=="vendre" then setIcons(IMG.sac,IMG.piece)
 	elseif s=="outil" then
 		-- montre la bulle des ciseaux dans la barre d'outils
-		local barre=pgui:FindFirstChild("BarreOutils")
+		local barre=findScreen("BarreOutils")
 		local slot=barre and barre:FindFirstChild("Ciseaux",true)
 		if slot then attachTo(slot,"haut",40,true) end
 	elseif s=="acheter" then
 		-- montre le bouton BOOSTS
-		local b=pgui:FindFirstChild("BoostsBouton")
+		local b=findScreen("BoostsBouton")
 		local holder=b and b:FindFirstChild("BoostsHolder")
 		if holder then attachTo(holder,"gauche",36,true) end -- petite flèche vers BOOSTS
 	end
