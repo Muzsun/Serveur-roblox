@@ -337,7 +337,7 @@ local curGui=Instance.new("ScreenGui") curGui.Name="CurseurCiseaux" curGui.Reset
 curGui.IgnoreGuiInset=true curGui.DisplayOrder=100 curGui.Parent=pgui
 local cursor=Instance.new("Frame") cursor.Name="Ciseaux" cursor.AnchorPoint=Vector2.new(.5,.5)
 cursor.Size=UDim2.fromOffset(44,44) cursor.BackgroundTransparency=1 cursor.Visible=false cursor.Parent=curGui
-local TAILLE_CURSEUR=1  -- taille du curseur ciseaux (0.8 = plus petit, 1.2 = plus grand)
+local TAILLE_CURSEUR=0.7  -- taille du curseur ciseaux (0.8 = plus petit, 1.2 = plus grand)
 local cScale=Instance.new("UIScale") cScale.Scale=TAILLE_CURSEUR cScale.Parent=cursor
 local OPEN=27           -- ouverture des lames (degrés)
 local branches,tinted={},{}

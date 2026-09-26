@@ -805,4 +805,741 @@ BuyUpgrade.OnServerEvent:Connect(function(plr,uid)
 	plr:SetAttribute("Upg_"..uid,lvl+1)
 	applyUpgrades(plr)
 end)
+]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX3"><Properties><string name="Name">GrassClient</string><ProtectedString name="Source"><![CDATA[-- GrassClient (LocalScript dans StarterPlayerScripts)
+-- ANTI-LAG : n'affiche que les touffes proches du joueur, construites petit à petit.
+if not game:GetService("RunService"):IsClient() then
+	warn("[Herbe] GrassClient doit être un LocalScript dans StarterPlayer > StarterPlayerScripts (pas un Script) !")
+	return
+end
+print("[Herbe] GrassClient démarré")
+local Players=game:GetService("Players")
+local RS=game:GetService("ReplicatedStorage")
+local Run=game:GetService("RunService")
+local CS=game:GetService("CollectionService")
+local UIS=game:GetService("UserInputService")
+local lp=Players.LocalPlayer
+local CFG=require(RS:WaitForChild("GrassConfig"))
+local K=require(RS:WaitForChild("GrassKit"))
+local remotes=RS:WaitForChild("GrassRemotes")
+local cam=workspace.CurrentCamera
+local pgui=lp:WaitForChild("PlayerGui")
+
+local BAG_IMAGE="rbxassetid://124953051791395"
+local RENDER=CFG.RENDER_DIST or 120
+local WHITE,RED=Color3.new(1,1,1),Color3.fromRGB(255,90,75)
+local GREEN,GOLD=Color3.fromRGB(150,245,90),Color3.fromRGB(255,215,70)
+local RARITY_TEXT={Or="✨ HERBE EN OR !",Diamant="💎 HERBE DIAMANT !",ArcEnCiel="🌈 HERBE ARC-EN-CIEL !"}
+local fx=Instance.new("Folder") fx.Name="GrassFX" fx.Parent=workspace
+local vis=Instance.new("Folder") vis.Name="GrassVisuals" vis.Parent=workspace
+local hitF=Instance.new("Folder") hitF.Name="GrassHit" hitF.Parent=workspace
+
+-- ===== outils =====
+local function tween(d,f)
+	local t0=os.clock()
+	while true do
+		local a=math.min((os.clock()-t0)/d,1)
+		f(a)
+		if a>=1 then return end
+		Run.RenderStepped:Wait()
+	end
+end
+local function outQuad(a) return 1-(1-a)^2 end
+local function bez(a,b,c,t) return (1-t)^2*a+2*(1-t)*t*b+t*t*c end
+local function stroke(o,th,col,border)
+	local s=Instance.new("UIStroke") s.Thickness=th s.Color=col
+	if border then s.ApplyStrokeMode=Enum.ApplyStrokeMode.Border end
+	s.Parent=o return s
+end
+local function corner(o,r) local c=Instance.new("UICorner") c.CornerRadius=r or UDim.new(1,0) c.Parent=o end
+local function fxPart(cls,shape)
+	local p=Instance.new(cls) if shape then p.Shape=shape end
+	p.Material=Enum.Material.SmoothPlastic p.Anchored=true
+	p.CanCollide=false p.CanQuery=false p.CanTouch=false p.CastShadow=false
+	return p
+end
+local function sound(id,pos,vol)
+	if not id or id=="" then return end
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local s=Instance.new("Sound") s.SoundId=id s.Volume=vol or .6 s.Parent=at
+	s:Play() game:GetService("Debris"):AddItem(at,4)
+end
+local function fmt(g) if g==math.floor(g) then return tostring(g) end return string.format("%.2f",g) end
+
+-- ===== interface du sac (en bas à gauche, sans animation) =====
+local gui=Instance.new("ScreenGui") gui.Name="GrassBagGui" gui.ResetOnSpawn=false gui.IgnoreGuiInset=true
+gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling gui.Parent=pgui
+
+local root=Instance.new("Frame") root.Name="Sac" root.AnchorPoint=Vector2.new(0,1)
+root.Position=UIS.TouchEnabled and UDim2.new(0,10,1,-10) or UDim2.new(0,16,1,-16)
+root.Size=UDim2.fromOffset(150,172) root.BackgroundTransparency=1 root.Parent=gui
+local uiScale=Instance.new("UIScale") uiScale.Parent=root
+-- plus petit, et encore réduit sur téléphone / tablette
+local function rescale()
+	local s=math.clamp(cam.ViewportSize.Y/950,.4,1)
+	if UIS.TouchEnabled then s*=.8 end
+	uiScale.Scale=s
+end
+rescale() cam:GetPropertyChangedSignal("ViewportSize"):Connect(rescale)
+
+local function bagImage(parent,color,transp)
+	local i=Instance.new("ImageLabel") i.BackgroundTransparency=1 i.Image=BAG_IMAGE i.ScaleType=Enum.ScaleType.Fit
+	i.Size=UDim2.fromOffset(140,140) i.ImageColor3=color or WHITE i.ImageTransparency=transp or 0 i.Parent=parent
+	return i
+end
+local icon=Instance.new("Frame") icon.Name="Image" icon.AnchorPoint=Vector2.new(.5,0) icon.Position=UDim2.new(.5,0,0,0)
+icon.Size=UDim2.fromOffset(140,140) icon.BackgroundTransparency=1 icon.Parent=root
+local shadow=bagImage(icon,Color3.new(0,0,0),.6) shadow.Position=UDim2.fromOffset(4,6)
+bagImage(icon,Color3.fromRGB(110,110,110),0)
+local clip=Instance.new("Frame") clip.AnchorPoint=Vector2.new(0,1) clip.Position=UDim2.fromScale(0,1)
+clip.Size=UDim2.fromScale(1,0) clip.BackgroundTransparency=1 clip.ClipsDescendants=true clip.Parent=icon
+local full=bagImage(clip) full.AnchorPoint=Vector2.new(0,1) full.Position=UDim2.fromScale(0,1)
+
+local count=Instance.new("TextLabel") count.Name="Compteur" count.AnchorPoint=Vector2.new(.5,.5) count.Position=UDim2.new(.5,0,0,92)
+count.Size=UDim2.fromOffset(120,44) count.BackgroundTransparency=1 count.Font=Enum.Font.FredokaOne count.TextScaled=true
+count.TextColor3=WHITE count.Text="0/"..CFG.BAG_CAPACITY count.ZIndex=3 count.Parent=root
+local cs=stroke(count,4,Color3.fromRGB(15,15,15)) cs.LineJoinMode=Enum.LineJoinMode.Round
+
+local toast=Instance.new("TextLabel") toast.AnchorPoint=Vector2.new(.5,1) toast.Position=UDim2.new(.5,0,1,-150)
+toast.Size=UDim2.fromOffset(520,46) toast.BackgroundColor3=Color3.fromRGB(44,22,18) toast.BackgroundTransparency=.1
+toast.Font=Enum.Font.FredokaOne toast.TextScaled=true toast.TextColor3=WHITE toast.Visible=false toast.Parent=gui
+corner(toast,UDim.new(0,14)) stroke(toast,2.5,RED,true)
+local pad=Instance.new("UIPadding") pad.PaddingLeft=UDim.new(0,16) pad.PaddingRight=UDim.new(0,16)
+pad.PaddingTop=UDim.new(0,7) pad.PaddingBottom=UDim.new(0,7) pad.Parent=toast
+local toastId=0
+local function showToast(text)
+	toastId+=1 local id=toastId
+	toast.Text=text toast.Visible=true
+	task.delay(2,function() if toastId==id then toast.Visible=false end end)
+end
+
+-- ===== texte de mutation (or / diamant / arc-en-ciel) =====
+local STY={
+	Or={a=Color3.fromRGB(255,248,170),b=Color3.fromRGB(255,165,30),st=Color3.fromRGB(95,50,0)},
+	Diamant={a=Color3.fromRGB(240,255,255),b=Color3.fromRGB(80,190,255),st=Color3.fromRGB(10,45,95)},
+	ArcEnCiel={st=Color3.fromRGB(45,20,70)},
+}
+local RAINBOW=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(255,90,90)),ColorSequenceKeypoint.new(.2,Color3.fromRGB(255,190,60)),
+	ColorSequenceKeypoint.new(.4,Color3.fromRGB(250,250,90)),ColorSequenceKeypoint.new(.6,Color3.fromRGB(90,240,120)),
+	ColorSequenceKeypoint.new(.8,Color3.fromRGB(90,170,255)),ColorSequenceKeypoint.new(1,Color3.fromRGB(210,110,255))})
+local banner=Instance.new("Frame") banner.AnchorPoint=Vector2.new(.5,.5) banner.Position=UDim2.new(.5,0,0,120)
+banner.Size=UDim2.fromOffset(620,110) banner.BackgroundTransparency=1 banner.Visible=false banner.Parent=gui
+local bScale=Instance.new("UIScale") bScale.Parent=banner
+local bTitle=Instance.new("TextLabel") bTitle.BackgroundTransparency=1 bTitle.Size=UDim2.fromScale(1,.66)
+bTitle.Font=Enum.Font.FredokaOne bTitle.TextScaled=true bTitle.TextColor3=WHITE bTitle.Parent=banner
+local bStroke=stroke(bTitle,5,Color3.new(0,0,0)) bStroke.LineJoinMode=Enum.LineJoinMode.Round
+local bGrad=Instance.new("UIGradient") bGrad.Rotation=90 bGrad.Parent=bTitle
+local bSub=Instance.new("TextLabel") bSub.BackgroundTransparency=1 bSub.Position=UDim2.fromScale(0,.64) bSub.Size=UDim2.fromScale(1,.34)
+bSub.Font=Enum.Font.FredokaOne bSub.TextScaled=true bSub.TextColor3=WHITE bSub.Parent=banner
+local sStroke=stroke(bSub,3.5,Color3.new(0,0,0)) sStroke.LineJoinMode=Enum.LineJoinMode.Round
+local fitScale=1
+local function fit() fitScale=math.clamp(cam.ViewportSize.X/1400,.4,1) end
+fit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(fit)
+do local sc=Instance.new("UIScale") sc.Parent=toast
+	local function f2() sc.Scale=math.clamp(cam.ViewportSize.X/1400,.4,1) end f2() cam:GetPropertyChangedSignal("ViewportSize"):Connect(f2) end
+local bannerId=0
+local function showBanner(rarity,size)
+	bannerId+=1 local id=bannerId
+	local s=STY[rarity] or STY.Or
+	bTitle.Text=RARITY_TEXT[rarity] or rarity
+	bSub.Text="+"..size.." 🎒"
+	bStroke.Color=s.st sStroke.Color=s.st
+	bGrad.Rotation=rarity=="ArcEnCiel" and 0 or 90
+	bGrad.Color=rarity=="ArcEnCiel" and RAINBOW or ColorSequence.new(s.a,s.b)
+	for _,o in {bTitle,bSub} do o.TextTransparency=0 end bStroke.Transparency=0 sStroke.Transparency=0
+	banner.Visible=true
+	task.spawn(function()
+		-- apparition "pop"
+		tween(.28,function(a)
+			if bannerId~=id then return end
+			local e=a<.6 and (a/.6)*1.18 or 1.18-.18*((a-.6)/.4)
+			bScale.Scale=fitScale*e
+		end)
+		-- l'arc-en-ciel défile, les autres brillent un peu
+		local t0=os.clock()
+		while bannerId==id and os.clock()-t0<1.5 do
+			if rarity=="ArcEnCiel" then bGrad.Offset=Vector2.new(math.sin((os.clock()-t0)*3)*.3,0)
+			else bScale.Scale=fitScale*(1+math.sin((os.clock()-t0)*6)*.02) end
+			Run.RenderStepped:Wait()
+		end
+		-- disparition en fondu
+		tween(.3,function(a)
+			if bannerId~=id then return end
+			bTitle.TextTransparency=a bSub.TextTransparency=a bStroke.Transparency=a sStroke.Transparency=a
+			bScale.Scale=fitScale*(1-.15*a)
+		end)
+		if bannerId==id then banner.Visible=false end
+	end)
+end
+
+local shown,pendingPicks,depositing=0,0,false
+local function maxBag() return lp:GetAttribute("BagMax") or CFG.BAG_CAPACITY end
+local function realBag() return lp:GetAttribute("Bag") or 0 end
+local function refresh()
+	local m=maxBag()
+	shown=math.clamp(shown,0,m)
+	count.Text=shown.."/"..m
+	clip.Size=UDim2.fromScale(1,m>0 and shown/m or 0)
+	count.TextColor3=shown>=m and RED or WHITE
+end
+local function sync() if pendingPicks==0 and not depositing then shown=realBag() refresh() end end
+lp:GetAttributeChangedSignal("Bag"):Connect(sync)
+lp:GetAttributeChangedSignal("BagMax"):Connect(refresh)
+shown=realBag() refresh()
+
+-- ===== argent (en bas à droite) =====
+local COIN="rbxassetid://103593634628600"
+local mRoot=Instance.new("Frame") mRoot.Name="Argent" mRoot.AnchorPoint=Vector2.new(1,1)
+mRoot.Position=UDim2.new(1,-18,1,-14) mRoot.Size=UDim2.fromOffset(230,70) mRoot.BackgroundTransparency=1 mRoot.Parent=gui
+local mScale=Instance.new("UIScale") mScale.Parent=mRoot
+local function mFit() local s=math.clamp(cam.ViewportSize.Y/950,.45,1) if UIS.TouchEnabled then s=math.min(s,.6) end mScale.Scale=s end
+mFit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(mFit)
+local mIcon=Instance.new("ImageLabel") mIcon.BackgroundTransparency=1 mIcon.Image=COIN mIcon.ScaleType=Enum.ScaleType.Fit
+mIcon.AnchorPoint=Vector2.new(1,.5) mIcon.Position=UDim2.fromScale(1,.5) mIcon.Size=UDim2.fromOffset(70,70) mIcon.ZIndex=3 mIcon.Parent=mRoot
+local mPop=Instance.new("UIScale") mPop.Parent=mIcon
+local mText=Instance.new("TextLabel") mText.BackgroundTransparency=1 mText.AnchorPoint=Vector2.new(1,.5)
+mText.Position=UDim2.new(1,-76,.5,0) mText.Size=UDim2.fromOffset(160,54) mText.Font=Enum.Font.LuckiestGuy
+mText.TextScaled=true mText.TextXAlignment=Enum.TextXAlignment.Right mText.Text="$0.00" mText.TextColor3=WHITE mText.ZIndex=3 mText.Parent=mRoot
+local mst=stroke(mText,4,Color3.fromRGB(26,22,28)) mst.LineJoinMode=Enum.LineJoinMode.Round
+local mg=Instance.new("UIGradient") mg.Rotation=90 mg.Color=ColorSequence.new(WHITE,Color3.fromRGB(255,228,140)) mg.Parent=mText
+local mTextPop=Instance.new("UIScale") mTextPop.Parent=mText
+task.spawn(function()
+	local ls=lp:WaitForChild("leaderstats",20) if not ls then return end
+	local mv
+	for _=1,40 do
+		if CFG.MONEY_STAT and CFG.MONEY_STAT~="" then mv=ls:FindFirstChild(CFG.MONEY_STAT) end
+		if not mv then for _,n in {"Money","Cash","Argent","Coins","Dollars","$"} do mv=ls:FindFirstChild(n) if mv then break end end end
+		if mv then break end task.wait(.25)
+	end
+	if not mv then return end
+	local last=tonumber(mv.Value) or 0
+	mText.Text=string.format("$%.2f",last)
+	mv.Changed:Connect(function()
+		local v=tonumber(mv.Value) or 0
+		mText.Text=string.format("$%.2f",v)
+		if v>last then
+			mPop.Scale=1.35 game:GetService("TweenService"):Create(mPop,TweenInfo.new(.35,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Scale=1}):Play()
+			mTextPop.Scale=1.2 game:GetService("TweenService"):Create(mTextPop,TweenInfo.new(.3,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Scale=1}):Play()
+		end
+		last=v
+	end)
+end)
+
+-- ===== touffes affichées seulement près du joueur =====
+local data={}      -- toutes les touffes de la partie (juste des infos)
+local visible={}   -- [id] = {bl=modèle, hb=zone de clic, cf=position}
+local queued={}
+local queue={}
+local gone={}      -- touffes déjà ramassées avant d'avoir reçu la liste
+local rainbow={}
+
+local function spawnVisual(e)
+	local cf=CFrame.new(e.p)*CFrame.Angles(0,e.yaw,0)
+	local bl=K.Build(cf,e.s,e.seed,true,e.r)
+	bl.Name="Touffe" bl.Parent=vis
+	local _,sz=bl:GetBoundingBox()
+	local hb=Instance.new("Part") hb.Name="Hit" hb.Size=Vector3.new(sz.X+.4,math.max(sz.Y,1),sz.Z+.4)
+	hb.CFrame=cf*CFrame.new(0,hb.Size.Y/2,0) hb.Transparency=1 hb.Anchored=true
+	hb.CanCollide=false hb.CanTouch=false hb.CanQuery=true hb.CastShadow=false
+	hb:SetAttribute("Id",e.id) hb.Parent=hitF
+	local st=K.STYLE[e.r]
+	if st and st.spark then
+		local pe=Instance.new("ParticleEmitter")
+		pe.Color=ColorSequence.new(st.spark)
+		pe.Size=NumberSequence.new({NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(.2,.35*e.s),NumberSequenceKeypoint.new(1,0)})
+		pe.Lifetime=NumberRange.new(.8,1.2) pe.Rate=st.rate pe.Speed=NumberRange.new(.3,1)
+		pe.SpreadAngle=Vector2.new(180,180) pe.LightEmission=1 pe.LightInfluence=0 pe.Parent=hb
+	end
+	if e.r=="ArcEnCiel" then rainbow[bl]=bl end
+	visible[e.id]={bl=bl,hb=hb,cf=cf}
+end
+local function despawnVisual(id)
+	local v=visible[id]
+	if v then v.bl:Destroy() v.hb:Destroy() visible[id]=nil end
+end
+
+-- récupère la liste des touffes au démarrage
+task.spawn(function()
+	local list=remotes:WaitForChild("GetGrass"):InvokeServer()
+	for _,a in list do
+		local id=a[1]
+		if not gone[id] then
+			data[id]={id=id,p=Vector3.new(a[2],a[3],a[4]),yaw=a[5],s=a[6],r=a[7],seed=a[8],size=a[9]}
+		end
+	end
+end)
+
+-- toutes les 0.3 s : on affiche ce qui est proche, on retire ce qui est loin
+task.spawn(function()
+	while true do
+		local ch=lp.Character
+		local hrp=ch and ch:FindFirstChild("HumanoidRootPart")
+		local c=hrp and hrp.Position or cam.CFrame.Position
+		for id,e in data do
+			local d=(e.p-c).Magnitude
+			if d<RENDER then
+				if not visible[id] and not queued[id] then queued[id]=true table.insert(queue,id) end
+			elseif d>RENDER+20 and visible[id] then
+				despawnVisual(id)
+			end
+		end
+		task.wait(.3)
+	end
+end)
+-- on construit max 8 touffes par image (pas de freeze)
+Run.Heartbeat:Connect(function()
+	local n=0
+	while #queue>0 and n<8 do
+		local id=table.remove(queue)
+		queued[id]=nil
+		local e=data[id]
+		if e and not visible[id] then spawnVisual(e) n+=1 end
+	end
+end)
+
+-- couleurs arc-en-ciel qui défilent
+local acc=0
+Run.Heartbeat:Connect(function(dt)
+	acc+=dt if acc<1/20 then return end acc=0
+	local tt=os.clock()*.25
+	for key,bl in rainbow do
+		if not key.Parent then rainbow[key]=nil else
+			for _,p in bl:GetChildren() do
+				local h=p:GetAttribute("Hue")
+				if h then p.Color=K.RainbowColor((h+tt)%1,p:GetAttribute("Tone")) end
+			end
+		end
+	end
+end)
+
+-- ===== survol + clic (sans ClickDetector) =====
+local hl=Instance.new("Highlight")
+hl.FillColor=WHITE hl.OutlineColor=WHITE hl.FillTransparency=.88 hl.OutlineTransparency=0
+hl.DepthMode=Enum.HighlightDepthMode.Occluded hl.Enabled=false hl.Parent=fx
+local hovered
+local rp=RaycastParams.new() rp.FilterType=Enum.RaycastFilterType.Exclude
+local function idFromRay(ray)
+	local ex={fx,vis}
+	if lp.Character then table.insert(ex,lp.Character) end
+	rp.FilterDescendantsInstances=ex
+	local hit=workspace:Raycast(ray.Origin,ray.Direction*250,rp)
+	if hit and hit.Instance.Parent==hitF then return hit.Instance:GetAttribute("Id") end
+end
+-- on ne coupe l'herbe qu'avec les ciseaux en main (et pas pendant que le menu des améliorations est ouvert)
+local function holdingScissors()
+	if lp:GetAttribute("MenuOuvert") then return false end
+	local ch=lp.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+end
+local function setHover(id)
+	hovered=id
+	local v=id and visible[id]
+	local e=id and data[id]
+	if not (v and e) then hl.Enabled=false hl.Adornee=nil return end
+	local col=(realBag()+e.size>maxBag()) and RED or (K.OUTLINE[e.r] or WHITE)
+	hl.OutlineColor=col hl.FillColor=col hl.Adornee=v.bl hl.Enabled=true
+end
+-- ===== curseur en forme de ciseaux (quand on les tient) =====
+local curGui=Instance.new("ScreenGui") curGui.Name="CurseurCiseaux" curGui.ResetOnSpawn=false
+curGui.IgnoreGuiInset=true curGui.DisplayOrder=100 curGui.Parent=pgui
+local cursor=Instance.new("Frame") cursor.Name="Ciseaux" cursor.AnchorPoint=Vector2.new(.5,.5)
+cursor.Size=UDim2.fromOffset(44,44) cursor.BackgroundTransparency=1 cursor.Visible=false cursor.Parent=curGui
+local TAILLE_CURSEUR=0.7  -- taille du curseur ciseaux (0.8 = plus petit, 1.2 = plus grand)
+local cScale=Instance.new("UIScale") cScale.Scale=TAILLE_CURSEUR cScale.Parent=cursor
+local OPEN=27           -- ouverture des lames (degrés)
+local branches,tinted={},{}
+local snipT=-math.huge
+local function drawScissors(col,offset,transp)
+	local layer=Instance.new("Frame") layer.BackgroundTransparency=1 layer.Size=UDim2.fromScale(1,1)
+	layer.Position=UDim2.fromOffset(offset,offset) layer.Parent=cursor
+	for _,s in {1,-1} do
+		-- une branche = une lame en haut + un anneau en bas, qui tourne autour de la vis
+		local h=Instance.new("Frame") h.BackgroundTransparency=1 h.AnchorPoint=Vector2.new(.5,.5)
+		h.Position=UDim2.fromScale(.5,.5) h.Size=UDim2.fromOffset(16,50) h.Rotation=s*OPEN h.Parent=layer
+		local blade=Instance.new("Frame") blade.BorderSizePixel=0 blade.BackgroundColor3=col blade.BackgroundTransparency=transp
+		blade.AnchorPoint=Vector2.new(.5,1) blade.Position=UDim2.new(.5,0,.5,0) blade.Size=UDim2.fromOffset(5,22) blade.Parent=h
+		corner(blade)
+		local shank=Instance.new("Frame") shank.BorderSizePixel=0 shank.BackgroundColor3=col shank.BackgroundTransparency=transp
+		shank.AnchorPoint=Vector2.new(.5,0) shank.Position=UDim2.new(.5,0,.5,-1) shank.Size=UDim2.fromOffset(3,12) shank.Parent=h
+		local ring=Instance.new("Frame") ring.BackgroundTransparency=1 ring.AnchorPoint=Vector2.new(.5,1)
+		ring.Position=UDim2.fromScale(.5,1) ring.Size=UDim2.fromOffset(12,12) ring.Parent=h
+		corner(ring)
+		local rs=stroke(ring,3,col) rs.Transparency=transp
+		table.insert(branches,{h=h,s=s})
+		if offset==0 then table.insert(tinted,blade) table.insert(tinted,shank) table.insert(tinted,rs) end
+	end
+end
+drawScissors(Color3.new(0,0,0),2,.55) -- ombre douce
+drawScissors(WHITE,0,0)
+local cursorShown,savedMouseIcon=false,true
+local function updateCursor(m)
+	-- visible seulement quand on vise de l'herbe (et un court instant après la coupe pour le clic-clac)
+	local e=hovered and visible[hovered] and data[hovered]
+	local show=UIS.MouseEnabled and holdingScissors() and (e~=nil or os.clock()-snipT<.2)
+	if show~=cursorShown then
+		cursorShown=show cursor.Visible=show
+		if show then savedMouseIcon=UIS.MouseIconEnabled UIS.MouseIconEnabled=false
+		else UIS.MouseIconEnabled=savedMouseIcon end
+	end
+	if not show then return end
+	cursor.Position=UDim2.fromOffset(m.X,m.Y)
+	-- toujours blanc (rouge seulement si le sac est trop plein pour cette touffe)
+	local col=(e and realBag()+e.size>maxBag()) and RED or WHITE
+	for _,o in tinted do if o:IsA("UIStroke") then o.Color=col else o.BackgroundColor3=col end end
+	-- clic-clac des lames
+	local t=(os.clock()-snipT)/.16
+	local ang=(t>=0 and t<1) and OPEN*(1-.85*math.sin(t*math.pi)) or OPEN
+	for _,b in branches do b.h.Rotation=b.s*ang end
+end
+Run.RenderStepped:Connect(function()
+	local m=UIS:GetMouseLocation()
+	if UIS.MouseEnabled then
+		local id=holdingScissors() and idFromRay(cam:ViewportPointToRay(m.X,m.Y)) or nil
+		if id~=hovered then setHover(id) end
+	end
+	updateCursor(m)
+end)
+-- clic avec les ciseaux = coupe l'herbe visée ; amélioration "Maintenir" = rester appuyé coupe en continu là où tu vises
+local holding,holdInput=false,nil
+local lastHint=0
+UIS.InputBegan:Connect(function(input,gp)
+	if gp then return end
+	local t=input.UserInputType
+	if t==Enum.UserInputType.MouseButton1 or t==Enum.UserInputType.Touch then
+		holding=true holdInput=input
+		local id=idFromRay(cam:ScreenPointToRay(input.Position.X,input.Position.Y))
+		if id then
+			if holdingScissors() then snipT=os.clock() remotes.PickRequest:FireServer(id)
+			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
+		end
+	end
+end)
+UIS.InputEnded:Connect(function(input)
+	if input==holdInput or input.UserInputType==Enum.UserInputType.MouseButton1 then holding=false holdInput=nil end
+end)
+task.spawn(function()
+	while true do
+		local dex=lp:GetAttribute("Upg_Dexterite") or 0
+		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-.15*dex))
+		task.wait(cd+.05)
+		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingScissors() then
+			local pos=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and holdInput.Position or UIS:GetMouseLocation()
+			local ray=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and cam:ScreenPointToRay(pos.X,pos.Y) or cam:ViewportPointToRay(pos.X,pos.Y)
+			local id=idFromRay(ray)
+			if id then remotes.PickRequest:FireServer(id) end
+		end
+	end
+end)
+
+-- ===== effets dans le monde =====
+local DIRT={Color3.fromRGB(104,74,46),Color3.fromRGB(86,60,36),Color3.fromRGB(122,90,58)}
+local function burst(pos,nDirt,nGrass,power,col)
+	local bits={}
+	for i=1,nDirt+nGrass do
+		local g=i>nDirt
+		local p=fxPart(g and "WedgePart" or "Part")
+		local sz=math.random(10,20)/100
+		p.Size=g and Vector3.new(.05,.35,.14) or Vector3.new(sz,sz,sz)
+		if g then
+			if col=="rainbow" then p.Color=Color3.fromHSV(math.random(),.7,1)
+			elseif col then p.Color=col
+			else p.Color=Color3.fromRGB(110+math.random(0,40),185+math.random(0,40),45) end
+		else p.Color=DIRT[math.random(1,3)] end
+		p.CFrame=CFrame.new(pos) p.Parent=fx
+		local a=math.random()*math.pi*2
+		local s=math.random(20,60)/10*power
+		bits[i]={p=p,v=Vector3.new(math.cos(a)*s,math.random(60,110)/10*power,math.sin(a)*s),
+			r=Vector3.new(math.random(-15,15),math.random(-15,15),math.random(-15,15)),s=p.Size}
+	end
+	task.spawn(function()
+		tween(.65,function(a)
+			local t=a*.65
+			for _,b in bits do
+				b.p.CFrame=CFrame.new(pos+b.v*t+Vector3.new(0,-26*t*t,0))*CFrame.Angles(b.r.X*t,b.r.Y*t,b.r.Z*t)
+				if a>.55 then b.p.Size=b.s*math.max(1-(a-.55)/.45,.01) end
+			end
+		end)
+		for _,b in bits do b.p:Destroy() end
+	end)
+end
+
+local function puffs(pos)
+	for i=1,6 do
+		local a=i/6*math.pi*2+math.random()*.5
+		local p=fxPart("Part",Enum.PartType.Ball)
+		p.Size=Vector3.new(.4,.4,.4) p.Color=Color3.fromRGB(196,170,130) p.Transparency=.3
+		p.CFrame=CFrame.new(pos) p.Parent=fx
+		local dir=Vector3.new(math.cos(a),.35,math.sin(a))
+		task.spawn(function()
+			tween(.55,function(t)
+				local e=outQuad(t)
+				p.CFrame=CFrame.new(pos+dir*1.4*e+Vector3.new(0,.2,0))
+				local s=.4+1.1*e p.Size=Vector3.new(s,s,s) p.Transparency=.3+.7*t
+			end)
+			p:Destroy()
+		end)
+	end
+end
+
+local function popupAt(pos,text,color)
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(180,90) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
+	local t=Instance.new("TextLabel") t.Size=UDim2.fromScale(1,1) t.BackgroundTransparency=1
+	t.Text=text t.Font=Enum.Font.FredokaOne t.TextScaled=true t.TextColor3=color t.Parent=g
+	local st=stroke(t,3,Color3.fromRGB(20,40,12))
+	g.Parent=pgui
+	task.spawn(function()
+		tween(1,function(a)
+			g.StudsOffset=Vector3.new(0,a*2.4,0)
+			local f=math.clamp((a-.55)/.45,0,1) t.TextTransparency=f st.Transparency=f
+		end)
+		g:Destroy() at:Destroy()
+	end)
+end
+
+-- ===== bras du joueur (lancer dans le composteur) =====
+local armOrig=setmetatable({},{__mode="k"})
+local armId=0
+local function armAnim(steps)
+	local ch=lp.Character if not ch then return end
+	local m,r15
+	local ua=ch:FindFirstChild("RightUpperArm")
+	if ua and ua:FindFirstChild("RightShoulder") then m=ua.RightShoulder r15=true
+	elseif ch:FindFirstChild("Torso") and ch.Torso:FindFirstChild("Right Shoulder") then m=ch.Torso["Right Shoulder"] end
+	if not m or not m:IsA("Motor6D") then return end
+	armOrig[m]=armOrig[m] or m.C0
+	local c0=armOrig[m]
+	armId+=1 local id=armId
+	local cur=0
+	local function set(x)
+		if armId~=id then return end
+		cur=x
+		pcall(function() m.C0=c0*(r15 and CFrame.Angles(x,0,0) or CFrame.Angles(0,0,x)) end)
+	end
+	for _,s in steps do
+		local from=cur
+		tween(s[1],function(a) set(from+(s[2]-from)*outQuad(a)) end)
+	end
+	if armId==id then pcall(function() m.C0=c0 end) end
+end
+
+-- ===== coupe aux ciseaux : effets =====
+local SNIP_SOUND="rbxassetid://135446324303740" -- son de l'herbe coupée (remplacé par PICK_SOUND si tu en mets un)
+local function snipSound(pos)
+	local id=(CFG.PICK_SOUND and CFG.PICK_SOUND~="") and CFG.PICK_SOUND or SNIP_SOUND
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local s=Instance.new("Sound") s.SoundId=id s.Volume=.6 s.PlaybackSpeed=.95+math.random()*.1 s.RollOffMaxDistance=60 s.Parent=at
+	s:Play() game:GetService("Debris"):AddItem(at,3)
+end
+local function leafColor(m)
+	for _,p in m:GetDescendants() do if p:IsA("BasePart") then return p.Color end end
+	return Color3.fromRGB(110,190,50)
+end
+-- deux lames blanches qui se referment sur la touffe
+local function slash(center,w)
+	local right=Vector3.new(cam.CFrame.RightVector.X,0,cam.CFrame.RightVector.Z)
+	if right.Magnitude<.01 then right=Vector3.new(1,0,0) end
+	right=right.Unit
+	local len=math.max(w,.8)*1.25
+	local pivot=center-right*len/2
+	local look=CFrame.lookAt(pivot,pivot+right)
+	local blades={}
+	for s=-1,1,2 do
+		local b=fxPart("Part") b.Material=Enum.Material.Neon b.Color=Color3.new(1,1,1) b.Transparency=.05
+		b.Size=Vector3.new(.06,.06,len) b.Parent=fx
+		table.insert(blades,{p=b,s=s})
+	end
+	task.spawn(function()
+		tween(.08,function(a)
+			for _,bd in blades do
+				bd.p.CFrame=look*CFrame.Angles(bd.s*math.rad(30)*(1-outQuad(a)),0,0)*CFrame.new(0,0,-len/2)
+			end
+		end)
+		tween(.2,function(a)
+			for _,bd in blades do
+				local t=.06*(1-a)+.01
+				bd.p.Size=Vector3.new(t,t,len*(1+.15*a)) bd.p.Transparency=.05+.95*a
+				bd.p.CFrame=look*CFrame.new(0,0,-len/2)
+			end
+		end)
+		for _,bd in blades do bd.p:Destroy() end
+	end)
+end
+-- petit chaume coupé qui reste au sol quelques secondes
+local function stubble(cf,w,h,col)
+	local m=Instance.new("Model") m.Name="Chaume"
+	local parts={}
+	for i=1,7 do
+		local a=i/7*math.pi*2+math.random()*.6
+		local r=math.random()*math.max(w,.4)*.3
+		local hh=h*(.75+math.random()*.25)
+		local stem=fxPart("Part") stem.Size=Vector3.new(.08,hh,.08) stem.Color=col:Lerp(Color3.new(0,0,0),.15)
+		stem.CFrame=cf*CFrame.new(math.cos(a)*r,hh/2,math.sin(a)*r)*CFrame.Angles(math.random()*.24-.12,math.random()*6.28,math.random()*.24-.12)
+		stem.Parent=m
+		local tip=fxPart("Part") tip.Size=Vector3.new(.085,.02,.085) tip.Color=col:Lerp(Color3.fromRGB(255,255,210),.5) -- tranche nette
+		tip.CFrame=stem.CFrame*CFrame.new(0,hh/2,0) tip.Parent=m
+		table.insert(parts,stem) table.insert(parts,tip)
+	end
+	m.Parent=fx
+	task.delay(4,function()
+		local p0=m:GetPivot()
+		tween(.6,function(a)
+			m:PivotTo(p0*CFrame.new(0,-h*a,0))
+			for _,p in parts do p.Transparency=a end
+		end)
+		m:Destroy()
+	end)
+end
+
+-- ===== coupe d'une touffe =====
+remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rarity)
+	size=size or 1
+	rarity=rarity or "Normal"
+	local mine=picker==lp
+	if not data[id] then gone[id]=true end
+	data[id]=nil queued[id]=nil
+	local v=visible[id] visible[id]=nil
+	if hovered==id then setHover(nil) end
+	if mine then
+		snipT=os.clock() -- le curseur fait clic-clac
+		pendingPicks+=1
+		if RARITY_TEXT[rarity] then showBanner(rarity,size) end
+	end
+	local function arrived()
+		if not mine then return end
+		pendingPicks=math.max(0,pendingPicks-1)
+		shown+=size refresh()
+		if pendingPicks==0 and not depositing and shown~=realBag() then shown=realBag() refresh() end
+	end
+	if not v then arrived() return end
+	v.hb:Destroy()
+	local fake,P=v.bl,v.cf
+	fake.Parent=fx
+	local base=fake:GetScale()
+	local _,sz=fake:GetBoundingBox()
+	local h=math.max(sz.Y,.5)
+	local cutH=math.clamp(h*.18,.12,.4)          -- hauteur de la coupe
+	local cutPos=P.Position+Vector3.new(0,cutH,0)
+	local col=leafColor(fake)
+	-- 1) les lames se referment : "snip"
+	snipSound(cutPos)
+	slash(cutPos,math.max(sz.X,sz.Z))
+	-- 2) il reste un petit chaume coupé au sol
+	stubble(P,math.min(sz.X,sz.Z),cutH,col)
+	-- 3) des petits brins coupés volent (pas de terre : on ne l'arrache pas)
+	if rarity=="ArcEnCiel" then burst(cutPos,0,12,.45,"rainbow")
+	elseif rarity~="Normal" then burst(cutPos,0,9,.4,K.OUTLINE[rarity])
+	else burst(cutPos,0,6,.35,col) end
+	-- 4) le haut de la touffe bascule et tombe, puis file dans le sac
+	local hrp0=picker and picker.Character and picker.Character:FindFirstChild("HumanoidRootPart")
+	local away=hrp0 and Vector3.new(P.Position.X-hrp0.Position.X,0,P.Position.Z-hrp0.Position.Z) or Vector3.zero
+	if away.Magnitude<.1 then local a=math.random()*math.pi*2 away=Vector3.new(math.cos(a),0,math.sin(a)) end
+	away=away.Unit
+	local axis=Vector3.new(0,1,0):Cross(away).Unit
+	local top=P*CFrame.new(0,cutH,0)
+	fake:PivotTo(top)
+	task.spawn(function()
+		tween(.36,function(a)
+			local e=a*a -- accélère comme une vraie chute
+			fake:PivotTo(CFrame.new(top.Position+away*.4*e-Vector3.new(0,cutH*e,0))*CFrame.fromAxisAngle(axis,math.rad(84)*e)*top.Rotation)
+		end)
+		task.wait(.12)
+		local p0=fake:GetPivot()
+		tween(.32,function(a)
+			local hrp=picker and picker.Character and picker.Character:FindFirstChild("HumanoidRootPart")
+			local tgt=hrp and hrp.Position or p0.Position+Vector3.new(0,3,0)
+			local e=a*a
+			fake:PivotTo(CFrame.new(p0.Position:Lerp(tgt,e))*p0.Rotation)
+			fake:ScaleTo(base*math.max(1-e,.05))
+		end)
+		fake:Destroy()
+		arrived()
+	end)
+end)
+
+-- ===== pas assez de place =====
+remotes:WaitForChild("BagFull").OnClientEvent:Connect(function(id,size,free)
+	if free and free>0 then
+		showToast("🎒 Il te faut "..tostring(size).." places (il t'en reste "..free..") : va au composteur ♻️")
+	else
+		showToast("🎒 Sac plein ! Va le vider au composteur ♻️")
+	end
+end)
+
+-- ===== composteur : indication + vidage =====
+local hints={}
+local function addHint(c)
+	local hb=c:WaitForChild("GrassDepositHitbox",15) if not hb then return end
+	local g=Instance.new("BillboardGui") g.Name="CompostHint" g.Adornee=hb g.Size=UDim2.fromOffset(240,64)
+	g.AlwaysOnTop=true g.MaxDistance=90 g.LightInfluence=0 g.ResetOnSpawn=false g.Enabled=false
+	g.StudsOffsetWorldSpace=Vector3.new(0,hb.Size.Y/2+1.6,0)
+	local pill=Instance.new("Frame") pill.Size=UDim2.fromScale(1,1) pill.BackgroundColor3=Color3.fromRGB(34,58,24) pill.BackgroundTransparency=.08 pill.Parent=g
+	corner(pill,UDim.new(0,18)) stroke(pill,3,WHITE,true)
+	local im=Instance.new("ImageLabel") im.BackgroundTransparency=1 im.Image=BAG_IMAGE im.ScaleType=Enum.ScaleType.Fit
+	im.Size=UDim2.fromOffset(48,48) im.Position=UDim2.fromOffset(8,8) im.Parent=pill
+	local tx=Instance.new("TextLabel") tx.BackgroundTransparency=1 tx.Position=UDim2.fromOffset(62,10) tx.Size=UDim2.new(1,-72,1,-20)
+	tx.Font=Enum.Font.FredokaOne tx.TextScaled=true tx.TextColor3=WHITE tx.Text="VIDE TON SAC ICI ⬇" tx.Parent=pill
+	stroke(tx,2,Color3.fromRGB(18,38,10))
+	g.Parent=pgui
+	table.insert(hints,{g=g,tx=tx})
+end
+for _,c in CS:GetTagged("GrassCompost") do task.spawn(addHint,c) end
+CS:GetInstanceAddedSignal("GrassCompost"):Connect(addHint)
+
+local hintAcc=0
+Run.Heartbeat:Connect(function(dt)
+	hintAcc+=dt if hintAcc<.2 then return end hintAcc=0
+	local isFull=shown>=maxBag()
+	for _,h in hints do
+		h.g.Enabled=shown>0 and not depositing
+		h.tx.Text=isFull and "SAC PLEIN ! VIDE-LE ICI ⬇" or "VIDE TON SAC ICI ⬇"
+		h.tx.TextColor3=isFull and GOLD or WHITE
+	end
+end)
+
+local function compostTarget(c)
+	local s=c:FindFirstChild("Compost",true)
+	if s and s:IsA("BasePart") then return s.Position+Vector3.new(0,s.Size.Y/2+.9,0) end
+	local cf,size=c:GetBoundingBox()
+	return cf.Position+Vector3.new(0,size.Y*.15,0)
+end
+
+remotes:WaitForChild("Deposited").OnClientEvent:Connect(function(plr,c,n,gain)
+	local mine=plr==lp
+	if not c or not c.Parent then if mine then depositing=false sync() end return end
+	local target=compostTarget(c)
+	local ch=plr.Character
+	local hrp=ch and ch:FindFirstChild("HumanoidRootPart")
+	local k=math.clamp(n,1,6)
+	if mine then depositing=true shown=math.max(shown,n) task.spawn(armAnim,{{.1,2.5},{.14,.9},{.2,0}}) end
+	local remaining=n
+	for i=1,k do
+		local dec=(i==k) and remaining or math.floor(n/k)
+		remaining-=dec
+		task.delay((i-1)*.1,function()
+			local from=(hrp and hrp.Parent) and (hrp.CFrame*CFrame.new(.9,1.3,-.8)).Position or target+Vector3.new(0,6,0)
+			local m=K.Build(CFrame.new(from),.38,math.random(1,1000000),true)
+			m.Parent=fx
+			local base=m:GetScale()
+			local mid=(from+target)/2+Vector3.new(0,math.max(0,target.Y-from.Y)+3.5,0)
+			local sp=math.random()*6.28
+			tween(.5,function(a)
+				m:PivotTo(CFrame.new(bez(from,mid,target,a))*CFrame.Angles(a*5,sp+a*7,a*2))
+				if a>.75 then m:ScaleTo(base*math.max((1-a)/.25,.05)) end
+			end)
+			m:Destroy()
+			burst(target,1,4,.55)
+			if mine then shown=math.max(0,shown-dec) refresh() end
+			if i==k then
+				burst(target,4,8,1.1) puffs(target-Vector3.new(0,.5,0))
+				sound(CFG.DEPOSIT_SOUND,target,.7)
+				if mine then
+					if gain and gain>0 then popupAt(target+Vector3.new(0,2.5,0),"+"..fmt(gain).."$",GOLD)
+					else popupAt(target+Vector3.new(0,2.5,0),"+"..n.." 🌿",GREEN) end
+					depositing=false sync()
+				end
+			end
+		end)
+	end
+end)
 ]]></ProtectedString></Properties></Item></Item></roblox>
