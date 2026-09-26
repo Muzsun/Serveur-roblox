@@ -251,6 +251,14 @@ end
 
 ---------------------------------------------------------------- Comportement de l'outil
 
+
+-- délai entre 2 coupes (le même que pour couper une herbe, réduit par la Dextérité)
+local okCfg, CFG_HERBE = pcall(function() return require(game:GetService("ReplicatedStorage"):WaitForChild("GrassConfig", 10)) end)
+if not okCfg or type(CFG_HERBE) ~= "table" then CFG_HERBE = {} end
+local function delaiCoupe(qui)
+	local dex = qui and qui:GetAttribute("Upg_Dexterite") or 0
+	return math.max(0.2, (CFG_HERBE.PICK_COOLDOWN or 0.9) * (1 - (CFG_HERBE.DEX_PAR_NIVEAU or 0.08) * dex))
+end
 local coupes = {} -- [outil] = fonction qui joue l'animation de coupe
 
 local function brancherOutil(outil)
@@ -263,8 +271,12 @@ local function brancherOutil(outil)
 	end
 
 	-- bras vers le sol + deux coups de ciseaux (≈ 0,45 s)
+	local derniere = -math.huge
 	coupes[outil] = function()
 		if occupe or not tenu() then return end
+		-- pas de spam : une coupe seulement quand le délai pour couper une herbe est passé
+		if os.clock() - derniere < delaiCoupe(Players:GetPlayerFromCharacter(perso)) * 0.85 then return end
+		derniere = os.clock()
 		occupe = true
 		local epaule = trouverEpaule(perso)
 		bougerBras(epaule, ANGLE_COUPE, 0.12)

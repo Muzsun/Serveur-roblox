@@ -101,9 +101,18 @@ local function bruitCiseaux(volume)
 	son:Play()
 end
 
+
+-- délai entre 2 coupes (le même que pour couper une herbe, réduit par la Dextérité)
+local okCfg, CFG_HERBE = pcall(function() return require(game:GetService("ReplicatedStorage"):WaitForChild("GrassConfig", 10)) end)
+if not okCfg or type(CFG_HERBE) ~= "table" then CFG_HERBE = {} end
+local function delaiCoupe(qui)
+	local dex = qui and qui:GetAttribute("Upg_Dexterite") or 0
+	return math.max(0.2, (CFG_HERBE.PICK_COOLDOWN or 0.9) * (1 - (CFG_HERBE.DEX_PAR_NIVEAU or 0.08) * dex))
+end
 local function coupe()
 	local maintenant = os.clock()
-	if maintenant - debutCoupe < DUREE_COUPE * 0.8 then return end
+	-- pas de spam : on attend que le délai pour couper une herbe soit passé
+	if maintenant - debutCoupe < math.max(DUREE_COUPE * 0.8, delaiCoupe(joueur) * 0.85) then return end
 	debutCoupe, debutClac = maintenant, maintenant
 	bruitCiseaux(0.7)
 end

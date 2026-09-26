@@ -417,6 +417,7 @@ end)
 -- clic avec les ciseaux = coupe l'herbe visée ; amélioration "Maintenir" = rester appuyé coupe en continu là où tu vises
 local holding,holdInput=false,nil
 local lastHint=0
+local lastCut=-math.huge
 UIS.InputBegan:Connect(function(input,gp)
 	local t=input.UserInputType
 	local pad=input.KeyCode==Enum.KeyCode.ButtonR2 -- gâchette droite (PlayStation R2 / Xbox RT)
@@ -428,7 +429,11 @@ UIS.InputBegan:Connect(function(input,gp)
 		else ray=cam:ScreenPointToRay(input.Position.X,input.Position.Y) end
 		local id=idFromRay(ray)
 		if id then
-			if holdingScissors() then snipT=os.clock() remotes.PickRequest:FireServer(id)
+			if holdingScissors() then
+				-- pas de spam : on ne peut recouper qu'une fois le délai passé (même délai que le serveur)
+				local dex=lp:GetAttribute("Upg_Dexterite") or 0
+				local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
+				if os.clock()-lastCut>=cd then lastCut=os.clock() snipT=os.clock() remotes.PickRequest:FireServer(id) end
 			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
 		end
 	end
@@ -447,7 +452,7 @@ task.spawn(function()
 			elseif hi and hi.UserInputType==Enum.UserInputType.Touch then ray=cam:ScreenPointToRay(hi.Position.X,hi.Position.Y)
 			else local m=UIS:GetMouseLocation() ray=cam:ViewportPointToRay(m.X,m.Y) end
 			local id=idFromRay(ray)
-			if id then remotes.PickRequest:FireServer(id) end
+			if id then lastCut=os.clock() remotes.PickRequest:FireServer(id) end
 		end
 	end
 end)
