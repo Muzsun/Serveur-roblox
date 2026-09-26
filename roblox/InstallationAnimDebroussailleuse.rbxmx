@@ -1002,6 +1002,25 @@ local function libererSouris(oui)
 	end
 end
 
+-- les effets de flou du jeu (profondeur de champ, flou) sont coupés pendant la fiche : l'outil reste net
+local flous = {}
+local function couperFlou(oui)
+	if oui then
+		flous = {}
+		for _, conteneur in { game:GetService("Lighting"), cam } do
+			for _, e in conteneur:GetChildren() do
+				if (e:IsA("DepthOfFieldEffect") or e:IsA("BlurEffect")) and e.Enabled then
+					e.Enabled = false
+					table.insert(flous, e)
+				end
+			end
+		end
+	else
+		for _, e in flous do if e.Parent then e.Enabled = true end end
+		flous = {}
+	end
+end
+
 -- remet tout comme avant (aussi utilisé si une erreur arrive pendant l'ouverture)
 local function restaurer()
 	tourCamera += 1
@@ -1014,11 +1033,13 @@ local function restaurer()
 	lp:SetAttribute("MenuOuvert", false)
 	bloquerControles(false)
 	libererSouris(false)
+	couperFlou(false)
 	ouvert, fermeture = false, false
 end
 
 local function ouvrirInterne(v)
 	ouvert = true
+	couperFlou(true)
 	libererSouris(true)
 	for i, x in vitrines do if x == v then courant = i end end
 	etat.cf, etat.type, etat.fov = cam.CFrame, cam.CameraType, cam.FieldOfView
@@ -1092,6 +1113,7 @@ local function fermer()
 		lp:SetAttribute("MenuOuvert", false)
 		bloquerControles(false)
 		libererSouris(false)
+		couperFlou(false)
 		ouvert, fermeture = false, false
 	end)
 end
