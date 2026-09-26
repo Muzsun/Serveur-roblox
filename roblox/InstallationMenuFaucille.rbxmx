@@ -319,7 +319,7 @@ local UPGRADES={
 	-- FAUCILLE (il faut l'avoir achetée pour acheter ses améliorations)
 	FMaintenir={prices={3.50},max=1,requires="Faucille"},                     -- rester appuyé = fauche en continu
 	FRapidite={prices={2.00,3.00,4.50,6.50,9.00},max=5,requires="Faucille"},  -- la faucille frappe plus vite
-	FCoupe={prices={3.00,5.00,8.00},max=3,requires="Faucille"},               -- +1 touffe coupée à chaque coup par niveau
+	FCoupe={prices={3.00,5.00},max=2,requires="Faucille"},                    -- +1 touffe par niveau : 3 -> 4 -> 5 touffes par coup
 }
 local GROWTH=1.5 -- seulement si un niveau n'a pas de prix dans la liste
 local function cost(u,lvl)
@@ -363,7 +363,7 @@ print("[Faucille] FaucilleServer démarré")
 
 local REGLAGES = {
 	PRIX = 7.99,
-	TOUFFES_EN_PLUS = 3, -- touffes voisines coupées en plus à chaque coup (les ciseaux : 0)
+	TOUFFES_EN_PLUS = 2, -- touffes voisines coupées en plus à chaque coup : 2 = 3 touffes au début (jusqu'à 5 avec les améliorations)
 	RAYON = 5.5, -- rayon autour de la touffe visée (studs)
 	TAILLE_EN_MAIN = 0.75, -- taille de la faucille dans la main
 	INCLINAISON = 0, -- degrés : penche la faucille dans la main si besoin (ex : 20 ou -20)
@@ -2098,8 +2098,8 @@ local OUTILS={
 			desc="Reste appuyé sur le clic pour faucher en continu."},
 		{id="FRapidite",name="Rapidité",icon="rbxassetid://78716197209384",price=2.00,max=5,
 			desc="Ta faucille frappe plus vite : -8 % d'attente par niveau."},
-		{id="FCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=3.00,max=3,
-			desc="Chaque coup de faucille coupe une touffe de plus par niveau."},
+		{id="FCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=3.00,max=2,
+			desc="+1 touffe par coup de faucille : 3, puis 4, puis 5 touffes."},
 	}},
 	{name="Débroussailleuse",locked=true,color=Color3.fromRGB(150,220,110),items={{locked=true},{locked=true},{locked=true}}},
 }

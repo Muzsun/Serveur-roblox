@@ -319,7 +319,7 @@ local UPGRADES={
 	-- FAUCILLE (il faut l'avoir achetée pour acheter ses améliorations)
 	FMaintenir={prices={3.50},max=1,requires="Faucille"},                     -- rester appuyé = fauche en continu
 	FRapidite={prices={2.00,3.00,4.50,6.50,9.00},max=5,requires="Faucille"},  -- la faucille frappe plus vite
-	FCoupe={prices={3.00,5.00,8.00},max=3,requires="Faucille"},               -- +1 touffe coupée à chaque coup par niveau
+	FCoupe={prices={3.00,5.00},max=2,requires="Faucille"},                    -- +1 touffe par niveau : 3 -> 4 -> 5 touffes par coup
 }
 local GROWTH=1.5 -- seulement si un niveau n'a pas de prix dans la liste
 local function cost(u,lvl)

@@ -10,7 +10,7 @@ print("[Faucille] FaucilleServer démarré")
 
 local REGLAGES = {
 	PRIX = 7.99,
-	TOUFFES_EN_PLUS = 3, -- touffes voisines coupées en plus à chaque coup (les ciseaux : 0)
+	TOUFFES_EN_PLUS = 2, -- touffes voisines coupées en plus à chaque coup : 2 = 3 touffes au début (jusqu'à 5 avec les améliorations)
 	RAYON = 5.5, -- rayon autour de la touffe visée (studs)
 	TAILLE_EN_MAIN = 0.75, -- taille de la faucille dans la main
 	INCLINAISON = 0, -- degrés : penche la faucille dans la main si besoin (ex : 20 ou -20)

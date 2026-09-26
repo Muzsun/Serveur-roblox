@@ -69,13 +69,15 @@ local lastPick,lastFull,lastDep={},{},{}
 Players.PlayerRemoving:Connect(function(p) lastPick[p]=nil lastFull[p]=nil lastDep[p]=nil end)
 local function hrpOf(plr) return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") end
 
--- ===== ciseaux : on ne peut couper l'herbe qu'avec les ciseaux en main =====
+-- ===== outils de coupe : on ne peut couper l'herbe qu'avec un outil en main (ciseaux, faucille...) =====
 local SCISSORS_EXTRA=CFG.SCISSORS_EXTRA or 0   -- touffes voisines coupées en plus à chaque coup (0 = une par une)
 local SCISSORS_RADIUS=CFG.SCISSORS_RADIUS or 4 -- rayon autour de la touffe visée (studs)
-local function holdsScissors(plr)
+-- un outil peut couper plus : attributs "CoupeEnPlus" (touffes en plus) et "RayonCoupe" (studs) sur l'outil
+local function cutterTool(plr)
 	local ch=plr.Character
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
-	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+	if tool and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil) then return tool end
+	return nil
 end
 
 -- ===== composteur =====
@@ -258,7 +260,8 @@ end
 PickRequest.OnServerEvent:Connect(function(plr,id)
 	if typeof(id)~="number" then return end
 	local t=tufts[id] if not t then return end
-	if not holdsScissors(plr) then return end -- plus d'arrachage à la main
+	local tool=cutterTool(plr)
+	if not tool then return end -- plus d'arrachage à la main
 	local hrp=hrpOf(plr)
 	if not hrp or (hrp.Position-t.p).Magnitude>CFG.CLICK_DIST+8 then return end
 	local now=os.clock()
@@ -268,7 +271,12 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 		return
 	end
 	-- Dextérité : chaque niveau réduit le délai de DEX_PAR_NIVEAU (8 % par défaut)
-	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*(plr:GetAttribute("Upg_Dexterite") or 0)))
+	-- les améliorations (Dextérité, Saisir, Maintenir) ne marchent qu'avec les ciseaux
+	-- chaque outil a ses améliorations : ciseaux (Dextérité, Saisir) / faucille (Rapidité, Coupe supplémentaire)
+	local scissors=CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux"
+	local sickle=CS:HasTag(tool,"OutilFaucille") or tool.Name=="Faucille"
+	local dex=scissors and (plr:GetAttribute("Upg_Dexterite") or 0) or sickle and (plr:GetAttribute("Upg_FRapidite") or 0) or 0
+	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 	if lastPick[plr] and now-lastPick[plr]<cd then return end
 	lastPick[plr]=now
 	local function take(tid,tt)
@@ -283,13 +291,14 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	-- animation de coupe des ciseaux (script CiseauxServer)
 	local anim=game:GetService("ServerStorage"):FindFirstChild("CiseauxCoupe")
 	if anim then anim:Fire(plr) end
-	-- Ciseaux + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
-	local extra=SCISSORS_EXTRA+(plr:GetAttribute("Upg_Saisir") or 0)
+	-- outil + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
+	local extra=SCISSORS_EXTRA+(scissors and (plr:GetAttribute("Upg_Saisir") or 0) or 0)+(sickle and (plr:GetAttribute("Upg_FCoupe") or 0) or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	local radius=math.max(SCISSORS_RADIUS,tonumber(tool:GetAttribute("RayonCoupe")) or 0)
 	if extra>0 then
 		local near={}
 		for id2,t2 in tufts do
 			local d=(t2.p-t.p).Magnitude
-			if d<=SCISSORS_RADIUS then table.insert(near,{id2,t2,d}) end
+			if d<=radius then table.insert(near,{id2,t2,d}) end
 		end
 		table.sort(near,function(a,b) return a[3]<b[3] end)
 		local got=0
@@ -307,6 +316,10 @@ local UPGRADES={
 	Maintenir={prices={1.10},max=1},                      -- rester appuyé = coupe en continu avec les ciseaux
 	Dexterite={prices={0.60,0.90,1.35,2.00,3.00},max=5},  -- les ciseaux coupent plus vite
 	Saisir={prices={0.85,1.90},max=2},                    -- +1 touffe voisine coupée en même temps par niveau
+	-- FAUCILLE (il faut l'avoir achetée pour acheter ses améliorations)
+	FMaintenir={prices={3.50},max=1,requires="Faucille"},                     -- rester appuyé = fauche en continu
+	FRapidite={prices={2.00,3.00,4.50,6.50,9.00},max=5,requires="Faucille"},  -- la faucille frappe plus vite
+	FCoupe={prices={3.00,5.00},max=2,requires="Faucille"},                    -- +1 touffe par niveau : 3 -> 4 -> 5 touffes par coup
 }
 local GROWTH=1.5 -- seulement si un niveau n'a pas de prix dans la liste
 local function cost(u,lvl)
@@ -331,6 +344,7 @@ BuyUpgrade.OnServerEvent:Connect(function(plr,uid)
 	local now=os.clock() if lastBuy[plr] and now-lastBuy[plr]<.3 then return end lastBuy[plr]=now
 	local lvl=plr:GetAttribute("Upg_"..uid) or 0
 	if lvl>=u.max then return end
+	if u.requires and not plr:GetAttribute(u.requires) then return end -- ex : acheter la faucille d'abord
 	local c=cost(u,lvl)
 	local m=moneyStat(plr) if not m or (tonumber(m.Value) or 0)<c then return end
 	m.Value=math.floor(((tonumber(m.Value) or 0)-c)*100+.5)/100
@@ -375,6 +389,15 @@ local OUTILS={
 			desc="Tes ciseaux coupent un peu plus vite : -8 % d'attente par niveau."},
 		{id="Saisir",name="Saisir",icon="rbxassetid://120921144181867",price=0.85,max=2,
 			desc="Chaque coup coupe aussi une touffe voisine de plus par niveau."},
+	}},
+	-- requires = il faut posséder l'outil (attribut du joueur) pour acheter ses améliorations
+	{name="Faucille",icon="rbxassetid://138905055767473",color=Color3.fromRGB(120,190,255),requires="Faucille",items={
+		{id="FMaintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=3.50,max=1,
+			desc="Reste appuyé sur le clic pour faucher en continu."},
+		{id="FRapidite",name="Rapidité",icon="rbxassetid://78716197209384",price=2.00,max=5,
+			desc="Ta faucille frappe plus vite : -8 % d'attente par niveau."},
+		{id="FCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=3.00,max=2,
+			desc="+1 touffe par coup de faucille : 3, puis 4, puis 5 touffes."},
 	}},
 	{name="Débroussailleuse",locked=true,color=Color3.fromRGB(150,220,110),items={{locked=true},{locked=true},{locked=true}}},
 }
@@ -448,6 +471,7 @@ local function price(it)
 	local growth=(buyRemote and buyRemote:GetAttribute("Growth")) or 1.5
 	return math.floor(base*growth^level(it)*100+.5)/100
 end
+local function owned(outil) return not outil.requires or player:GetAttribute(outil.requires)==true end
 local function maxLevel(it) return (buyRemote and buyRemote:GetAttribute("Max_"..it.id)) or it.max end
 local function fmt(v) return string.format("%.2f$",v) end
 
@@ -606,7 +630,8 @@ local function makeRow(page,outil,item,i)
 	end
 	-- textes
 	lbl(row,item.locked and "???" or item.name,UDim2.fromScale(.19,.1),UDim2.fromScale(.4,.3),{z=4})
-	table.insert(descs,lbl(row,item.locked and "Bientôt disponible" or item.desc or "",UDim2.fromScale(.19,.42),UDim2.fromScale(.5,.26),{z=4,color=GRAY_TEXT,wrap=true}))
+	local descLbl=lbl(row,item.locked and "Bientôt disponible" or item.desc or "",UDim2.fromScale(.19,.42),UDim2.fromScale(.5,.26),{z=4,color=GRAY_TEXT,wrap=true})
+	table.insert(descs,descLbl)
 	-- niveau
 	local pips,lv={},nil
 	if not item.locked then
@@ -635,7 +660,7 @@ local function makeRow(page,outil,item,i)
 	local buyText=lbl(face,"",UDim2.fromScale(.08,.12),UDim2.fromScale(.84,.76),{font=Enum.Font.LuckiestGuy,color=WHITE,align=Enum.TextXAlignment.Center,z=7})
 	local buyStroke=stroke(buyText,2.5,INK,0,true)
 	local buyScale=new("UIScale",{},buy)
-	local r={row=row,stroke=st,scale=sc,item=item,outil=outil,pips=pips,lv=lv,buy=buy,face=face,faceGrad=faceGrad,
+	local r={row=row,stroke=st,scale=sc,item=item,outil=outil,pips=pips,lv=lv,buy=buy,face=face,faceGrad=faceGrad,desc=descLbl,
 		baseGrad=baseGrad,buyText=buyText,buyStroke=buyStroke,buyScale=buyScale,lastLevel=item.locked and 0 or level(item)}
 	table.insert(rows,r)
 
@@ -646,7 +671,7 @@ local function makeRow(page,outil,item,i)
 	buy.Activated:Connect(function()
 		playClick()
 		if item.locked or level(item)>=maxLevel(item) then return end
-		if money()<price(item) then
+		if not owned(outil) or money()<price(item) then
 			-- pas assez d'argent : le bouton tremble
 			local p0=buy.Position
 			for k=1,4 do
@@ -698,7 +723,7 @@ end
 local function affordable()
 	for _,r in rows do
 		local it=r.item
-		if not it.locked and level(it)<maxLevel(it) and money()>=price(it) then return true end
+		if not it.locked and owned(r.outil) and level(it)<maxLevel(it) and money()>=price(it) then return true end
 	end
 	return false
 end
@@ -716,7 +741,12 @@ local function refresh()
 			r.buy:SetAttribute("Achetable",l<mx and money()>=price(it)) -- utilisé par le tutoriel
 			for p,pip in r.pips do pip.frame.BackgroundColor3=p<=l and r.outil.color or EMPTY_PIP end
 			r.lv.Text=l>=mx and "MAX" or ("NIV "..l.."/"..mx)
-			if l>=mx then buyStyle(r,"gold") r.buyText.Text="MAX"
+			r.desc.Text=owned(r.outil) and (it.desc or "") or ("Achète d'abord la "..r.outil.name:lower().." à l'établi !")
+			if not owned(r.outil) then
+				-- outil pas encore acheté : améliorations bloquées
+				buyStyle(r,"gray") r.buyText.Text="BLOQUÉ"
+				r.buy:SetAttribute("Achetable",false)
+			elseif l>=mx then buyStyle(r,"gold") r.buyText.Text="MAX"
 			else
 				buyStyle(r,money()>=price(it) and "green" or "gray")
 				r.buyText.Text=fmt(price(it))
@@ -736,6 +766,7 @@ local function refresh()
 	end
 	for _,t in tabs do
 		if t.outil.locked then t.sub.Text="Bientôt"
+		elseif not owned(t.outil) then t.sub.Text="À acheter"
 		else
 			local total,maxi=0,0
 			for _,it in t.outil.items do if not it.locked then total+=level(it) maxi+=maxLevel(it) end end
@@ -772,7 +803,7 @@ selectOutil=function(i)
 	end
 end
 
-player.AttributeChanged:Connect(function(a) if a:sub(1,4)=="Upg_" then refresh() end end)
+player.AttributeChanged:Connect(function(a) if a:sub(1,4)=="Upg_" or a=="Faucille" then refresh() end end)
 task.spawn(function()
 	buyRemote=buyRemote or RS:WaitForChild("BuyUpgrade",20)
 	if buyRemote then buyRemote.AttributeChanged:Connect(refresh) refresh() end

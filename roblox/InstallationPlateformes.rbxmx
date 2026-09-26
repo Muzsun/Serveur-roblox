@@ -1205,12 +1205,21 @@ local MONEY_STAT=""     -- nom de ta monnaie dans leaderstats ("" = auto : Money
 -- Le prix et le niveau max viennent de GrassServer (UPGRADES) ; ceux d'ici servent si le serveur ne répond pas.
 local OUTILS={
 	{name="Ciseaux",icon="rbxassetid://98821470151953",color=Color3.fromRGB(255,120,110),items={
-		{id="Maintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=1.25,max=1,
+		{id="Maintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=1.10,max=1,
 			desc="Reste appuyé sur le clic pour couper en continu là où tu vises."},
-		{id="Dexterite",name="Dextérité",icon="rbxassetid://78716197209384",price=0.75,max=5,
+		{id="Dexterite",name="Dextérité",icon="rbxassetid://78716197209384",price=0.60,max=5,
 			desc="Tes ciseaux coupent un peu plus vite : -8 % d'attente par niveau."},
-		{id="Saisir",name="Saisir",icon="rbxassetid://120921144181867",price=1.00,max=2,
+		{id="Saisir",name="Saisir",icon="rbxassetid://120921144181867",price=0.85,max=2,
 			desc="Chaque coup coupe aussi une touffe voisine de plus par niveau."},
+	}},
+	-- requires = il faut posséder l'outil (attribut du joueur) pour acheter ses améliorations
+	{name="Faucille",icon="rbxassetid://138905055767473",color=Color3.fromRGB(120,190,255),requires="Faucille",items={
+		{id="FMaintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=3.50,max=1,
+			desc="Reste appuyé sur le clic pour faucher en continu."},
+		{id="FRapidite",name="Rapidité",icon="rbxassetid://78716197209384",price=2.00,max=5,
+			desc="Ta faucille frappe plus vite : -8 % d'attente par niveau."},
+		{id="FCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=3.00,max=2,
+			desc="+1 touffe par coup de faucille : 3, puis 4, puis 5 touffes."},
 	}},
 	{name="Débroussailleuse",locked=true,color=Color3.fromRGB(150,220,110),items={{locked=true},{locked=true},{locked=true}}},
 }
@@ -1276,12 +1285,15 @@ local buyRemote=RS:FindFirstChild("BuyUpgrade")
 local moneyValue
 local function money() return moneyValue and tonumber(moneyValue.Value) or 0 end
 local function level(it) return player:GetAttribute("Upg_"..it.id) or 0 end
--- prix du prochain niveau : prix de base × Growth^niveau (même calcul que GrassServer)
+-- prix du prochain niveau : envoyé par GrassServer pour chaque niveau (sinon prix de base × Growth^niveau)
 local function price(it)
+	local exact=buyRemote and buyRemote:GetAttribute("Price_"..it.id.."_"..(level(it)+1))
+	if exact then return exact end
 	local base=(buyRemote and buyRemote:GetAttribute("Price_"..it.id)) or it.price
 	local growth=(buyRemote and buyRemote:GetAttribute("Growth")) or 1.5
 	return math.floor(base*growth^level(it)*100+.5)/100
 end
+local function owned(outil) return not outil.requires or player:GetAttribute(outil.requires)==true end
 local function maxLevel(it) return (buyRemote and buyRemote:GetAttribute("Max_"..it.id)) or it.max end
 local function fmt(v) return string.format("%.2f$",v) end
 
@@ -1440,7 +1452,8 @@ local function makeRow(page,outil,item,i)
 	end
 	-- textes
 	lbl(row,item.locked and "???" or item.name,UDim2.fromScale(.19,.1),UDim2.fromScale(.4,.3),{z=4})
-	table.insert(descs,lbl(row,item.locked and "Bientôt disponible" or item.desc or "",UDim2.fromScale(.19,.42),UDim2.fromScale(.5,.26),{z=4,color=GRAY_TEXT,wrap=true}))
+	local descLbl=lbl(row,item.locked and "Bientôt disponible" or item.desc or "",UDim2.fromScale(.19,.42),UDim2.fromScale(.5,.26),{z=4,color=GRAY_TEXT,wrap=true})
+	table.insert(descs,descLbl)
 	-- niveau
 	local pips,lv={},nil
 	if not item.locked then
@@ -1456,6 +1469,7 @@ local function makeRow(page,outil,item,i)
 	-- bouton d'achat en relief
 	local buy=new("TextButton",{Text="",AutoButtonColor=false,AnchorPoint=Vector2.new(1,.5),Position=UDim2.fromScale(.975,.5),
 		Size=UDim2.fromScale(.26,.62),BackgroundTransparency=1,ZIndex=4},row)
+	buy:SetAttribute("UpgradeId",item.id or "") -- repère pour le tutoriel
 	local base=new("Frame",{Position=UDim2.fromScale(0,.12),Size=UDim2.fromScale(1,.88),ZIndex=4},buy)
 	corner(base,UDim.new(.35,0)) stroke(base,3)
 	local baseGrad=gradient(base,{WHITE,WHITE})
@@ -1468,7 +1482,7 @@ local function makeRow(page,outil,item,i)
 	local buyText=lbl(face,"",UDim2.fromScale(.08,.12),UDim2.fromScale(.84,.76),{font=Enum.Font.LuckiestGuy,color=WHITE,align=Enum.TextXAlignment.Center,z=7})
 	local buyStroke=stroke(buyText,2.5,INK,0,true)
 	local buyScale=new("UIScale",{},buy)
-	local r={row=row,stroke=st,scale=sc,item=item,outil=outil,pips=pips,lv=lv,buy=buy,face=face,faceGrad=faceGrad,
+	local r={row=row,stroke=st,scale=sc,item=item,outil=outil,pips=pips,lv=lv,buy=buy,face=face,faceGrad=faceGrad,desc=descLbl,
 		baseGrad=baseGrad,buyText=buyText,buyStroke=buyStroke,buyScale=buyScale,lastLevel=item.locked and 0 or level(item)}
 	table.insert(rows,r)
 
@@ -1479,7 +1493,7 @@ local function makeRow(page,outil,item,i)
 	buy.Activated:Connect(function()
 		playClick()
 		if item.locked or level(item)>=maxLevel(item) then return end
-		if money()<price(item) then
+		if not owned(outil) or money()<price(item) then
 			-- pas assez d'argent : le bouton tremble
 			local p0=buy.Position
 			for k=1,4 do
@@ -1531,7 +1545,7 @@ end
 local function affordable()
 	for _,r in rows do
 		local it=r.item
-		if not it.locked and level(it)<maxLevel(it) and money()>=price(it) then return true end
+		if not it.locked and owned(r.outil) and level(it)<maxLevel(it) and money()>=price(it) then return true end
 	end
 	return false
 end
@@ -1543,11 +1557,18 @@ local function refresh()
 		local it=r.item
 		if it.locked then
 			buyStyle(r,"gray") r.buyText.Text="BIENTÔT"
+			r.buy:SetAttribute("Achetable",false)
 		else
 			local l,mx=level(it),maxLevel(it)
+			r.buy:SetAttribute("Achetable",l<mx and money()>=price(it)) -- utilisé par le tutoriel
 			for p,pip in r.pips do pip.frame.BackgroundColor3=p<=l and r.outil.color or EMPTY_PIP end
 			r.lv.Text=l>=mx and "MAX" or ("NIV "..l.."/"..mx)
-			if l>=mx then buyStyle(r,"gold") r.buyText.Text="MAX"
+			r.desc.Text=owned(r.outil) and (it.desc or "") or ("Achète d'abord la "..r.outil.name:lower().." à l'établi !")
+			if not owned(r.outil) then
+				-- outil pas encore acheté : améliorations bloquées
+				buyStyle(r,"gray") r.buyText.Text="BLOQUÉ"
+				r.buy:SetAttribute("Achetable",false)
+			elseif l>=mx then buyStyle(r,"gold") r.buyText.Text="MAX"
 			else
 				buyStyle(r,money()>=price(it) and "green" or "gray")
 				r.buyText.Text=fmt(price(it))
@@ -1567,6 +1588,7 @@ local function refresh()
 	end
 	for _,t in tabs do
 		if t.outil.locked then t.sub.Text="Bientôt"
+		elseif not owned(t.outil) then t.sub.Text="À acheter"
 		else
 			local total,maxi=0,0
 			for _,it in t.outil.items do if not it.locked then total+=level(it) maxi+=maxLevel(it) end end
@@ -1603,7 +1625,7 @@ selectOutil=function(i)
 	end
 end
 
-player.AttributeChanged:Connect(function(a) if a:sub(1,4)=="Upg_" then refresh() end end)
+player.AttributeChanged:Connect(function(a) if a:sub(1,4)=="Upg_" or a=="Faucille" then refresh() end end)
 task.spawn(function()
 	buyRemote=buyRemote or RS:WaitForChild("BuyUpgrade",20)
 	if buyRemote then buyRemote.AttributeChanged:Connect(refresh) refresh() end

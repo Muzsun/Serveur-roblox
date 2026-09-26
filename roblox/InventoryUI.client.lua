@@ -43,8 +43,8 @@ local OUTILS={
 			desc="Reste appuyé sur le clic pour faucher en continu."},
 		{id="FRapidite",name="Rapidité",icon="rbxassetid://78716197209384",price=2.00,max=5,
 			desc="Ta faucille frappe plus vite : -8 % d'attente par niveau."},
-		{id="FCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=3.00,max=3,
-			desc="Chaque coup de faucille coupe une touffe de plus par niveau."},
+		{id="FCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=3.00,max=2,
+			desc="+1 touffe par coup de faucille : 3, puis 4, puis 5 touffes."},
 	}},
 	{name="Débroussailleuse",locked=true,color=Color3.fromRGB(150,220,110),items={{locked=true},{locked=true},{locked=true}}},
 }
