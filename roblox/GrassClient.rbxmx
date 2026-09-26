@@ -1,4 +1,4 @@
--- GrassClient (LocalScript dans StarterPlayerScripts)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="LocalScript" referent="RBX0"><Properties><string name="Name">GrassClient</string><ProtectedString name="Source"><![CDATA[-- GrassClient (LocalScript dans StarterPlayerScripts)
 -- ANTI-LAG : n'affiche que les touffes proches du joueur, construites petit à petit.
 if not game:GetService("RunService"):IsClient() then
 	warn("[Herbe] GrassClient doit être un LocalScript dans StarterPlayer > StarterPlayerScripts (pas un Script) !")
@@ -734,3 +734,4 @@ remotes:WaitForChild("Deposited").OnClientEvent:Connect(function(plr,c,n,gain)
 		end)
 	end
 end)
+]]></ProtectedString></Properties></Item></roblox>
