@@ -357,7 +357,9 @@ conn=Run.RenderStepped:Connect(function(dt)
 	anchor.WorldPosition=target
 	local p,onScreen=cam:WorldToViewportPoint(target+Vector3.new(0,2.2,0))
 	if onScreen and p.Z>0 then
-		marker.Enabled=true edge.Visible=false
+		-- le composteur a déjà son panneau (herbe = $) avec une flèche : pas de 2e repère par-dessus
+		local panneau=step=="vendre" and pgui:FindFirstChild("CompostHint")
+		marker.Enabled=not (panneau and panneau.Enabled) edge.Visible=false
 		markerArrow.Position=UDim2.fromOffset(0,bounce) -- rebond
 	else
 		marker.Enabled=false edge.Visible=true

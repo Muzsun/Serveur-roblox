@@ -710,34 +710,129 @@ remotes:WaitForChild("BagFull").OnClientEvent:Connect(function(id,size,free)
 	end
 end)
 
--- ===== composteur : indication + vidage =====
+-- ===== composteur : panneau "1 herbe = $" + vidage =====
+-- Au-dessus du composteur : une touffe (en 3D, qui tourne) = pièce + prix d'une herbe.
+-- Quand le sac n'est pas vide : 2e petit panneau "sac 12 → +$0.12" et une flèche qui rebondit.
+local MPP=CFG.MONEY_PER_PLACE or 0
+local INK=Color3.fromRGB(26,22,28)
+local WOOD_A,WOOD_B,WOOD_DARK=Color3.fromRGB(170,114,64),Color3.fromRGB(122,78,42),Color3.fromRGB(72,44,22)
+local function money(v) if v>=1 and v==math.floor(v) then return "$"..v end return string.format("$%.2f",v) end
+local function px(n) return math.floor(n*BB+.5) end
+local function board(parent,h,y)
+	local f=Instance.new("Frame") f.AnchorPoint=Vector2.new(.5,0) f.Position=UDim2.new(.5,0,0,px(y))
+	f.Size=UDim2.fromOffset(0,px(h)) f.AutomaticSize=Enum.AutomaticSize.X f.BackgroundColor3=WHITE f.BorderSizePixel=0 f.Parent=parent
+	corner(f,UDim.new(0,px(14)))
+	local gr=Instance.new("UIGradient") gr.Rotation=90 gr.Parent=f -- reflet clair en haut, plus foncé en bas
+	gr.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(206,150,94)),ColorSequenceKeypoint.new(.14,WOOD_A),ColorSequenceKeypoint.new(1,WOOD_B)})
+	local st=stroke(f,px(4),WOOD_DARK,true)
+	local pad=Instance.new("UIPadding") pad.PaddingLeft=UDim.new(0,px(9)) pad.PaddingRight=UDim.new(0,px(9)) pad.Parent=f
+	local l=Instance.new("UIListLayout") l.FillDirection=Enum.FillDirection.Horizontal l.VerticalAlignment=Enum.VerticalAlignment.Center
+	l.HorizontalAlignment=Enum.HorizontalAlignment.Center l.SortOrder=Enum.SortOrder.LayoutOrder l.Padding=UDim.new(0,px(6)) l.Parent=f
+	-- 2 clous aux bouts (comme une planche clouée)
+	for _,o in {0,99} do
+		local n=Instance.new("Frame") n.Size=UDim2.fromOffset(px(7),px(7)) n.LayoutOrder=o
+		n.BackgroundColor3=Color3.fromRGB(64,62,66) n.BorderSizePixel=0 n.Parent=f corner(n)
+	end
+	return f,st
+end
+local function word(parent,txt,size,order,color)
+	local t=Instance.new("TextLabel") t.BackgroundTransparency=1 t.Font=Enum.Font.LuckiestGuy t.Text=txt t.TextSize=px(size)
+	t.Size=UDim2.fromOffset(0,px(size+6)) t.AutomaticSize=Enum.AutomaticSize.X t.TextColor3=color or WHITE t.LayoutOrder=order t.Parent=parent
+	local s=stroke(t,px(3.5),INK) s.LineJoinMode=Enum.LineJoinMode.Round
+	return t
+end
+local function iconImg(parent,img,size,order)
+	local i=Instance.new("ImageLabel") i.BackgroundTransparency=1 i.Image=img i.ScaleType=Enum.ScaleType.Fit
+	i.Size=UDim2.fromOffset(px(size),px(size)) i.LayoutOrder=order i.Parent=parent
+	return i
+end
+-- touffe d'herbe en 3D dans le panneau (la vraie touffe du jeu)
+local function tuftView(parent,size,order)
+	local vp=Instance.new("ViewportFrame") vp.BackgroundTransparency=1 vp.Size=UDim2.fromOffset(px(size),px(size)) vp.LayoutOrder=order
+	vp.Ambient=Color3.fromRGB(175,175,175) vp.LightColor=WHITE vp.LightDirection=Vector3.new(-.4,-1,-.5) vp.Parent=parent
+	local vc=Instance.new("Camera") vc.FieldOfView=28 vc.Parent=vp vp.CurrentCamera=vc
+	local ok,m=pcall(K.Build,CFrame.new(),1,424242,true)
+	if not ok or not m then vp:Destroy() return word(parent,"🌿",size-10,order),nil end
+	for _,d in m:GetDescendants() do if d:IsA("ParticleEmitter") or d:IsA("Light") then d:Destroy() end end
+	m.Parent=vp
+	local cf,sz=m:GetBoundingBox()
+	local r=math.max(sz.X,sz.Y,sz.Z)*.5
+	local dist=r/math.tan(math.rad(vc.FieldOfView/2))*1.08
+	return vp,function(t)
+		local a=t*.9
+		vc.CFrame=CFrame.lookAt(cf.Position+Vector3.new(math.sin(a)*dist*.94,dist*.34,math.cos(a)*dist*.94),cf.Position)
+	end
+end
+-- flèche (chevron) dessinée avec 2 barres
+local function chevron(parent)
+	local f=Instance.new("Frame") f.AnchorPoint=Vector2.new(.5,1) f.BackgroundTransparency=1 f.Size=UDim2.fromOffset(px(40),px(30)) f.Parent=parent
+	for _,s in {-1,1} do
+		local b=Instance.new("Frame") b.AnchorPoint=Vector2.new(.5,.5) b.Size=UDim2.fromOffset(px(28),px(10)) b.Rotation=45*-s
+		b.Position=UDim2.new(.5,s*px(8.5),.5,0) b.BackgroundColor3=WHITE b.BorderSizePixel=0 b.Parent=f
+		corner(b) stroke(b,px(3),INK,true)
+	end
+	return f
+end
+
 local hints={}
 local function addHint(c)
 	local hb=c:WaitForChild("GrassDepositHitbox",15) if not hb then return end
-	local g=Instance.new("BillboardGui") g.Name="CompostHint" g.Adornee=hb g.Size=UDim2.fromOffset(240*BB,64*BB)
+	local top=c:FindFirstChild("Compost",true)
+	local g=Instance.new("BillboardGui") g.Name="CompostHint"
+	if top and top:IsA("BasePart") then g.Adornee=top g.StudsOffsetWorldSpace=Vector3.new(0,top.Size.Y/2+2.2,0)
+	else g.Adornee=hb g.StudsOffsetWorldSpace=Vector3.new(0,hb.Size.Y/2+.4,0) end
+	g.Size=UDim2.fromOffset(px(360),px(196)) g.SizeOffset=Vector2.new(0,.5) -- le bas du panneau (la flèche) pointe sur le composteur
 	g.AlwaysOnTop=true g.MaxDistance=90 g.LightInfluence=0 g.ResetOnSpawn=false g.Enabled=false
-	g.StudsOffsetWorldSpace=Vector3.new(0,hb.Size.Y/2+1.6,0)
-	local pill=Instance.new("Frame") pill.Size=UDim2.fromScale(1,1) pill.BackgroundColor3=Color3.fromRGB(34,58,24) pill.BackgroundTransparency=.08 pill.Parent=g
-	corner(pill,UDim.new(0,18)) stroke(pill,3,WHITE,true)
-	local im=Instance.new("ImageLabel") im.BackgroundTransparency=1 im.Image=BAG_IMAGE im.ScaleType=Enum.ScaleType.Fit
-	im.Size=UDim2.fromOffset(48*BB,48*BB) im.Position=UDim2.fromOffset(8*BB,8*BB) im.Parent=pill
-	local tx=Instance.new("TextLabel") tx.BackgroundTransparency=1 tx.Position=UDim2.fromOffset(62*BB,10*BB) tx.Size=UDim2.new(1,-72*BB,1,-20*BB)
-	tx.Font=Enum.Font.FredokaOne tx.TextScaled=true tx.TextColor3=WHITE tx.Text="VIDE TON SAC ICI ⬇" tx.Parent=pill
-	stroke(tx,2,Color3.fromRGB(18,38,10))
+	local root=Instance.new("Frame") root.BackgroundTransparency=1 root.Size=UDim2.fromScale(1,1) root.Parent=g
+	-- panneau principal : [touffe] = [pièce] $0.01
+	local main=board(root,72,0)
+	local _,spin=tuftView(main,64,1)
+	word(main,"=",40,2)
+	iconImg(main,COIN,46,3)
+	local val=word(main,MPP>0 and money(MPP) or "+1",42,4)
+	local vg=Instance.new("UIGradient") vg.Rotation=90 vg.Color=ColorSequence.new(WHITE,Color3.fromRGB(255,228,140)) vg.Parent=val
+	-- ce que contient ton sac : [sac] 12 → +$0.12
+	local gain,gst=board(root,50,84)
+	local gScale=Instance.new("UIScale") gScale.Parent=gain
+	iconImg(gain,BAG_IMAGE,36,1)
+	local nTx=word(gain,"0",28,2)
+	word(gain,"→",28,3)
+	local gTx=word(gain,"+$0",28,4,GOLD)
+	local arrow=chevron(root) arrow.Position=UDim2.new(.5,0,1,0)
 	g.Parent=pgui
-	table.insert(hints,{g=g,tx=tx})
+	table.insert(hints,{g=g,top=top or hb,spin=spin,gain=gain,gst=gst,gScale=gScale,nTx=nTx,gTx=gTx,arrow=arrow})
 end
 for _,c in CS:GetTagged("GrassCompost") do task.spawn(addHint,c) end
 CS:GetInstanceAddedSignal("GrassCompost"):Connect(addHint)
 
 local hintAcc=0
-Run.Heartbeat:Connect(function(dt)
-	hintAcc+=dt if hintAcc<.2 then return end hintAcc=0
-	local isFull=shown>=maxBag()
+Run.RenderStepped:Connect(function(dt)
+	hintAcc+=dt
+	local slow=hintAcc>=.2 if slow then hintAcc=0 end
+	local t=os.clock()
+	local m=maxBag()
+	local isFull=shown>=m
+	local hasBag=shown>0 and not depositing
+	local hide=lp:GetAttribute("IntroEnCours")==true
 	for _,h in hints do
-		h.g.Enabled=shown>0 and not depositing
-		h.tx.Text=isFull and "SAC PLEIN ! VIDE-LE ICI ⬇" or "VIDE TON SAC ICI ⬇"
-		h.tx.TextColor3=isFull and GOLD or WHITE
+		if slow then
+			h.g.Enabled=not hide and h.top.Parent~=nil
+			h.gain.Visible=hasBag h.arrow.Visible=hasBag
+			if hasBag then
+				h.nTx.Text=tostring(shown)
+				h.gTx.Text=MPP>0 and "+"..money(shown*MPP) or "+"..shown.." 🌿"
+				h.gst.Color=isFull and GOLD or WOOD_DARK
+				h.nTx.TextColor3=isFull and GOLD or WHITE
+			end
+		end
+		-- animations seulement si le panneau est proche (pas de calcul pour rien)
+		if h.g.Enabled and (cam.CFrame.Position-h.top.Position).Magnitude<95 then
+			if h.spin then h.spin(t) end
+			if hasBag then
+				h.arrow.Position=UDim2.new(.5,0,1,-px(math.abs(math.sin(t*4.5))*9))
+				h.gScale.Scale=isFull and 1+.06*math.abs(math.sin(t*5)) or 1
+			end
+		end
 	end
 end)
 

@@ -294,6 +294,7 @@ end)
 local step,target=nil,nil
 local function decide()
 	if fini() then return "fin" end
+	if lp:GetAttribute("IntroEnCours") then return "rien" end -- on attend la fin de l'intro du chiot
 	if lp:GetAttribute("MenuOuvert") then return "menu" end
 	if anyAffordable() then return "acheter" end
 	if aVendu then return "rien" end
@@ -356,7 +357,9 @@ conn=Run.RenderStepped:Connect(function(dt)
 	anchor.WorldPosition=target
 	local p,onScreen=cam:WorldToViewportPoint(target+Vector3.new(0,2.2,0))
 	if onScreen and p.Z>0 then
-		marker.Enabled=true edge.Visible=false
+		-- le composteur a déjà son panneau (herbe = $) avec une flèche : pas de 2e repère par-dessus
+		local panneau=step=="vendre" and pgui:FindFirstChild("CompostHint")
+		marker.Enabled=not (panneau and panneau.Enabled) edge.Visible=false
 		markerArrow.Position=UDim2.fromOffset(0,bounce) -- rebond
 	else
 		marker.Enabled=false edge.Visible=true
@@ -378,6 +381,7 @@ end)
 task.spawn(function()
 	if not lp.Character then lp.CharacterAdded:Wait() end
 	task.wait(1.5)
+	while lp:GetAttribute("IntroEnCours") do task.wait(0.25) end -- après l'intro du chiot
 	if not fini() then intro() end
 end)
 ]]></ProtectedString></Properties></Item></roblox>
