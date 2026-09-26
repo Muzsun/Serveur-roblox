@@ -685,7 +685,7 @@ local function titre(parent, texte, props)
 	return l
 end
 -- libère la souris (même en vue 1re personne) tant que la fiche est ouverte
-nouveau("TextButton", { Text = "", BackgroundTransparency = 1, Size = UDim2.fromOffset(0, 0), Modal = true }, ecran)
+nouveau("TextButton", { Text = "", BackgroundTransparency = 1, Size = UDim2.fromOffset(1, 1), Modal = true, Selectable = false }, ecran)
 
 -- fond assombri à gauche (la fiche se lit mieux, l'outil reste bien visible à droite)
 local voile = nouveau("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.fromRGB(8, 18, 10), BorderSizePixel = 0, BackgroundTransparency = 0 }, ecran)
@@ -832,7 +832,12 @@ end
 
 -- boutons qui grossissent un peu au survol
 for _, b in { gauche, droite, boutonX, bouton } do
-	local sc = b:FindFirstChildOfClass("UIScale") or nouveau("UIScale", {}, b)
+	local sc = if b == bouton then popBouton else nouveau("UIScale", {}, b:IsA("GuiButton") and b or b)
+	if b == boutonX then
+		-- boutonX a déjà l'échelle de l'écran : on grossit sa croix à la place
+		sc = nil
+	end
+	if not sc then continue end
 	b.MouseEnter:Connect(function() TweenService:Create(sc, TweenInfo.new(0.12), { Scale = 1.06 }):Play() end)
 	b.MouseLeave:Connect(function() TweenService:Create(sc, TweenInfo.new(0.12), { Scale = 1 }):Play() face.Position = UDim2.fromOffset(0, 0) end)
 end
@@ -967,9 +972,35 @@ local function bloquerControles(bloquer)
 	if controles then pcall(function() if bloquer then controles:Disable() else controles:Enable() end end) end
 end
 
-local function ouvrir(v)
-	if ouvert or fermeture or not v then return end
+-- souris libre (même si le jeu est en vue 1re personne) : réglée après les scripts de caméra, à chaque image
+local function libererSouris(oui)
+	pcall(function() RunService:UnbindFromRenderStep("BoutiqueSouris") end)
+	if oui then
+		RunService:BindToRenderStep("BoutiqueSouris", Enum.RenderPriority.Last.Value, function()
+			UIS.MouseBehavior = Enum.MouseBehavior.Default
+			UIS.MouseIconEnabled = true
+		end)
+	end
+end
+
+-- remet tout comme avant (aussi utilisé si une erreur arrive pendant l'ouverture)
+local function restaurer()
+	tourCamera += 1
+	ecran.Enabled = false
+	cam.CameraType = Enum.CameraType.Custom
+	cam.FieldOfView = etat.fov or 70
+	for _, g in etat.guis or {} do if g.Parent then g.Enabled = true end end
+	etat.guis = {}
+	pcall(function() game:GetService("ProximityPromptService").Enabled = true end)
+	lp:SetAttribute("MenuOuvert", false)
+	bloquerControles(false)
+	libererSouris(false)
+	ouvert, fermeture = false, false
+end
+
+local function ouvrirInterne(v)
 	ouvert = true
+	libererSouris(true)
 	for i, x in vitrines do if x == v then courant = i end end
 	etat.cf, etat.type, etat.fov = cam.CFrame, cam.CameraType, cam.FieldOfView
 	-- on cache le reste de l'interface et on bloque le personnage
@@ -985,12 +1016,18 @@ local function ouvrir(v)
 	bloquerControles(true)
 	for _, x in vitrines do x.contour.Enabled = false end
 	-- la caméra se rapproche de l'outil
-	cam.CameraType = Enum.CameraType.Scriptable
-	cam.FieldOfView = 70
-	bougerCamera(cadrage(v), REGLAGES.DUREE_CAMERA)
+	local okC, cible = pcall(cadrage, v)
+	if okC then
+		cam.CameraType = Enum.CameraType.Scriptable
+		cam.FieldOfView = 70
+		bougerCamera(cible, REGLAGES.DUREE_CAMERA)
+	else
+		warn("[Boutique] Erreur de caméra : " .. tostring(cible))
+	end
 	-- la fiche arrive
-	remplir(v)
 	ecran.Enabled = true
+	local okR, errR = pcall(remplir, v)
+	if not okR then warn("[Boutique] Erreur en remplissant la fiche : " .. tostring(errR)) end
 	voile.BackgroundTransparency = 1
 	carte.Position = UDim2.new(0, -620, 0.5, 0)
 	nav.Position = UDim2.new(0.66, 0, 1, 200)
@@ -1005,6 +1042,15 @@ local function ouvrir(v)
 		TweenService:Create(boutonX, info, { Position = UDim2.new(1, -30, 0, 28) }):Play()
 	end)
 	if UIS.GamepadEnabled then GuiService.SelectedObject = bouton end
+end
+
+local function ouvrir(v)
+	if ouvert or fermeture or not v then return end
+	local ok, err = pcall(ouvrirInterne, v)
+	if not ok then
+		warn("[Boutique] Erreur à l'ouverture de la fiche : " .. tostring(err))
+		restaurer()
+	end
 end
 
 local function fermer()
@@ -1026,6 +1072,7 @@ local function fermer()
 		pcall(function() game:GetService("ProximityPromptService").Enabled = true end)
 		lp:SetAttribute("MenuOuvert", false)
 		bloquerControles(false)
+		libererSouris(false)
 		ouvert, fermeture = false, false
 	end)
 end
@@ -1073,7 +1120,7 @@ UIS.InputBegan:Connect(function(input, gp)
 		local k = input.KeyCode
 		if k == Enum.KeyCode.Left or k == Enum.KeyCode.A or k == Enum.KeyCode.DPadLeft then changer(-1)
 		elseif k == Enum.KeyCode.Right or k == Enum.KeyCode.D or k == Enum.KeyCode.DPadRight then changer(1)
-		elseif k == Enum.KeyCode.Backspace or k == Enum.KeyCode.ButtonB then fermer() end
+		elseif k == Enum.KeyCode.Backspace or k == Enum.KeyCode.ButtonB or k == Enum.KeyCode.X then fermer() end
 		return
 	end
 	if gp then return end
