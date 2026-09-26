@@ -1004,9 +1004,9 @@ local REGLAGES = {
 	FACE = Vector3.new(0.2, 0.3, 1), -- le côté plat des ciseaux regarde vers la caméra
 	BALANCEMENT = 1, -- 0 = les ciseaux ne bougent pas quand on tourne / marche
 	FAUCILLE = {
-		POSITION = Vector3.new(1.05, -1.25, -2.7), -- place du poing par rapport à la caméra (droite, bas, devant)
-		MANCHE = Vector3.new(-0.3, 0.85, -0.35), -- vers où pointe le manche (gauche, haut, devant)
-		FACE = Vector3.new(0.15, 0, -1), -- le plat de la lame (on voit bien le croissant)
+		POSITION = Vector3.new(0.75, -1.3, -2.7), -- place du poing par rapport à la caméra (droite, bas, devant)
+		MANCHE = Vector3.new(0.2, 0.85, -0.35), -- vers où pointe le manche (droite, haut, devant)
+		FACE = Vector3.new(-0.15, 0, 1), -- le plat de la lame : (-0.15, 0, 1) = croissant vers la droite, (0.15, 0, -1) = vers la gauche
 	},
 }
 
