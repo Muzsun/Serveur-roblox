@@ -296,6 +296,15 @@ task.spawn(function()
 	end)
 end)
 
+-- TEST (seulement dans Studio) : touche K = finir la zone en cours d'un coup
+if Run:IsStudio() then
+	UIS.InputBegan:Connect(function(input,gp)
+		if gp or input.KeyCode~=Enum.KeyCode.K then return end
+		local r=remotes:FindFirstChild("TestFinirZone")
+		if r then r:FireServer() showToast("🧪 TEST : zone terminée !") end
+	end)
+end
+
 -- toutes les 0.3 s : on affiche ce qui est proche, on retire ce qui est loin
 task.spawn(function()
 	while true do

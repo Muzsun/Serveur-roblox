@@ -309,6 +309,9 @@ end
 -- En Play (barre de commande côté Server) : game.ServerStorage.TestFinirZone:Fire()
 local testZone=game:GetService("ServerStorage"):FindFirstChild("TestFinirZone") or Instance.new("BindableEvent")
 testZone.Name="TestFinirZone" testZone.Parent=game:GetService("ServerStorage")
+-- plus simple : dans Studio, appuie sur la touche K en jouant (ne marche PAS dans le vrai jeu publié)
+local testKey=remote("TestFinirZone")
+testKey.OnServerEvent:Connect(function() if game:GetService("RunService"):IsStudio() then testZone:Fire() end end)
 testZone.Event:Connect(function()
 	local n=0
 	for id,t in tufts do
