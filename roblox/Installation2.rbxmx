@@ -391,6 +391,7 @@ local Picked,BagFull,Deposited,PickRequest=remote("Picked"),remote("BagFull"),re
 local GetGrass=remote("GetGrass","RemoteFunction")
 local NewGrass=remote("NewGrass") -- une nouvelle zone vient de pousser
 -- fin du jeu : CONTINUER relance une partie toute neuve (nouveau serveur réservé rien que pour le joueur)
+local LOBBY_PLACE_ID=102336813563140 -- le lobby (mets 0 pour relancer une partie neuve à la place)
 local Relancer=remote("RelancerPartie")
 local relanceEnCours={}
 Relancer.OnServerEvent:Connect(function(plr)
@@ -398,10 +399,14 @@ Relancer.OnServerEvent:Connect(function(plr)
 	relanceEnCours[plr]=true
 	local TPS=game:GetService("TeleportService")
 	local ok,err=pcall(function()
-		local code=TPS:ReserveServer(game.PlaceId)
-		local opt=Instance.new("TeleportOptions")
-		opt.ReservedServerAccessCode=code
-		TPS:TeleportAsync(game.PlaceId,{plr},opt)
+		if LOBBY_PLACE_ID>0 then
+			TPS:TeleportAsync(LOBBY_PLACE_ID,{plr}) -- retour au lobby
+		else
+			local code=TPS:ReserveServer(game.PlaceId)
+			local opt=Instance.new("TeleportOptions")
+			opt.ReservedServerAccessCode=code
+			TPS:TeleportAsync(game.PlaceId,{plr},opt)
+		end
 	end)
 	if not ok then
 		warn("[Relancer] Téléportation impossible ("..tostring(err).."), on déconnecte le joueur pour qu'il relance.")

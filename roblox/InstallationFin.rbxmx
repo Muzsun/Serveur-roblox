@@ -1830,7 +1830,7 @@ task.spawn(function()
 		TS:Create(voileNoir, TweenInfo.new(0.3), { BackgroundTransparency = 0 }):Play()
 		task.wait(0.32)
 		-- on relance une partie toute neuve (le serveur nous téléporte sur un nouveau serveur)
-		local msgRelance = nouveau("TextLabel", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(0.6, 0.08), Text = "NOUVELLE PARTIE...", Font = Enum.Font.LuckiestGuy, TextScaled = true, TextColor3 = WHITE, ZIndex = 21 }, fg)
+		local msgRelance = nouveau("TextLabel", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(0.6, 0.08), Text = "RETOUR AU LOBBY...", Font = Enum.Font.LuckiestGuy, TextScaled = true, TextColor3 = WHITE, ZIndex = 21 }, fg)
 		trait(msgRelance, 4)
 		local relancer = remotes:FindFirstChild("RelancerPartie")
 		local echec = not relancer
@@ -1845,7 +1845,7 @@ task.spawn(function()
 			msgRelance.Text = "PARTIE TERMINÉE ! (dans Studio : arrête et relance le test)"
 			task.wait(2.5)
 		end
-		lp:Kick("Partie terminée ! Relance le jeu pour rejouer 🐶")
+		lp:Kick("Partie terminée ! Relance le jeu pour retourner au lobby 🐶")
 		task.wait(1)
 		msgRelance:Destroy()
 		connCam:Disconnect()
@@ -1918,6 +1918,7 @@ local Picked,BagFull,Deposited,PickRequest=remote("Picked"),remote("BagFull"),re
 local GetGrass=remote("GetGrass","RemoteFunction")
 local NewGrass=remote("NewGrass") -- une nouvelle zone vient de pousser
 -- fin du jeu : CONTINUER relance une partie toute neuve (nouveau serveur réservé rien que pour le joueur)
+local LOBBY_PLACE_ID=102336813563140 -- le lobby (mets 0 pour relancer une partie neuve à la place)
 local Relancer=remote("RelancerPartie")
 local relanceEnCours={}
 Relancer.OnServerEvent:Connect(function(plr)
@@ -1925,10 +1926,14 @@ Relancer.OnServerEvent:Connect(function(plr)
 	relanceEnCours[plr]=true
 	local TPS=game:GetService("TeleportService")
 	local ok,err=pcall(function()
-		local code=TPS:ReserveServer(game.PlaceId)
-		local opt=Instance.new("TeleportOptions")
-		opt.ReservedServerAccessCode=code
-		TPS:TeleportAsync(game.PlaceId,{plr},opt)
+		if LOBBY_PLACE_ID>0 then
+			TPS:TeleportAsync(LOBBY_PLACE_ID,{plr}) -- retour au lobby
+		else
+			local code=TPS:ReserveServer(game.PlaceId)
+			local opt=Instance.new("TeleportOptions")
+			opt.ReservedServerAccessCode=code
+			TPS:TeleportAsync(game.PlaceId,{plr},opt)
+		end
 	end)
 	if not ok then
 		warn("[Relancer] Téléportation impossible ("..tostring(err).."), on déconnecte le joueur pour qu'il relance.")

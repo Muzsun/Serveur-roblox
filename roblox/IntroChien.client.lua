@@ -1830,7 +1830,7 @@ task.spawn(function()
 		TS:Create(voileNoir, TweenInfo.new(0.3), { BackgroundTransparency = 0 }):Play()
 		task.wait(0.32)
 		-- on relance une partie toute neuve (le serveur nous téléporte sur un nouveau serveur)
-		local msgRelance = nouveau("TextLabel", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(0.6, 0.08), Text = "NOUVELLE PARTIE...", Font = Enum.Font.LuckiestGuy, TextScaled = true, TextColor3 = WHITE, ZIndex = 21 }, fg)
+		local msgRelance = nouveau("TextLabel", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(0.6, 0.08), Text = "RETOUR AU LOBBY...", Font = Enum.Font.LuckiestGuy, TextScaled = true, TextColor3 = WHITE, ZIndex = 21 }, fg)
 		trait(msgRelance, 4)
 		local relancer = remotes:FindFirstChild("RelancerPartie")
 		local echec = not relancer
@@ -1845,7 +1845,7 @@ task.spawn(function()
 			msgRelance.Text = "PARTIE TERMINÉE ! (dans Studio : arrête et relance le test)"
 			task.wait(2.5)
 		end
-		lp:Kick("Partie terminée ! Relance le jeu pour rejouer 🐶")
+		lp:Kick("Partie terminée ! Relance le jeu pour retourner au lobby 🐶")
 		task.wait(1)
 		msgRelance:Destroy()
 		connCam:Disconnect()
