@@ -1001,6 +1001,7 @@ local function argent()
 end
 
 ---------------------------------------------------------------- Panneau au-dessus de la faucille
+local TAILLE_PANNEAU = 1.4 -- hauteur des panneaux de prix en studs (avant : 2)
 local panneaux = {}
 local function creerPanneau(article, achat, vitrine)
 	local base = vitrine.PrimaryPart or vitrine:WaitForChild("Base", 10)
@@ -1009,14 +1010,14 @@ local function creerPanneau(article, achat, vitrine)
 	local g = Instance.new("BillboardGui")
 	g.Name = "Prix_" .. article.attribut
 	-- taille fixe dans le monde (en studs) : il ne grossit pas quand on s'éloigne
-	g.Size = UDim2.fromScale(4.2, 2)
+	g.Size = UDim2.fromScale(TAILLE_PANNEAU * 2.1, TAILLE_PANNEAU) -- en studs
 	local ancre = vitrine:FindFirstChild("PanneauPrix")
 	if ancre then
 		g.Adornee = ancre -- le panneau est centré sur ce repère
 	else
 		g.Adornee = base -- au-dessus de l'outil
 		g.SizeOffset = Vector2.new(0, 0.5)
-		g.StudsOffsetWorldSpace = Vector3.new(0, 1.3, 0)
+		g.StudsOffsetWorldSpace = Vector3.new(0, 1, 0)
 	end
 	g.AlwaysOnTop = true
 	g.LightInfluence = 0

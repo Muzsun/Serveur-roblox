@@ -1,4 +1,4 @@
--- BoutiqueClient (LocalScript dans StarterPlayer > StarterPlayerScripts)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="LocalScript" referent="RBX0"><Properties><string name="Name">BoutiqueClient</string><ProtectedString name="Source"><![CDATA[-- BoutiqueClient (LocalScript dans StarterPlayer > StarterPlayerScripts)
 -- Les outils en vente sur l'établi (faucille, débroussailleuse) : panneau de prix (pièce + prix),
 -- petite fête quand on achète, et la tête de la débroussailleuse qui tourne.
 -- (remplace l'ancien script FaucilleClient)
@@ -397,3 +397,4 @@ reponse = function(article, quoi, manque)
 		end
 	end
 end
+]]></ProtectedString></Properties></Item></roblox>
