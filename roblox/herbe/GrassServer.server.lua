@@ -303,12 +303,16 @@ end)
 -- ===== AMÉLIORATIONS (menu TAB) =====
 -- Les prix et niveaux max d'ici sont envoyés au menu InventoryUI (ce sont eux qui comptent).
 local UPGRADES={
-	Maintenir={price=1.25,max=1},  -- rester appuyé = coupe en continu avec les ciseaux
-	Dexterite={price=0.75,max=5},  -- les ciseaux coupent plus vite (-15% de délai par niveau)
-	Saisir={price=1.00,max=2},     -- +1 touffe voisine coupée en même temps par niveau
+-- prices = prix de chaque niveau (niveau 1, niveau 2, ...)
+	Maintenir={prices={1.10},max=1},                      -- rester appuyé = coupe en continu avec les ciseaux
+	Dexterite={prices={0.60,0.90,1.35,2.00,3.00},max=5},  -- les ciseaux coupent plus vite
+	Saisir={prices={0.85,1.90},max=2},                    -- +1 touffe voisine coupée en même temps par niveau
 }
-local GROWTH=1.5 -- le prix est multiplié par ça à chaque niveau acheté
-local function cost(u,lvl) return math.floor(u.price*GROWTH^lvl*100+.5)/100 end
+local GROWTH=1.5 -- seulement si un niveau n'a pas de prix dans la liste
+local function cost(u,lvl)
+	if u.prices[lvl+1] then return u.prices[lvl+1] end
+	return math.floor(u.prices[#u.prices]*GROWTH^(lvl+1-#u.prices)*100+.5)/100
+end
 local function applyUpgrades(plr)
 	plr:SetAttribute("BagMax",CFG.BAG_CAPACITY)
 end
@@ -316,7 +320,10 @@ Players.PlayerAdded:Connect(function(p) task.wait(1) applyUpgrades(p) end)
 for _,p in Players:GetPlayers() do task.spawn(applyUpgrades,p) end
 local BuyUpgrade=RS:FindFirstChild("BuyUpgrade") or Instance.new("RemoteEvent")
 BuyUpgrade.Name="BuyUpgrade" BuyUpgrade.Parent=RS
-for uid,u in UPGRADES do BuyUpgrade:SetAttribute("Price_"..uid,u.price) BuyUpgrade:SetAttribute("Max_"..uid,u.max) end
+for uid,u in UPGRADES do
+	BuyUpgrade:SetAttribute("Price_"..uid,cost(u,0)) BuyUpgrade:SetAttribute("Max_"..uid,u.max)
+	for lvl=0,u.max-1 do BuyUpgrade:SetAttribute("Price_"..uid.."_"..(lvl+1),cost(u,lvl)) end -- prix de chaque niveau pour le menu
+end
 BuyUpgrade:SetAttribute("Growth",GROWTH)
 local lastBuy={}
 BuyUpgrade.OnServerEvent:Connect(function(plr,uid)

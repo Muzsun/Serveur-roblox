@@ -30,11 +30,11 @@ local MONEY_STAT=""     -- nom de ta monnaie dans leaderstats ("" = auto : Money
 -- Le prix et le niveau max viennent de GrassServer (UPGRADES) ; ceux d'ici servent si le serveur ne répond pas.
 local OUTILS={
 	{name="Ciseaux",icon="rbxassetid://98821470151953",color=Color3.fromRGB(255,120,110),items={
-		{id="Maintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=1.25,max=1,
+		{id="Maintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=1.10,max=1,
 			desc="Reste appuyé sur le clic pour couper en continu là où tu vises."},
-		{id="Dexterite",name="Dextérité",icon="rbxassetid://78716197209384",price=0.75,max=5,
+		{id="Dexterite",name="Dextérité",icon="rbxassetid://78716197209384",price=0.60,max=5,
 			desc="Tes ciseaux coupent un peu plus vite : -8 % d'attente par niveau."},
-		{id="Saisir",name="Saisir",icon="rbxassetid://120921144181867",price=1.00,max=2,
+		{id="Saisir",name="Saisir",icon="rbxassetid://120921144181867",price=0.85,max=2,
 			desc="Chaque coup coupe aussi une touffe voisine de plus par niveau."},
 	}},
 	{name="Débroussailleuse",locked=true,color=Color3.fromRGB(150,220,110),items={{locked=true},{locked=true},{locked=true}}},
@@ -101,8 +101,10 @@ local buyRemote=RS:FindFirstChild("BuyUpgrade")
 local moneyValue
 local function money() return moneyValue and tonumber(moneyValue.Value) or 0 end
 local function level(it) return player:GetAttribute("Upg_"..it.id) or 0 end
--- prix du prochain niveau : prix de base × Growth^niveau (même calcul que GrassServer)
+-- prix du prochain niveau : envoyé par GrassServer pour chaque niveau (sinon prix de base × Growth^niveau)
 local function price(it)
+	local exact=buyRemote and buyRemote:GetAttribute("Price_"..it.id.."_"..(level(it)+1))
+	if exact then return exact end
 	local base=(buyRemote and buyRemote:GetAttribute("Price_"..it.id)) or it.price
 	local growth=(buyRemote and buyRemote:GetAttribute("Growth")) or 1.5
 	return math.floor(base*growth^level(it)*100+.5)/100
