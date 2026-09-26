@@ -23,6 +23,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local joueur = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
+local SON_CISEAUX = "rbxassetid://9114794521" -- bruit des ciseaux (clic-clac)
 local FERMETURE = math.rad(11)
 local DUREE_COUPE = 0.32
 local DUREE_SORTIE = 0.25
@@ -89,10 +90,22 @@ local function creerVue()
 	debutSortie = os.clock()
 end
 
+local son = Instance.new("Sound")
+son.Name = "BruitCiseaux"
+son.SoundId = SON_CISEAUX
+son.Parent = game:GetService("SoundService")
+local function bruitCiseaux(volume)
+	son.Volume = volume
+	son.PlaybackSpeed = 0.95 + math.random() * 0.1
+	son.TimePosition = 0
+	son:Play()
+end
+
 local function coupe()
 	local maintenant = os.clock()
 	if maintenant - debutCoupe < DUREE_COUPE * 0.8 then return end
 	debutCoupe, debutClac = maintenant, maintenant
+	bruitCiseaux(0.7)
 end
 
 ---------------------------------------------------------------- Ciseaux en main ou pas
@@ -105,6 +118,7 @@ local function surOutil(nouvel)
 	outil, outilCache = nouvel, false
 	if outil then
 		debutClac = os.clock()
+		bruitCiseaux(0.4) -- petit clic-clac quand on sort les ciseaux
 		if not branches[outil] then
 			branches[outil] = true
 			outil.Activated:Connect(function()
