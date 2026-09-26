@@ -317,8 +317,9 @@ local function idFromRay(ray)
 	local hit=workspace:Raycast(ray.Origin,ray.Direction*250,rp)
 	if hit and hit.Instance.Parent==hitF then return hit.Instance:GetAttribute("Id") end
 end
--- on ne coupe l'herbe qu'avec les ciseaux en main
+-- on ne coupe l'herbe qu'avec les ciseaux en main (et pas pendant que le menu des améliorations est ouvert)
 local function holdingScissors()
+	if lp:GetAttribute("MenuOuvert") then return false end
 	local ch=lp.Character
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
 	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")

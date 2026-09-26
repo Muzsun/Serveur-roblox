@@ -301,11 +301,11 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 end)
 
 -- ===== AMÉLIORATIONS (menu TAB) =====
--- Garde les mêmes id / prix / max que dans InventoryUI.
+-- Les prix et niveaux max d'ici sont envoyés au menu InventoryUI (ce sont eux qui comptent).
 local UPGRADES={
-	Maintenir={price=1.00,max=1},  -- rester appuyé sur clic gauche = ramasse en continu
-	Dexterite={price=0.50,max=5},  -- ramasse plus vite (-15% de délai par niveau)
-	Saisir={price=0.75,max=5},     -- +1 herbe proche attrapée en même temps par niveau
+	Maintenir={price=1.25,max=1},  -- rester appuyé = coupe en continu avec les ciseaux
+	Dexterite={price=0.75,max=5},  -- les ciseaux coupent plus vite (-15% de délai par niveau)
+	Saisir={price=1.00,max=5},     -- +1 touffe voisine coupée en même temps par niveau
 }
 local function applyUpgrades(plr)
 	plr:SetAttribute("BagMax",CFG.BAG_CAPACITY)
@@ -314,6 +314,7 @@ Players.PlayerAdded:Connect(function(p) task.wait(1) applyUpgrades(p) end)
 for _,p in Players:GetPlayers() do task.spawn(applyUpgrades,p) end
 local BuyUpgrade=RS:FindFirstChild("BuyUpgrade") or Instance.new("RemoteEvent")
 BuyUpgrade.Name="BuyUpgrade" BuyUpgrade.Parent=RS
+for uid,u in UPGRADES do BuyUpgrade:SetAttribute("Price_"..uid,u.price) BuyUpgrade:SetAttribute("Max_"..uid,u.max) end
 local lastBuy={}
 BuyUpgrade.OnServerEvent:Connect(function(plr,uid)
 	local u=typeof(uid)=="string" and UPGRADES[uid] if not u then return end
