@@ -410,7 +410,14 @@ local OUTILS={
 		{id="FCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=3.00,max=2,
 			desc="+1 touffe par coup de faucille : 3, puis 4, puis 5 touffes."},
 	}},
-	{name="Débroussailleuse",locked=true,color=Color3.fromRGB(150,220,110),items={{locked=true},{locked=true},{locked=true}}},
+	{name="Débroussailleuse",icon="",color=Color3.fromRGB(150,220,110),requires="Debroussailleuse",items={
+		{id="DMaintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=8.00,max=1,
+			desc="Reste appuyé sur le clic pour faucher en continu."},
+		{id="DRapidite",name="Rapidité",icon="rbxassetid://78716197209384",price=5.00,max=5,
+			desc="Ta débroussailleuse fauche plus vite : -8 % d'attente par niveau."},
+		{id="DCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=8.00,max=2,
+			desc="+2 touffes par coup : 6, puis 8, puis 10 touffes."},
+	}},
 }
 -- ===============================================
 

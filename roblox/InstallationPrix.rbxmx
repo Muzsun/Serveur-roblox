@@ -357,8 +357,9 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	-- les améliorations (Dextérité, Saisir, Maintenir) ne marchent qu'avec les ciseaux
 	-- chaque outil a ses améliorations : ciseaux (Dextérité, Saisir) / faucille (Rapidité, Coupe supplémentaire)
 	local scissors=CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux"
-	local sickle=CS:HasTag(tool,"OutilFaucille") or tool.Name=="Faucille"
-	local dex=scissors and (plr:GetAttribute("Upg_Dexterite") or 0) or sickle and (plr:GetAttribute("Upg_FRapidite") or 0) or 0
+	-- les autres outils ont un préfixe : F = faucille, D = débroussailleuse (Upg_<P>Rapidite, Upg_<P>Coupe)
+	local pre=tool:GetAttribute("Prefixe") or ((CS:HasTag(tool,"OutilFaucille") or tool.Name=="Faucille") and "F") or nil
+	local dex=scissors and (plr:GetAttribute("Upg_Dexterite") or 0) or pre and (plr:GetAttribute("Upg_"..pre.."Rapidite") or 0) or 0
 	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 	if lastPick[plr] and now-lastPick[plr]<cd then return end
 	lastPick[plr]=now
@@ -377,7 +378,7 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	local anim=game:GetService("ServerStorage"):FindFirstChild("CiseauxCoupe")
 	if anim then anim:Fire(plr) end
 	-- outil + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
-	local extra=SCISSORS_EXTRA+(scissors and (plr:GetAttribute("Upg_Saisir") or 0) or 0)+(sickle and (plr:GetAttribute("Upg_FCoupe") or 0) or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	local extra=SCISSORS_EXTRA+(scissors and (plr:GetAttribute("Upg_Saisir") or 0) or 0)+(pre and (plr:GetAttribute("Upg_"..pre.."Coupe") or 0)*(tonumber(tool:GetAttribute("CoupeParNiveau")) or 1) or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
 	local radius=math.max(SCISSORS_RADIUS,tonumber(tool:GetAttribute("RayonCoupe")) or 0)
 	if extra>0 then
 		local near={}
@@ -405,6 +406,10 @@ local UPGRADES={
 	FMaintenir={prices={3.50},max=1,requires="Faucille"},                     -- rester appuyé = fauche en continu
 	FRapidite={prices={2.00,3.00,4.50,6.50,9.00},max=5,requires="Faucille"},  -- la faucille frappe plus vite
 	FCoupe={prices={3.00,5.00},max=2,requires="Faucille"},                    -- +1 touffe par niveau : 3 -> 4 -> 5 touffes par coup
+	-- DÉBROUSSAILLEUSE (il faut l'avoir achetée)
+	DMaintenir={prices={8.00},max=1,requires="Debroussailleuse"},                        -- rester appuyé = fauche en continu
+	DRapidite={prices={5.00,7.50,11.00,16.00,22.00},max=5,requires="Debroussailleuse"}, -- elle fauche plus vite
+	DCoupe={prices={8.00,14.00},max=2,requires="Debroussailleuse"},                      -- +2 touffes par niveau : 6 -> 8 -> 10
 }
 local GROWTH=1.5 -- seulement si un niveau n'a pas de prix dans la liste
 local function cost(u,lvl)
@@ -484,7 +489,14 @@ local OUTILS={
 		{id="FCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=3.00,max=2,
 			desc="+1 touffe par coup de faucille : 3, puis 4, puis 5 touffes."},
 	}},
-	{name="Débroussailleuse",locked=true,color=Color3.fromRGB(150,220,110),items={{locked=true},{locked=true},{locked=true}}},
+	{name="Débroussailleuse",icon="",color=Color3.fromRGB(150,220,110),requires="Debroussailleuse",items={
+		{id="DMaintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=8.00,max=1,
+			desc="Reste appuyé sur le clic pour faucher en continu."},
+		{id="DRapidite",name="Rapidité",icon="rbxassetid://78716197209384",price=5.00,max=5,
+			desc="Ta débroussailleuse fauche plus vite : -8 % d'attente par niveau."},
+		{id="DCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=8.00,max=2,
+			desc="+2 touffes par coup : 6, puis 8, puis 10 touffes."},
+	}},
 }
 -- ===============================================
 

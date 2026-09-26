@@ -374,19 +374,24 @@ local function holdingRealScissors()
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
 	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
 end
-local function holdingSickle()
+-- préfixe des améliorations de l'outil en main : F = faucille, D = débroussailleuse (nil = ciseaux)
+local function toolPrefix()
 	local ch=lp.Character
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
-	return tool~=nil and (CS:HasTag(tool,"OutilFaucille") or tool.Name=="Faucille")
+	if not tool then return nil end
+	return tool:GetAttribute("Prefixe") or ((CS:HasTag(tool,"OutilFaucille") or tool.Name=="Faucille") and "F") or nil
 end
+local function holdingSickle() return toolPrefix()~=nil end
 local function speedLevel()
 	if holdingRealScissors() then return lp:GetAttribute("Upg_Dexterite") or 0 end
-	if holdingSickle() then return lp:GetAttribute("Upg_FRapidite") or 0 end
+	local pre=toolPrefix()
+	if pre then return lp:GetAttribute("Upg_"..pre.."Rapidite") or 0 end
 	return 0
 end
 local function canHold()
 	if holdingRealScissors() then return (lp:GetAttribute("Upg_Maintenir") or 0)>=1 end
-	if holdingSickle() then return (lp:GetAttribute("Upg_FMaintenir") or 0)>=1 end
+	local pre=toolPrefix()
+	if pre then return (lp:GetAttribute("Upg_"..pre.."Maintenir") or 0)>=1 end
 	return false
 end
 local function setHover(id)
@@ -754,7 +759,7 @@ end
 
 -- ===== pas de délai : l'herbe est coupée chez nous au moment où les lames se ferment =====
 -- (sans attendre la réponse du serveur ; si le serveur refuse, la touffe revient)
-local CLOSE_SCISSORS,CLOSE_SICKLE=.08,.15 -- secondes entre le clic et les lames qui se ferment
+local CLOSE_SCISSORS,CLOSE_SICKLE,CLOSE_TRIMMER=.08,.15,.12 -- secondes entre le clic et le moment où l'outil touche l'herbe
 local scheduled,predicted={},{}
 local function heldTool() local ch=lp.Character return ch and ch:FindFirstChildOfClass("Tool") end
 local function pendingSize()
@@ -774,7 +779,8 @@ requestCut=function(id)
 	-- touffes voisines coupées en même temps (faucille, Saisir) : les plus proches d'abord, comme le serveur
 	local extra=(CFG.SCISSORS_EXTRA or 0)+(tool and tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
 	if holdingRealScissors() then extra+=lp:GetAttribute("Upg_Saisir") or 0 end
-	if holdingSickle() then extra+=lp:GetAttribute("Upg_FCoupe") or 0 end
+	local pre=toolPrefix()
+	if pre then extra+=(lp:GetAttribute("Upg_"..pre.."Coupe") or 0)*(tool and tonumber(tool:GetAttribute("CoupeParNiveau")) or 1) end
 	if extra>0 then
 		local radius=math.max(CFG.SCISSORS_RADIUS or 4,tool and tonumber(tool:GetAttribute("RayonCoupe")) or 0)
 		local near={}
@@ -791,7 +797,9 @@ requestCut=function(id)
 		end
 	end
 	for _,x in list do scheduled[x.id]=x end
-	task.delay(sickle and CLOSE_SICKLE or CLOSE_SCISSORS,function()
+	local closeDelay=CLOSE_SCISSORS
+	if sickle then closeDelay=(toolPrefix()=="D") and CLOSE_TRIMMER or CLOSE_SICKLE end
+	task.delay(closeDelay,function()
 		for _,x in list do
 			local st=scheduled[x.id] scheduled[x.id]=nil
 			if st and data[x.id] then

@@ -1,5 +1,5 @@
 -- CiseauxVue (LocalScript dans StarterPlayer > StarterPlayerScripts)
--- Vue à la 1re personne : l'outil en main (ciseaux ou faucille) suit la caméra (en bas à droite de l'écran),
+-- Vue à la 1re personne : l'outil en main (ciseaux, faucille ou débroussailleuse) suit la caméra (en bas à droite de l'écran),
 -- se balance quand on tourne ou marche, les ciseaux font "clic-clac" et la faucille donne un coup à chaque coupe.
 -- Vue de loin : on voit les ciseaux dans la main du personnage, comme les autres joueurs.
 if not game:GetService("RunService"):IsClient() then
@@ -17,6 +17,10 @@ local REGLAGES = {
 		POSITION = Vector3.new(0.75, -1.3, -2.7), -- place du poing par rapport à la caméra (droite, bas, devant)
 		MANCHE = Vector3.new(0.2, 0.85, -0.35), -- vers où pointe le manche (droite, haut, devant)
 		FACE = Vector3.new(-0.15, 0, 1), -- le plat de la lame : (-0.15, 0, 1) = croissant vers la droite, (0.15, 0, -1) = vers la gauche
+	},
+	DEBROUSSAILLEUSE = {
+		POSITION = Vector3.new(1.2, -1.25, -0.3), -- place de la poignée arrière par rapport à la caméra
+		TUBE = Vector3.new(-0.27, -0.1, -0.96), -- vers où pointe le tube (gauche, bas, devant)
 	},
 }
 
@@ -43,6 +47,12 @@ local axeManche = RF.MANCHE.Unit
 local axePlat = (RF.FACE - axeManche * axeManche:Dot(RF.FACE)).Unit
 local REPERE_FAUCILLE = CFrame.fromMatrix(RF.POSITION, axePlat, axeManche, axePlat:Cross(axeManche))
 local DUREE_COUP_FAUCILLE = 0.42
+-- Repère de la débroussailleuse : X = le tube, Y = le haut (comme dans DebroussailleuseServer)
+local RD = REGLAGES.DEBROUSSAILLEUSE
+local axeTube = RD.TUBE.Unit
+local axeHaut = (Vector3.yAxis - axeTube * axeTube:Dot(Vector3.yAxis)).Unit
+local REPERE_DEBROU = CFrame.fromMatrix(RD.POSITION, axeTube, axeHaut, axeTube:Cross(axeHaut))
+local DUREE_COUP_DEBROU = 0.4
 
 local function estCiseaux(objet)
 	return objet:IsA("Tool") and (CollectionService:HasTag(objet, "OutilCiseaux") or objet.Name == "Ciseaux")
@@ -50,14 +60,18 @@ end
 local function estFaucille(objet)
 	return objet:IsA("Tool") and (CollectionService:HasTag(objet, "OutilFaucille") or objet.Name == "Faucille")
 end
-local function estOutilVue(objet) return estCiseaux(objet) or estFaucille(objet) end
+local function estDebrou(objet)
+	return objet:IsA("Tool") and (CollectionService:HasTag(objet, "OutilDebroussailleuse") or objet.Name == "Debroussailleuse")
+end
+local function estOutilVue(objet) return estCiseaux(objet) or estFaucille(objet) or estDebrou(objet) end
 
 ---------------------------------------------------------------- État
 
 local outil = nil -- les ciseaux tenus en main
 local vue = nil -- copie locale affichée devant la caméra
 local vueHandle, vueDecalage, vueMoteurs = nil, nil, {}
-local faucille = false -- l'outil en main est la faucille
+local faucille = false -- l'outil en main est la faucille (ou la débroussailleuse : pas de clic-clac)
+local debrou = false -- l'outil en main est la débroussailleuse
 local vueTrainee = nil
 local outilCache = false
 local debutCoupe, debutClac, debutSortie = -math.huge, -math.huge, -math.huge
@@ -88,6 +102,12 @@ local function creerVue()
 	vueHandle = modele:FindFirstChild("Handle")
 	-- point de repère : la vis des ciseaux, ou le poing (Handle) de la faucille
 	local fente = if faucille then vueHandle else modele:FindFirstChild("Fente", true)
+	if vueHandle and faucille then
+		-- la tête de la débroussailleuse reste sur son moteur (BoutiqueClient la fait tourner)
+		for _, d in modele:GetDescendants() do
+			if d:IsA("Motor6D") and d.Name == "TeteMoteur" then d.Transform = CFrame.identity end
+		end
+	end
 	if not vueHandle or not fente then modele:Destroy() return end
 	vueTrainee = modele:FindFirstChild("Trainee", true)
 	for _, d in modele:GetDescendants() do
@@ -125,7 +145,8 @@ end
 local okCfg, CFG_HERBE = pcall(function() return require(game:GetService("ReplicatedStorage"):WaitForChild("GrassConfig", 10)) end)
 if not okCfg or type(CFG_HERBE) ~= "table" then CFG_HERBE = {} end
 local function delaiCoupe(qui)
-	local dex = qui and qui:GetAttribute(faucille and "Upg_FRapidite" or "Upg_Dexterite") or 0 -- faucille : Rapidité, ciseaux : Dextérité
+	local nom = if debrou then "Upg_DRapidite" elseif faucille then "Upg_FRapidite" else "Upg_Dexterite"
+	local dex = qui and qui:GetAttribute(nom) or 0 -- faucille / débroussailleuse : Rapidité, ciseaux : Dextérité
 	return math.max(0.2, (CFG_HERBE.PICK_COOLDOWN or 0.9) * (1 - (CFG_HERBE.DEX_PAR_NIVEAU or 0.08) * dex))
 end
 local function coupe()
@@ -144,7 +165,8 @@ local function surOutil(nouvel)
 	cacherOutil(false)
 	detruireVue()
 	outil, outilCache = nouvel, false
-	faucille = outil ~= nil and estFaucille(outil)
+	debrou = outil ~= nil and estDebrou(outil)
+	faucille = outil ~= nil and (estFaucille(outil) or debrou)
 	if outil then
 		debutClac = os.clock()
 		if not faucille then bruitCiseaux(0.4) end -- petit clic-clac quand on sort les ciseaux
@@ -228,6 +250,17 @@ RunService:BindToRenderStep("CiseauxVue", Enum.RenderPriority.Camera.Value + 1, 
 	local decalage = Vector3.new(-0.15 * k, -1.2 * s - 0.25 * k, -0.3 * k)
 	local inclinaison = CFrame.Angles(-0.5 * s - 0.45 * k, 0, 0.12 * k) -- tourne autour de la vis
 
+	if debrou then
+		-- débroussailleuse : on balaie à droite puis à gauche, la tête près du sol
+		local d = math.clamp((maintenant - debutCoupe) / DUREE_COUP_DEBROU, 0, 1)
+		local lacet = if d < 1 then -0.42 * math.sin(d * math.pi * 2) else 0
+		local plonge = if d < 1 then math.sin(d * math.pi) else 0
+		local poing = camera.CFrame * balade * balancement
+			* CFrame.new(REPERE_DEBROU.Position + Vector3.new(0, -1.2 * s - 0.15 * plonge, 0))
+			* CFrame.Angles(-0.5 * s - 0.08 * plonge, lacet, 0) * REPERE_DEBROU.Rotation
+		vueHandle.CFrame = poing * vueDecalage
+		return
+	end
 	if faucille then
 		-- coup de faucille : on arme vers la droite, on balaie vers le bas à gauche, puis on revient
 		local d = math.clamp((maintenant - debutCoupe) / DUREE_COUP_FAUCILLE, 0, 1)

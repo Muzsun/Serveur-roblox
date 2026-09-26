@@ -1,4 +1,463 @@
-<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="Folder" referent="RBX0"><Properties><string name="Name">InstallationMenuFaucille</string></Properties><Item class="Script" referent="RBX1"><Properties><string name="Name">GrassServer</string><ProtectedString name="Source"><![CDATA[-- GrassServer (Script dans ServerScriptService)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="Folder" referent="RBX78"><Properties><string name="Name">InstallationDebroussailleuse</string></Properties><Item class="Model" referent="RBX70"><Properties><string name="Name">DebroussailleuseVitrine</string><Ref name="PrimaryPart">RBXBASED</Ref></Properties><Item class="Part" referent="RBXBASED"><Properties><string name="Name">Base</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>0</Y><Z>0</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>7</X><Y>0.8</Y><Z>0.8</Z></Vector3><Color3uint8 name="Color3uint8">4294967295</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">1</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX69"><Properties><string name="Name">PanneauPrix</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>2.4</X><Y>-2</Y><Z>-0.35</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>0.2</X><Y>0.2</Y><Z>0.2</Z></Vector3><Color3uint8 name="Color3uint8">4294967295</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">1</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX1"><Properties><string name="Name">Carter</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>2.5</X><Y>-0.175</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.42</X><Y>0.5</Y><Z>0.5</Z></Vector3><Color3uint8 name="Color3uint8">4282006594</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX2"><Properties><string name="Name">Moteur</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.16</X><Y>-0.115</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.95</X><Y>0.72</Y><Z>0.78</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX3"><Properties><string name="Name">Capot</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.16</X><Y>0.125</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.95</X><Y>0.8</Y><Z>0.8</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX4"><Properties><string name="Name">CapotBande</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.16</X><Y>-0.155</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.97</X><Y>0.14</Y><Z>0.82</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX5"><Properties><string name="Name">Logo</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.13</X><Y>0.53</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.5</X><Y>0.03</Y><Z>0.2</Z></Vector3><Color3uint8 name="Color3uint8">4293716706</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX6"><Properties><string name="Name">LogoTrait</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.13</X><Y>0.532</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.3</X><Y>0.035</Y><Z>0.06</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX7"><Properties><string name="Name">Lanceur</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.7</X><Y>-0.095</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.16</X><Y>0.78</Y><Z>0.78</Z></Vector3><Color3uint8 name="Color3uint8">4282006594</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX8"><Properties><string name="Name">LanceurCentre</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.8</X><Y>-0.095</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.3</Y><Z>0.3</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX9"><Properties><string name="Name">PoigneeLanceur</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.86</X><Y>-0.095</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.14</X><Y>0.13</Y><Z>0.42</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX10"><Properties><string name="Name">Reservoir</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.1</X><Y>-0.645</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.8</X><Y>0.36</Y><Z>0.7</Z></Vector3><Color3uint8 name="Color3uint8">4293716706</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0.1</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX11"><Properties><string name="Name">ReservoirBouchon</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.1</X><Y>-0.645</Y><Z>-0.35</Z><R00>0</R00><R01>0</R01><R02>1</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>-1</R20><R21>0</R21><R22>0</R22></CoordinateFrame><Vector3 name="size"><X>0.12</X><Y>0.2</Y><Z>0.2</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX12"><Properties><string name="Name">Filtre</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.06</X><Y>-0.055</Y><Z>-0.4</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.52</X><Y>0.46</Y><Z>0.14</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX13"><Properties><string name="Name">FiltreGrille</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.06</X><Y>-0.175</Y><Z>-0.475</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.4</X><Y>0.04</Y><Z>0.02</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX14"><Properties><string name="Name">FiltreGrille</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.06</X><Y>-0.055</Y><Z>-0.475</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.4</X><Y>0.04</Y><Z>0.02</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX15"><Properties><string name="Name">FiltreGrille</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.06</X><Y>0.065</Y><Z>-0.475</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.4</X><Y>0.04</Y><Z>0.02</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX16"><Properties><string name="Name">Pot</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.08</X><Y>-0.195</Y><Z>0.5</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.46</X><Y>0.34</Y><Z>0.14</Z></Vector3><Color3uint8 name="Color3uint8">4289902786</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.15</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX17"><Properties><string name="Name">PotFente</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.22</X><Y>-0.195</Y><Z>0.575</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.06</X><Y>0.24</Y><Z>0.02</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX18"><Properties><string name="Name">PotFente</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.08</X><Y>-0.195</Y><Z>0.575</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.06</X><Y>0.24</Y><Z>0.02</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX19"><Properties><string name="Name">PotFente</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>2.94</X><Y>-0.195</Y><Z>0.575</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.06</X><Y>0.24</Y><Z>0.02</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX20"><Properties><string name="Name">Bougie</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>3.54</X><Y>0.445</Y><Z>0.05</Z><R00>0</R00><R01>1</R01><R02>0</R02><R10>1</R10><R11>0</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.2</X><Y>0.13</Y><Z>0.13</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX21"><Properties><string name="Name">Poignee</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>2</X><Y>-0.175</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.72</X><Y>0.27</Y><Z>0.27</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX22"><Properties><string name="Name">PoigneeStrie</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>2.26</X><Y>-0.175</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.04</X><Y>0.285</Y><Z>0.285</Z></Vector3><Color3uint8 name="Color3uint8">4282006594</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX23"><Properties><string name="Name">PoigneeStrie</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>2</X><Y>-0.175</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.04</X><Y>0.285</Y><Z>0.285</Z></Vector3><Color3uint8 name="Color3uint8">4282006594</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX24"><Properties><string name="Name">PoigneeStrie</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.74</X><Y>-0.175</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.04</X><Y>0.285</Y><Z>0.285</Z></Vector3><Color3uint8 name="Color3uint8">4282006594</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX25"><Properties><string name="Name">Gachette</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.98</X><Y>-0.365</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.26</X><Y>0.2</Y><Z>0.08</Z></Vector3><Color3uint8 name="Color3uint8">4292225064</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX26"><Properties><string name="Name">Interrupteur</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>2.24</X><Y>-0.015</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.1</X><Y>0.07</Y><Z>0.1</Z></Vector3><Color3uint8 name="Color3uint8">4292225064</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX27"><Properties><string name="Name">Tube</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-0.32</X><Y>-0.175</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>4</X><Y>0.16</Y><Z>0.16</Z></Vector3><Color3uint8 name="Color3uint8">4289902786</Color3uint8><token name="Material">1088</token><token name="shape">2</token><float name="Reflectance">0.2</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX28"><Properties><string name="Name">Harnais</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.23</X><Y>-0.175</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.1</X><Y>0.22</Y><Z>0.22</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX29"><Properties><string name="Name">HarnaisAnneau</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.23</X><Y>-0.345</Y><Z>0.05</Z><R00>0</R00><R01>0</R01><R02>1</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>-1</R20><R21>0</R21><R22>0</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.2</Y><Z>0.2</Z></Vector3><Color3uint8 name="Color3uint8">4289902786</Color3uint8><token name="Material">1088</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX30"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>0.2629</Y><Z>-0.379</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>-0.2225</R11><R12>0.9749</R12><R20>0</R20><R21>0.9749</R21><R22>0.2225</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX31"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>0.4393</Y><Z>-0.294</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>-0.6235</R11><R12>0.7818</R12><R20>0</R20><R21>0.7818</R21><R22>0.6235</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX32"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>0.5614</Y><Z>-0.1409</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>-0.901</R11><R12>0.4339</R12><R20>0</R20><R21>0.4339</R21><R22>0.901</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX33"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>0.605</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>-1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX34"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>0.5614</Y><Z>0.2409</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>-0.901</R11><R12>-0.4339</R12><R20>0</R20><R21>-0.4339</R21><R22>0.901</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX35"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>0.4393</Y><Z>0.394</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>-0.6235</R11><R12>-0.7818</R12><R20>0</R20><R21>-0.7818</R21><R22>0.6235</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX36"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>0.2629</Y><Z>0.479</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>-0.2225</R11><R12>-0.9749</R12><R20>0</R20><R21>-0.9749</R21><R22>0.2225</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX37"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>0.0671</Y><Z>0.479</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>0.2225</R11><R12>-0.9749</R12><R20>0</R20><R21>-0.9749</R21><R22>-0.2225</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX38"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>-0.1093</Y><Z>0.394</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>0.6235</R11><R12>-0.7818</R12><R20>0</R20><R21>-0.7818</R21><R22>-0.6235</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX39"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>-0.2314</Y><Z>0.2409</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>0.901</R11><R12>-0.4339</R12><R20>0</R20><R21>-0.4339</R21><R22>-0.901</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX40"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>-0.2314</Y><Z>-0.1409</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>0.901</R11><R12>0.4339</R12><R20>0</R20><R21>0.4339</R21><R22>-0.901</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX41"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>-0.1093</Y><Z>-0.294</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>0.6235</R11><R12>0.7818</R12><R20>0</R20><R21>0.7818</R21><R22>-0.6235</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX42"><Properties><string name="Name">Boucle</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>0.0671</Y><Z>-0.379</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>0.2225</R11><R12>0.9749</R12><R20>0</R20><R21>0.9749</R21><R22>-0.2225</R22></CoordinateFrame><Vector3 name="size"><X>0.13</X><Y>0.13</Y><Z>0.2252</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX43"><Properties><string name="Name">Collier</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.33</X><Y>-0.215</Y><Z>0.05</Z><R00>-1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.2</X><Y>0.2</Y><Z>0.3</Z></Vector3><Color3uint8 name="Color3uint8">4282006594</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX44"><Properties><string name="Name">Renvoi</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.4</X><Y>-0.215</Y><Z>0.05</Z><R00>-0.848</R00><R01>-0.5299</R01><R02>0</R02><R10>-0.5299</R10><R11>0.848</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.36</X><Y>0.3</Y><Z>0.3</Z></Vector3><Color3uint8 name="Color3uint8">4282006594</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX45"><Properties><string name="Name">Bobine</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.7096</X><Y>-0.4664</Y><Z>0.05</Z><R00>0.5299</R00><R01>0.848</R01><R02>0</R02><R10>0.848</R10><R11>-0.5299</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.22</X><Y>0.56</Y><Z>0.56</Z></Vector3><Color3uint8 name="Color3uint8">4280163874</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX46"><Properties><string name="Name">BobineBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.6672</X><Y>-0.3985</Y><Z>0.05</Z><R00>0.5299</R00><R01>0.848</R01><R02>0</R02><R10>0.848</R10><R11>-0.5299</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.06</X><Y>0.6</Y><Z>0.6</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX47"><Properties><string name="Name">Capuchon</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.7891</X><Y>-0.5936</Y><Z>0.05</Z><R00>0.5299</R00><R01>0.848</R01><R02>0</R02><R10>0.848</R10><R11>-0.5299</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.1</X><Y>0.34</Y><Z>0.34</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX48"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.7361</X><Y>-0.5088</Y><Z>0.05</Z><R00>-0.848</R00><R01>0.5299</R01><R02>0</R02><R10>0.5299</R10><R11>0.848</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>1.35</X><Y>0.035</Y><Z>0.035</Z></Vector3><Color3uint8 name="Color3uint8">4294951976</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX49"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.7361</X><Y>-0.5088</Y><Z>0.05</Z><R00>0</R00><R01>0.5299</R01><R02>0.848</R02><R10>0</R10><R11>0.848</R11><R12>-0.5299</R12><R20>-1</R20><R21>0</R21><R22>0</R22></CoordinateFrame><Vector3 name="size"><X>1.35</X><Y>0.035</Y><Z>0.035</Z></Vector3><Color3uint8 name="Color3uint8">4294951976</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX50"><Properties><string name="Name">Protection</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.5432</X><Y>-0.3345</Y><Z>-0.3538</Z><R00>0.1473</R00><R01>0.5299</R01><R02>0.8352</R02><R10>-0.092</R10><R11>0.848</R11><R12>-0.5219</R12><R20>-0.9848</R20><R21>0</R21><R22>0.1736</R22></CoordinateFrame><Vector3 name="size"><X>0.82</X><Y>0.04</Y><Z>0.3417</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX51"><Properties><string name="Name">ProtectionBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.5229</X><Y>-0.4297</Y><Z>-0.7378</Z><R00>0.1473</R00><R01>0.5299</R01><R02>0.8352</R02><R10>-0.092</R10><R11>0.848</R11><R12>-0.5219</R12><R20>-0.9848</R20><R21>0</R21><R22>0.1736</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.16</Y><Z>0.3274</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX52"><Properties><string name="Name">Protection</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.4297</X><Y>-0.4054</Y><Z>-0.3051</Z><R00>0.424</R00><R01>0.5299</R01><R02>0.7344</R02><R10>-0.265</R10><R11>0.848</R11><R12>-0.4589</R12><R20>-0.866</R20><R21>0</R21><R22>0.5</R22></CoordinateFrame><Vector3 name="size"><X>0.82</X><Y>0.04</Y><Z>0.3417</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX53"><Properties><string name="Name">ProtectionBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.3015</X><Y>-0.5681</Y><Z>-0.6428</Z><R00>0.424</R00><R01>0.5299</R01><R02>0.7344</R02><R10>-0.265</R10><R11>0.848</R11><R12>-0.4589</R12><R20>-0.866</R20><R21>0</R21><R22>0.5</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.16</Y><Z>0.3274</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX54"><Properties><string name="Name">Protection</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.3372</X><Y>-0.4632</Y><Z>-0.2135</Z><R00>0.6496</R00><R01>0.5299</R01><R02>0.5451</R02><R10>-0.4059</R10><R11>0.848</R11><R12>-0.3406</R12><R20>-0.6428</R20><R21>0</R21><R22>0.766</R22></CoordinateFrame><Vector3 name="size"><X>0.82</X><Y>0.04</Y><Z>0.3417</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX55"><Properties><string name="Name">ProtectionBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.121</X><Y>-0.6809</Y><Z>-0.4642</Z><R00>0.6496</R00><R01>0.5299</R01><R02>0.5451</R02><R10>-0.4059</R10><R11>0.848</R11><R12>-0.3406</R12><R20>-0.6428</R20><R21>0</R21><R22>0.766</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.16</Y><Z>0.3274</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX56"><Properties><string name="Name">Protection</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.2769</X><Y>-0.5009</Y><Z>-0.0902</Z><R00>0.7969</R00><R01>0.5299</R01><R02>0.29</R02><R10>-0.498</R10><R11>0.848</R11><R12>-0.1812</R12><R20>-0.342</R20><R21>0</R21><R22>0.9397</R22></CoordinateFrame><Vector3 name="size"><X>0.82</X><Y>0.04</Y><Z>0.3417</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX57"><Properties><string name="Name">ProtectionBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.0032</X><Y>-0.7545</Y><Z>-0.2236</Z><R00>0.7969</R00><R01>0.5299</R01><R02>0.29</R02><R10>-0.498</R10><R11>0.848</R11><R12>-0.1812</R12><R20>-0.342</R20><R21>0</R21><R22>0.9397</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.16</Y><Z>0.3274</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX58"><Properties><string name="Name">Protection</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.2559</X><Y>-0.514</Y><Z>0.05</Z><R00>0.848</R00><R01>0.5299</R01><R02>0</R02><R10>-0.5299</R10><R11>0.848</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>0.82</X><Y>0.04</Y><Z>0.3417</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX59"><Properties><string name="Name">ProtectionBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-1.9622</X><Y>-0.7801</Y><Z>0.05</Z><R00>0.848</R00><R01>0.5299</R01><R02>0</R02><R10>-0.5299</R10><R11>0.848</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.16</Y><Z>0.3274</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX60"><Properties><string name="Name">Protection</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.2769</X><Y>-0.5009</Y><Z>0.1902</Z><R00>0.7969</R00><R01>0.5299</R01><R02>-0.29</R02><R10>-0.498</R10><R11>0.848</R11><R12>0.1812</R12><R20>0.342</R20><R21>0</R21><R22>0.9397</R22></CoordinateFrame><Vector3 name="size"><X>0.82</X><Y>0.04</Y><Z>0.3417</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX61"><Properties><string name="Name">ProtectionBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.0032</X><Y>-0.7545</Y><Z>0.3236</Z><R00>0.7969</R00><R01>0.5299</R01><R02>-0.29</R02><R10>-0.498</R10><R11>0.848</R11><R12>0.1812</R12><R20>0.342</R20><R21>0</R21><R22>0.9397</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.16</Y><Z>0.3274</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX62"><Properties><string name="Name">Protection</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.3372</X><Y>-0.4632</Y><Z>0.3135</Z><R00>0.6496</R00><R01>0.5299</R01><R02>-0.5451</R02><R10>-0.4059</R10><R11>0.848</R11><R12>0.3406</R12><R20>0.6428</R20><R21>0</R21><R22>0.766</R22></CoordinateFrame><Vector3 name="size"><X>0.82</X><Y>0.04</Y><Z>0.3417</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX63"><Properties><string name="Name">ProtectionBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.121</X><Y>-0.6809</Y><Z>0.5642</Z><R00>0.6496</R00><R01>0.5299</R01><R02>-0.5451</R02><R10>-0.4059</R10><R11>0.848</R11><R12>0.3406</R12><R20>0.6428</R20><R21>0</R21><R22>0.766</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.16</Y><Z>0.3274</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX64"><Properties><string name="Name">Protection</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.4297</X><Y>-0.4054</Y><Z>0.4051</Z><R00>0.424</R00><R01>0.5299</R01><R02>-0.7344</R02><R10>-0.265</R10><R11>0.848</R11><R12>0.4589</R12><R20>0.866</R20><R21>0</R21><R22>0.5</R22></CoordinateFrame><Vector3 name="size"><X>0.82</X><Y>0.04</Y><Z>0.3417</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX65"><Properties><string name="Name">ProtectionBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.3015</X><Y>-0.5681</Y><Z>0.7428</Z><R00>0.424</R00><R01>0.5299</R01><R02>-0.7344</R02><R10>-0.265</R10><R11>0.848</R11><R12>0.4589</R12><R20>0.866</R20><R21>0</R21><R22>0.5</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.16</Y><Z>0.3274</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX66"><Properties><string name="Name">Protection</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.5432</X><Y>-0.3345</Y><Z>0.4538</Z><R00>0.1473</R00><R01>0.5299</R01><R02>-0.8352</R02><R10>-0.092</R10><R11>0.848</R11><R12>0.5219</R12><R20>0.9848</R20><R21>0</R21><R22>0.1736</R22></CoordinateFrame><Vector3 name="size"><X>0.82</X><Y>0.04</Y><Z>0.3417</Z></Vector3><Color3uint8 name="Color3uint8">4294078492</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX67"><Properties><string name="Name">ProtectionBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.5229</X><Y>-0.4297</Y><Z>0.8378</Z><R00>0.1473</R00><R01>0.5299</R01><R02>-0.8352</R02><R10>-0.092</R10><R11>0.848</R11><R12>0.5219</R12><R20>0.9848</R20><R21>0</R21><R22>0.1736</R22></CoordinateFrame><Vector3 name="size"><X>0.05</X><Y>0.16</Y><Z>0.3274</Z></Vector3><Color3uint8 name="Color3uint8">4291318802</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX68"><Properties><string name="Name">ProtectionPatte</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-2.3492</X><Y>-0.4557</Y><Z>0.05</Z><R00>-0.848</R00><R01>0.5299</R01><R02>0</R02><R10>0.5299</R10><R11>0.848</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>-1</R22></CoordinateFrame><Vector3 name="size"><X>0.5</X><Y>0.08</Y><Z>0.14</Z></Vector3><Color3uint8 name="Color3uint8">4282006594</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item></Item><Item class="Script" referent="RBX71"><Properties><string name="Name">DebroussailleuseServer</string><ProtectedString name="Source"><![CDATA[-- DebroussailleuseServer (Script dans ServerScriptService)
+-- La débroussailleuse est accrochée au panneau de l'établi (modèle "DebroussailleuseVitrine").
+-- On l'achète avec E, elle arrive dans la barre d'outils et fauche beaucoup de touffes d'un coup.
+-- Sa tête tourne (BoutiqueClient). À chaque nouvelle partie, il faut la racheter.
+if not game:GetService("RunService"):IsServer() then
+	warn("[Débroussailleuse] DebroussailleuseServer doit être un Script dans ServerScriptService !")
+	return
+end
+print("[Débroussailleuse] DebroussailleuseServer démarré")
+
+local REGLAGES = {
+	PRIX = 19.99,
+	TOUFFES_EN_PLUS = 5, -- touffes voisines coupées en plus à chaque coup : 5 = 6 touffes au début
+	COUPE_PAR_NIVEAU = 2, -- "Coupe supplémentaire" : +2 touffes par niveau (6 -> 8 -> 10)
+	RAYON = 7, -- rayon autour de la touffe visée (studs)
+	TAILLE_EN_MAIN = 0.8, -- taille de la débroussailleuse dans la main
+	INCLINAISON = 32, -- degrés : la tête descend vers le sol devant toi
+	EQUIPER_APRES_ACHAT = true, -- la débroussailleuse arrive directement dans la main
+	SON = "rbxasset://sounds/swordslash.wav", -- bruit à chaque coup (mets un son de moteur si tu en as un : "rbxassetid://...")
+	SAUVEGARDER = false, -- true = garde l'achat quand le joueur revient (DataStore). false = à racheter à chaque partie
+}
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
+local DataStoreService = game:GetService("DataStoreService")
+
+local TAG = "OutilDebroussailleuse"
+local NOM = "Debroussailleuse" -- nom de l'outil (et de l'attribut du joueur quand il l'a achetée)
+local okCfg, CFG = pcall(function() return require(ReplicatedStorage:WaitForChild("GrassConfig", 10)) end)
+if not okCfg or type(CFG) ~= "table" then CFG = {} end
+
+-- infos pour l'écran des joueurs (prix, nombre de touffes)
+local achat = ReplicatedStorage:FindFirstChild("DebroussailleuseAchat") or Instance.new("RemoteEvent")
+achat.Name = "DebroussailleuseAchat"
+achat:SetAttribute("Prix", REGLAGES.PRIX)
+achat:SetAttribute("Touffes", 1 + REGLAGES.TOUFFES_EN_PLUS)
+achat.Parent = ReplicatedStorage
+
+---------------------------------------------------------------- Le modèle (le même sur l'établi et dans la main)
+-- nom, forme, taille (x, y, z), position (x, y, z), rotation (9 nombres), couleur (r, g, b), matière, reflet, transparence, tête (tourne)
+-- Repère : la main (poignée arrière) en (0, 0, 0), le tube vers +X, le moteur derrière, la tête au bout.
+local PIECES = {
+	{ "Carter", "Cylinder", 0.42, 0.5, 0.5, -0.42, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 60, 66, "SmoothPlastic", 0, 0, false },
+	{ "Moteur", "Block", 0.95, 0.72, 0.78, -1.08, 0.06, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "Capot", "Cylinder", 0.95, 0.8, 0.8, -1.08, 0.3, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "CapotBande", "Block", 0.97, 0.14, 0.82, -1.08, 0.02, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Logo", "Block", 0.5, 0.03, 0.2, -1.05, 0.705, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 236, 234, 226, "SmoothPlastic", 0, 0, false },
+	{ "LogoTrait", "Block", 0.3, 0.035, 0.06, -1.05, 0.707, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Lanceur", "Cylinder", 0.16, 0.78, 0.78, -1.62, 0.08, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 60, 66, "SmoothPlastic", 0, 0, false },
+	{ "LanceurCentre", "Cylinder", 0.05, 0.3, 0.3, -1.72, 0.08, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "PoigneeLanceur", "Block", 0.14, 0.13, 0.42, -1.78, 0.08, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Reservoir", "Block", 0.8, 0.36, 0.7, -1.02, -0.47, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 236, 234, 226, "SmoothPlastic", 0, 0.1, false },
+	{ "ReservoirBouchon", "Cylinder", 0.12, 0.2, 0.2, -1.02, -0.47, 0.4, 0, 0, -1, 0, 1, 0, 1, 0, 0, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Filtre", "Block", 0.52, 0.46, 0.14, -0.98, 0.12, 0.45, 1, 0, 0, 0, 1, 0, 0, 0, 1, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "FiltreGrille", "Block", 0.4, 0.04, 0.02, -0.98, 0, 0.525, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "FiltreGrille", "Block", 0.4, 0.04, 0.02, -0.98, 0.12, 0.525, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "FiltreGrille", "Block", 0.4, 0.04, 0.02, -0.98, 0.24, 0.525, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Pot", "Block", 0.46, 0.34, 0.14, -1, -0.02, -0.45, 1, 0, 0, 0, 1, 0, 0, 0, 1, 178, 184, 194, "Metal", 0.15, 0, false },
+	{ "PotFente", "Block", 0.06, 0.24, 0.02, -1.14, -0.02, -0.525, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "PotFente", "Block", 0.06, 0.24, 0.02, -1, -0.02, -0.525, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "PotFente", "Block", 0.06, 0.24, 0.02, -0.86, -0.02, -0.525, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Bougie", "Cylinder", 0.2, 0.13, 0.13, -1.46, 0.62, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Poignee", "Cylinder", 0.72, 0.27, 0.27, 0.08, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "PoigneeStrie", "Cylinder", 0.04, 0.285, 0.285, -0.18, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 60, 66, "SmoothPlastic", 0, 0, false },
+	{ "PoigneeStrie", "Cylinder", 0.04, 0.285, 0.285, 0.08, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 60, 66, "SmoothPlastic", 0, 0, false },
+	{ "PoigneeStrie", "Cylinder", 0.04, 0.285, 0.285, 0.34, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 60, 66, "SmoothPlastic", 0, 0, false },
+	{ "Gachette", "Block", 0.26, 0.2, 0.08, 0.1, -0.19, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 214, 40, 40, "SmoothPlastic", 0, 0, false },
+	{ "Interrupteur", "Block", 0.1, 0.07, 0.1, -0.16, 0.16, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 214, 40, 40, "SmoothPlastic", 0, 0, false },
+	{ "Tube", "Cylinder", 4, 0.16, 0.16, 2.4, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 178, 184, 194, "Metal", 0.2, 0, false },
+	{ "Harnais", "Cylinder", 0.1, 0.22, 0.22, 0.85, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "HarnaisAnneau", "Cylinder", 0.05, 0.2, 0.2, 0.85, -0.17, 0, 0, 0, -1, 0, 1, 0, 1, 0, 0, 178, 184, 194, "Metal", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.4379, 0.429, 1, 0, 0, 0, -0.2225, 0.9749, 0, -0.9749, -0.2225, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.6143, 0.344, 1, 0, 0, 0, -0.6235, 0.7818, 0, -0.7818, -0.6235, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.7364, 0.1909, 1, 0, 0, 0, -0.901, 0.4339, 0, -0.4339, -0.901, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.78, 0, 1, 0, 0, 0, -1, 0, 0, 0, -1, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.7364, -0.1909, 1, 0, 0, 0, -0.901, -0.4339, 0, 0.4339, -0.901, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.6143, -0.344, 1, 0, 0, 0, -0.6235, -0.7818, 0, 0.7818, -0.6235, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.4379, -0.429, 1, 0, 0, 0, -0.2225, -0.9749, 0, 0.9749, -0.2225, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.2421, -0.429, 1, 0, 0, 0, 0.2225, -0.9749, 0, 0.9749, 0.2225, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.0657, -0.344, 1, 0, 0, 0, 0.6235, -0.7818, 0, 0.7818, 0.6235, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, -0.0564, -0.1909, 1, 0, 0, 0, 0.901, -0.4339, 0, 0.4339, 0.901, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, -0.0564, 0.1909, 1, 0, 0, 0, 0.901, 0.4339, 0, -0.4339, 0.901, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.0657, 0.344, 1, 0, 0, 0, 0.6235, 0.7818, 0, -0.7818, 0.6235, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Boucle", "Block", 0.13, 0.13, 0.2252, 1.75, 0.2421, 0.429, 1, 0, 0, 0, 0.2225, 0.9749, 0, -0.9749, 0.2225, 30, 30, 34, "SmoothPlastic", 0, 0, false },
+	{ "Collier", "Block", 0.2, 0.2, 0.3, 1.75, -0.04, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 58, 60, 66, "SmoothPlastic", 0, 0, false },
+	{ "Renvoi", "Block", 0.36, 0.3, 0.3, 4.48, -0.04, 0, 0.848, 0.5299, 0, -0.5299, 0.848, 0, 0, 0, 1, 58, 60, 66, "SmoothPlastic", 0, 0, false },
+	{ "Bobine", "Cylinder", 0.22, 0.56, 0.56, 4.7896, -0.2914, 0, -0.5299, -0.848, 0, 0.848, -0.5299, 0, 0, 0, 1, 30, 30, 34, "SmoothPlastic", 0, 0, true },
+	{ "BobineBord", "Cylinder", 0.06, 0.6, 0.6, 4.7472, -0.2235, 0, -0.5299, -0.848, 0, 0.848, -0.5299, 0, 0, 0, 1, 242, 112, 28, "SmoothPlastic", 0, 0, true },
+	{ "Capuchon", "Cylinder", 0.1, 0.34, 0.34, 4.8691, -0.4186, 0, -0.5299, -0.848, 0, 0.848, -0.5299, 0, 0, 0, 1, 242, 112, 28, "SmoothPlastic", 0, 0, true },
+	{ "Fil", "Block", 1.35, 0.035, 0.035, 4.8161, -0.3338, 0, 0.848, -0.5299, 0, 0.5299, 0.848, 0, 0, 0, 1, 255, 196, 40, "SmoothPlastic", 0, 0, true },
+	{ "Fil", "Block", 1.35, 0.035, 0.035, 4.8161, -0.3338, 0, 0, -0.5299, -0.848, 0, 0.848, -0.5299, 1, 0, 0, 255, 196, 40, "SmoothPlastic", 0, 0, true },
+	{ "Protection", "Block", 0.82, 0.04, 0.3417, 4.6232, -0.1595, 0.4038, -0.1473, -0.5299, -0.8352, -0.092, 0.848, -0.5219, 0.9848, 0, -0.1736, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionBord", "Block", 0.05, 0.16, 0.3274, 4.6029, -0.2547, 0.7878, -0.1473, -0.5299, -0.8352, -0.092, 0.848, -0.5219, 0.9848, 0, -0.1736, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Protection", "Block", 0.82, 0.04, 0.3417, 4.5097, -0.2304, 0.3551, -0.424, -0.5299, -0.7344, -0.265, 0.848, -0.4589, 0.866, 0, -0.5, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionBord", "Block", 0.05, 0.16, 0.3274, 4.3815, -0.3931, 0.6928, -0.424, -0.5299, -0.7344, -0.265, 0.848, -0.4589, 0.866, 0, -0.5, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Protection", "Block", 0.82, 0.04, 0.3417, 4.4172, -0.2882, 0.2635, -0.6496, -0.5299, -0.5451, -0.4059, 0.848, -0.3406, 0.6428, 0, -0.766, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionBord", "Block", 0.05, 0.16, 0.3274, 4.201, -0.5059, 0.5142, -0.6496, -0.5299, -0.5451, -0.4059, 0.848, -0.3406, 0.6428, 0, -0.766, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Protection", "Block", 0.82, 0.04, 0.3417, 4.3569, -0.3259, 0.1402, -0.7969, -0.5299, -0.29, -0.498, 0.848, -0.1812, 0.342, 0, -0.9397, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionBord", "Block", 0.05, 0.16, 0.3274, 4.0832, -0.5795, 0.2736, -0.7969, -0.5299, -0.29, -0.498, 0.848, -0.1812, 0.342, 0, -0.9397, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Protection", "Block", 0.82, 0.04, 0.3417, 4.3359, -0.339, 0, -0.848, -0.5299, 0, -0.5299, 0.848, 0, 0, 0, -1, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionBord", "Block", 0.05, 0.16, 0.3274, 4.0422, -0.6051, 0, -0.848, -0.5299, 0, -0.5299, 0.848, 0, 0, 0, -1, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Protection", "Block", 0.82, 0.04, 0.3417, 4.3569, -0.3259, -0.1402, -0.7969, -0.5299, 0.29, -0.498, 0.848, 0.1812, -0.342, 0, -0.9397, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionBord", "Block", 0.05, 0.16, 0.3274, 4.0832, -0.5795, -0.2736, -0.7969, -0.5299, 0.29, -0.498, 0.848, 0.1812, -0.342, 0, -0.9397, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Protection", "Block", 0.82, 0.04, 0.3417, 4.4172, -0.2882, -0.2635, -0.6496, -0.5299, 0.5451, -0.4059, 0.848, 0.3406, -0.6428, 0, -0.766, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionBord", "Block", 0.05, 0.16, 0.3274, 4.201, -0.5059, -0.5142, -0.6496, -0.5299, 0.5451, -0.4059, 0.848, 0.3406, -0.6428, 0, -0.766, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Protection", "Block", 0.82, 0.04, 0.3417, 4.5097, -0.2304, -0.3551, -0.424, -0.5299, 0.7344, -0.265, 0.848, 0.4589, -0.866, 0, -0.5, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionBord", "Block", 0.05, 0.16, 0.3274, 4.3815, -0.3931, -0.6928, -0.424, -0.5299, 0.7344, -0.265, 0.848, 0.4589, -0.866, 0, -0.5, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "Protection", "Block", 0.82, 0.04, 0.3417, 4.6232, -0.1595, -0.4038, -0.1473, -0.5299, 0.8352, -0.092, 0.848, 0.5219, -0.9848, 0, -0.1736, 242, 112, 28, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionBord", "Block", 0.05, 0.16, 0.3274, 4.6029, -0.2547, -0.7878, -0.1473, -0.5299, 0.8352, -0.092, 0.848, 0.5219, -0.9848, 0, -0.1736, 200, 84, 18, "SmoothPlastic", 0, 0, false },
+	{ "ProtectionPatte", "Block", 0.5, 0.08, 0.14, 4.4292, -0.2807, 0, 0.848, -0.5299, 0, 0.5299, 0.848, 0, 0, 0, 1, 58, 60, 66, "SmoothPlastic", 0, 0, false },
+}
+
+local function construire(parent, origine, echelle, ancre)
+	local parts = {}
+	for _, d in PIECES do
+		local p = Instance.new("Part")
+		p.Name = d[1]
+		p.Shape = Enum.PartType[d[2]]
+		p.Size = Vector3.new(d[3], d[4], d[5]) * echelle
+		p.CFrame = origine * CFrame.new(d[6] * echelle, d[7] * echelle, d[8] * echelle, d[9], d[10], d[11], d[12], d[13], d[14], d[15], d[16], d[17])
+		p.Color = Color3.fromRGB(d[18], d[19], d[20])
+		p.Material = Enum.Material[d[21]]
+		p.Reflectance = d[22]
+		p.Transparency = d[23] or 0
+		if d[24] then p:SetAttribute("Tete", true) end
+		p.Anchored = ancre
+		p.CanCollide, p.CanTouch, p.CanQuery = false, false, false
+		p.Massless = true
+		p.CastShadow = true
+		p.TopSurface, p.BottomSurface = Enum.SurfaceType.Smooth, Enum.SurfaceType.Smooth
+		p.Parent = parent
+		table.insert(parts, p)
+	end
+	return parts
+end
+
+---------------------------------------------------------------- L'outil
+local function construireOutil()
+	local E = REGLAGES.TAILLE_EN_MAIN
+	local outil = Instance.new("Tool")
+	outil.Name = NOM
+	outil.ToolTip = "Débroussailleuse : fauche " .. (1 + REGLAGES.TOUFFES_EN_PLUS) .. " touffes d'un coup"
+	outil.CanBeDropped = false
+	outil:SetAttribute("CoupeEnPlus", REGLAGES.TOUFFES_EN_PLUS) -- lu par GrassServer
+	outil:SetAttribute("RayonCoupe", REGLAGES.RAYON)
+	outil:SetAttribute("Prefixe", "D") -- ses améliorations : Upg_DMaintenir, Upg_DRapidite, Upg_DCoupe
+	outil:SetAttribute("CoupeParNiveau", REGLAGES.COUPE_PAR_NIVEAU)
+	CollectionService:AddTag(outil, TAG)
+	local handle = Instance.new("Part")
+	handle.Name = "Handle"
+	handle.Size = Vector3.new(0.3, 0.3, 0.3)
+	handle.Transparency = 1
+	handle.CanCollide, handle.CanTouch, handle.CanQuery = false, false, false
+	handle.Massless = true
+	handle.CFrame = CFrame.identity
+	handle.Parent = outil
+	local modele = Instance.new("Folder")
+	modele.Name = "Modele"
+	modele.Parent = outil
+	local parts = construire(modele, CFrame.identity, E, false)
+	-- la tête (bobine + fils) tourne autour de son axe : elle est sur un moteur
+	local centre = Vector3.zero
+	for _, p in parts do if p:GetAttribute("Tete") and p.Name == "Bobine" then centre = p.Position end end
+	local axe = Vector3.new(-math.sin(math.rad(32)), math.cos(math.rad(32)), 0)
+	local pivot = Instance.new("Part")
+	pivot.Name = "TetePivot"
+	pivot.Size = Vector3.new(0.1, 0.1, 0.1)
+	pivot.Transparency = 1
+	pivot.CanCollide, pivot.CanTouch, pivot.CanQuery = false, false, false
+	pivot.Massless = true
+	pivot.CFrame = CFrame.fromMatrix(centre, axe:Cross(Vector3.new(0, 0, 1)).Unit, axe) -- Y du pivot = axe de la tête
+	pivot.Parent = modele
+	local moteur = Instance.new("Motor6D")
+	moteur.Name = "TeteMoteur"
+	moteur.Part0, moteur.Part1 = handle, pivot
+	moteur.C0 = pivot.CFrame
+	moteur.Parent = handle
+	CollectionService:AddTag(moteur, "TeteDebroussailleuse") -- BoutiqueClient la fait tourner
+	for _, p in parts do
+		local base = if p:GetAttribute("Tete") then pivot else handle
+		local w = Instance.new("Weld")
+		w.Part0, w.Part1 = base, p
+		w.C0 = base.CFrame:ToObjectSpace(p.CFrame)
+		w.Parent = p
+	end
+	-- dans la main : le tube vers l'avant, la tête qui descend vers le sol
+	outil.Grip = CFrame.fromMatrix(Vector3.zero, Vector3.new(0, 0, 1), Vector3.new(0, 1, 0), Vector3.new(-1, 0, 0))
+		* CFrame.Angles(math.rad(REGLAGES.INCLINAISON), 0, 0)
+	local son = Instance.new("Sound")
+	son.Name = "Swoosh"
+	son.SoundId = REGLAGES.SON
+	son.Volume = 0.45
+	son.Parent = handle
+	return outil
+end
+local modeleOutil = construireOutil()
+
+---------------------------------------------------------------- Le coup de débroussailleuse (bras qui balaie l'herbe)
+local function trouverEpaule(perso)
+	local bras = perso:FindFirstChild("RightUpperArm")
+	if bras then return bras:FindFirstChild("RightShoulder") end
+	local torse = perso:FindFirstChild("Torso")
+	return torse and torse:FindFirstChild("Right Shoulder")
+end
+local animations = setmetatable({}, { __mode = "k" })
+local function animerC0(joint, cible, duree)
+	local depart = joint.C0
+	local id = (animations[joint] or 0) + 1
+	animations[joint] = id
+	task.spawn(function()
+		local t0 = os.clock()
+		while animations[joint] == id do
+			local a = math.min((os.clock() - t0) / duree, 1)
+			local ok = pcall(function() joint.C0 = depart:Lerp(cible, 1 - (1 - a) ^ 2) end)
+			if not ok or a >= 1 then return end
+			RunService.Heartbeat:Wait()
+		end
+	end)
+end
+local function bras(epaule, tangage, lacet, duree)
+	if not (epaule and epaule:IsA("Motor6D")) then return end
+	local origine = epaule:GetAttribute("C0Origine")
+	if not origine then
+		origine = epaule.C0
+		epaule:SetAttribute("C0Origine", origine)
+	end
+	animerC0(epaule, CFrame.new(origine.Position) * CFrame.Angles(math.rad(tangage), math.rad(lacet), 0) * origine.Rotation, duree)
+end
+local function delaiCoupe(qui)
+	-- amélioration de vitesse de la débroussailleuse : Rapidité
+	local dex = qui and qui:GetAttribute("Upg_DRapidite") or 0
+	return math.max(0.2, (CFG.PICK_COOLDOWN or 0.9) * (1 - (CFG.DEX_PAR_NIVEAU or 0.08) * dex))
+end
+
+local derniers = setmetatable({}, { __mode = "k" })
+local occupes = setmetatable({}, { __mode = "k" })
+local function coup(outil)
+	local perso = outil.Parent
+	local joueur = perso and Players:GetPlayerFromCharacter(perso)
+	if not joueur or occupes[outil] then return end
+	-- pas de spam : un coup seulement quand le délai pour couper une herbe est passé
+	if os.clock() - (derniers[outil] or -math.huge) < delaiCoupe(joueur) * 0.85 then return end
+	derniers[outil] = os.clock()
+	occupes[outil] = true
+	local epaule = trouverEpaule(perso)
+	local handle = outil:FindFirstChild("Handle")
+	-- balayage : à droite, à gauche, puis on revient
+	local son = handle and handle:FindFirstChild("Swoosh")
+	if son then son.PlaybackSpeed = 0.9 + math.random() * 0.2 son:Play() end
+	bras(epaule, -30, -35, 0.1)
+	task.wait(0.1)
+	bras(epaule, -34, 35, 0.16)
+	task.wait(0.17)
+	if outil.Parent == perso then bras(epaule, -22, 0, 0.16) end
+	task.wait(0.04)
+	occupes[outil] = nil
+end
+
+local branches = setmetatable({}, { __mode = "k" })
+local function brancher(outil)
+	if not outil:IsA("Tool") or branches[outil] then return end
+	branches[outil] = true
+	outil.Equipped:Connect(function()
+		bras(trouverEpaule(outil.Parent), -22, 0, 0.2)
+	end)
+	outil.Unequipped:Connect(function()
+		local joueur = outil:FindFirstAncestorOfClass("Player")
+		local perso = joueur and joueur.Character
+		local epaule = perso and trouverEpaule(perso)
+		local origine = epaule and epaule:GetAttribute("C0Origine")
+		if origine then animerC0(epaule, origine, 0.12) end
+	end)
+	outil.Activated:Connect(function() coup(outil) end)
+end
+CollectionService:GetInstanceAddedSignal(TAG):Connect(brancher)
+for _, o in CollectionService:GetTagged(TAG) do brancher(o) end
+
+-- GrassServer prévient quand une touffe est vraiment coupée (aussi en restant appuyé)
+local signal = ServerStorage:WaitForChild("CiseauxCoupe", 5)
+if not signal then
+	signal = Instance.new("BindableEvent")
+	signal.Name = "CiseauxCoupe"
+	signal.Parent = ServerStorage
+end
+signal.Event:Connect(function(joueur)
+	local outil = joueur.Character and joueur.Character:FindFirstChildOfClass("Tool")
+	if outil and CollectionService:HasTag(outil, TAG) then task.spawn(coup, outil) end
+end)
+
+---------------------------------------------------------------- Achat et sauvegarde
+local store
+if REGLAGES.SAUVEGARDER then
+	local ok, s = pcall(function() return DataStoreService:GetDataStore("Debroussailleuse_v1") end)
+	if ok then store = s end
+end
+local avertiSauvegarde = false
+local function charger(joueur)
+	if not store then return false end
+	local ok, v = pcall(function() return store:GetAsync("u" .. joueur.UserId) end)
+	if not ok and not avertiSauvegarde then
+		avertiSauvegarde = true
+		warn("[Débroussailleuse] Sauvegarde impossible. Dans Studio : Home > Game Settings > Security > Enable Studio Access to API Services")
+	end
+	return ok and v == true
+end
+local function sauver(joueur)
+	if not store then return end
+	task.spawn(function()
+		for _ = 1, 3 do
+			if pcall(function() store:SetAsync("u" .. joueur.UserId, true) end) then return end
+			task.wait(3)
+		end
+	end)
+end
+
+local NOMS_ARGENT = { "Money", "Cash", "Argent", "Coins", "Dollars", "Pieces", "Pièces", "$" }
+local function argent(joueur)
+	local ls = joueur:FindFirstChild("leaderstats")
+	if not ls then return nil end
+	if CFG.MONEY_STAT and CFG.MONEY_STAT ~= "" then return ls:FindFirstChild(CFG.MONEY_STAT) end
+	for _, n in NOMS_ARGENT do
+		local v = ls:FindFirstChild(n)
+		if v and (v:IsA("IntValue") or v:IsA("NumberValue")) then return v end
+	end
+	return nil
+end
+
+local function donner(joueur, equiper)
+	local gear = joueur:FindFirstChild("StarterGear") or joueur:WaitForChild("StarterGear", 5)
+	if gear and not gear:FindFirstChild(NOM) then modeleOutil:Clone().Parent = gear end -- gardée après la mort
+	local sac = joueur:FindFirstChildOfClass("Backpack") or joueur:WaitForChild("Backpack", 5)
+	local perso = joueur.Character
+	local outil = (sac and sac:FindFirstChild(NOM)) or (perso and perso:FindFirstChild(NOM))
+	if not outil and sac then
+		outil = modeleOutil:Clone()
+		outil.Parent = sac
+	end
+	if equiper and outil and sac and outil.Parent == sac and perso then
+		local h = perso:FindFirstChildOfClass("Humanoid")
+		if h and h.Health > 0 then h:EquipTool(outil) end
+	end
+end
+
+local enCours = {}
+local function acheter(joueur)
+	if enCours[joueur] then return end
+	enCours[joueur] = true
+	if joueur:GetAttribute(NOM) then
+		donner(joueur, true)
+	else
+		local m = argent(joueur)
+		local v = m and tonumber(m.Value) or 0
+		local prix = REGLAGES.PRIX
+		if m and m:IsA("IntValue") then prix = math.ceil(prix) end
+		if not m or v + 1e-6 < prix then
+			achat:FireClient(joueur, "manque", prix - v)
+		else
+			m.Value = if m:IsA("IntValue") then v - prix else math.floor((v - prix) * 100 + 0.5) / 100
+			joueur:SetAttribute(NOM, true)
+			sauver(joueur)
+			donner(joueur, REGLAGES.EQUIPER_APRES_ACHAT)
+			achat:FireClient(joueur, "ok")
+			print("[Débroussailleuse] " .. joueur.Name .. " a acheté la débroussailleuse")
+		end
+	end
+	task.wait(0.3)
+	enCours[joueur] = nil
+end
+
+local function arrivee(joueur)
+	if charger(joueur) then
+		joueur:SetAttribute(NOM, true)
+		if not joueur.Character then joueur.CharacterAdded:Wait() end
+		task.wait(1)
+		donner(joueur, false)
+	end
+end
+-- sécurité : personne n'a la débroussailleuse sans l'avoir achetée (même si une copie traîne dans StarterPack)
+local function estFaucille(o) return o:IsA("Tool") and (o.Name == NOM or CollectionService:HasTag(o, TAG)) end
+for _, o in game:GetService("StarterPack"):GetChildren() do
+	if estFaucille(o) then
+		warn("[Débroussailleuse] Une débroussailleuse était dans StarterPack : retirée (il faut l'acheter)")
+		o:Destroy()
+	end
+end
+local function surveiller(joueur)
+	local function verifier(o)
+		if estFaucille(o) and not joueur:GetAttribute(NOM) then task.defer(function() o:Destroy() end) end
+	end
+	local function suivre(conteneur)
+		if not conteneur then return end
+		for _, o in conteneur:GetChildren() do verifier(o) end
+		conteneur.ChildAdded:Connect(verifier)
+	end
+	suivre(joueur:FindFirstChild("StarterGear") or joueur:WaitForChild("StarterGear", 10))
+	local function surPerso(perso)
+		suivre(perso)
+		suivre(joueur:FindFirstChildOfClass("Backpack") or joueur:WaitForChild("Backpack", 10))
+	end
+	if joueur.Character then surPerso(joueur.Character) end
+	joueur.CharacterAdded:Connect(surPerso)
+end
+Players.PlayerAdded:Connect(function(j) task.spawn(surveiller, j) end)
+for _, j in Players:GetPlayers() do task.spawn(surveiller, j) end
+
+Players.PlayerAdded:Connect(arrivee)
+for _, j in Players:GetPlayers() do task.spawn(arrivee, j) end
+Players.PlayerRemoving:Connect(function(joueur) enCours[joueur] = nil end)
+
+---------------------------------------------------------------- La débroussailleuse accrochée à l'établi
+local function vitrine()
+	local v = workspace:FindFirstChild("DebroussailleuseVitrine", true)
+	if v then return v end
+	-- pas de vitrine : on l'accroche aux crochets du panneau de l'établi
+	local meuble = workspace:FindFirstChild("MeubleOutils", true)
+	local place = meuble and meuble:FindFirstChild("Emplacement_Debroussailleuse", true)
+	if not (place and place:IsA("BasePart")) then
+		warn("[Débroussailleuse] Pas de 'DebroussailleuseVitrine' ni d'établi 'MeubleOutils' : la débroussailleuse n'est pas en vente")
+		return nil
+	end
+	v = Instance.new("Model")
+	v.Name = "DebroussailleuseVitrine"
+	local base = Instance.new("Part")
+	base.Name = "Base"
+	base.Size = Vector3.new(7, 0.8, 0.8)
+	base.CFrame = place.CFrame
+	base.Transparency = 1
+	base.Anchored = true
+	base.CanCollide, base.CanTouch, base.CanQuery = false, false, false
+	base.Parent = v
+	v.PrimaryPart = base
+	local panneau = base:Clone()
+	panneau.Name = "PanneauPrix"
+	panneau.Size = Vector3.new(0.2, 0.2, 0.2)
+	panneau.CFrame = place.CFrame * CFrame.new(2.4, -2, -0.35)
+	panneau.Parent = v
+	construire(v, place.CFrame * CFrame.new(2.08, -0.175, 0.05) * CFrame.Angles(0, math.pi, 0), 1, true)
+	v.Parent = meuble
+	return v
+end
+
+local v = vitrine()
+if v then
+	local base = v.PrimaryPart or v:FindFirstChild("Base")
+	local prompt = base:FindFirstChildOfClass("ProximityPrompt") or Instance.new("ProximityPrompt")
+	prompt.Name = "Acheter"
+	prompt.ActionText = string.format("Acheter  $%.2f", REGLAGES.PRIX)
+	prompt.ObjectText = "Débroussailleuse"
+	prompt.HoldDuration = 0.35
+	prompt.MaxActivationDistance = 11
+	prompt.RequiresLineOfSight = false
+	prompt.KeyboardKeyCode = Enum.KeyCode.E
+	prompt.Parent = base
+	prompt.Triggered:Connect(acheter)
+	print("[Débroussailleuse] En vente sur l'établi : $" .. REGLAGES.PRIX)
+end
+]]></ProtectedString></Properties></Item><Item class="Script" referent="RBX72"><Properties><string name="Name">GrassServer</string><ProtectedString name="Source"><![CDATA[-- GrassServer (Script dans ServerScriptService)
 -- ANTI-LAG : le serveur ne crée AUCUNE pièce d'herbe. Il garde seulement la liste des touffes
 -- (position, taille, rareté). Chaque joueur affiche lui-même les touffes proches de lui.
 if not game:GetService("RunService"):IsServer() then
@@ -441,454 +900,309 @@ BuyUpgrade.OnServerEvent:Connect(function(plr,uid)
 	plr:SetAttribute("Upg_"..uid,lvl+1)
 	applyUpgrades(plr)
 end)
-]]></ProtectedString></Properties></Item><Item class="Script" referent="RBX2"><Properties><string name="Name">FaucilleServer</string><ProtectedString name="Source"><![CDATA[-- FaucilleServer (Script dans ServerScriptService)
--- La faucille est posée sur l'établi (modèle "FaucilleVitrine" sur le tapis vert).
--- On l'achète avec E (ou en restant appuyé sur le bouton), elle arrive dans la barre d'outils
--- et coupe plusieurs touffes d'un coup. À chaque nouvelle partie, il faut la racheter.
-if not game:GetService("RunService"):IsServer() then
-	warn("[Faucille] FaucilleServer doit être un Script dans ServerScriptService !")
+]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX73"><Properties><string name="Name">BoutiqueClient</string><ProtectedString name="Source"><![CDATA[-- BoutiqueClient (LocalScript dans StarterPlayer > StarterPlayerScripts)
+-- Les outils en vente sur l'établi (faucille, débroussailleuse) : panneau de prix (pièce + prix),
+-- petite fête quand on achète, et la tête de la débroussailleuse qui tourne.
+-- (remplace l'ancien script FaucilleClient)
+if not game:GetService("RunService"):IsClient() then
+	warn("[Boutique] BoutiqueClient doit être un LocalScript dans StarterPlayer > StarterPlayerScripts !")
 	return
 end
-print("[Faucille] FaucilleServer démarré")
 
-local REGLAGES = {
-	PRIX = 7.99,
-	TOUFFES_EN_PLUS = 2, -- touffes voisines coupées en plus à chaque coup : 2 = 3 touffes au début (jusqu'à 5 avec les améliorations)
-	RAYON = 5.5, -- rayon autour de la touffe visée (studs)
-	TAILLE_EN_MAIN = 0.75, -- taille de la faucille dans la main
-	INCLINAISON = 0, -- degrés : penche la faucille dans la main si besoin (ex : 20 ou -20)
-	EQUIPER_APRES_ACHAT = true, -- la faucille arrive directement dans la main
-	SON = "rbxassetid://96174578707811", -- bruit du coup de faucille
-	SAUVEGARDER = false, -- true = garde l'achat quand le joueur revient (DataStore). false = à racheter à chaque partie
+-- outils en vente : remote du serveur, modèle sur l'établi, attribut du joueur quand c'est acheté
+local ARTICLES = {
+	{ remote = "FaucilleAchat", vitrine = "FaucilleVitrine", attribut = "Faucille", titre = "FAUCILLE", nom = "faucille" },
+	{ remote = "DebroussailleuseAchat", vitrine = "DebroussailleuseVitrine", attribut = "Debroussailleuse", titre = "DÉBROUSSAILLEUSE", nom = "débroussailleuse" },
 }
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local ServerStorage = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CollectionService = game:GetService("CollectionService")
-local DataStoreService = game:GetService("DataStoreService")
+local TweenService = game:GetService("TweenService")
 
-local TAG = "OutilFaucille"
+local COIN = "rbxassetid://103593634628600" -- l'icône des pièces
+local lp = Players.LocalPlayer
+local pgui = lp:WaitForChild("PlayerGui")
+local cam = workspace.CurrentCamera
+
+local BLANC, ENCRE = Color3.new(1, 1, 1), Color3.fromRGB(26, 22, 28)
+local OR, VERT, ROUGE = Color3.fromRGB(255, 215, 70), Color3.fromRGB(150, 245, 90), Color3.fromRGB(255, 96, 80)
+local BOIS_A, BOIS_B, BOIS_BORD = Color3.fromRGB(170, 114, 64), Color3.fromRGB(122, 78, 42), Color3.fromRGB(72, 44, 22)
+
+local function argentTexte(v) return string.format("$%.2f", v) end
+
+local function coin(o, r) local c = Instance.new("UICorner") c.CornerRadius = r or UDim.new(1, 0) c.Parent = o end
+local function contour(o, e, c, bord)
+	local s = Instance.new("UIStroke")
+	s.Thickness = e
+	s.Color = c
+	s.LineJoinMode = Enum.LineJoinMode.Round
+	if bord then s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end
+	s.Parent = o
+	return s
+end
+local function texte(parent, t, police, pos, taille, couleur)
+	local l = Instance.new("TextLabel")
+	l.BackgroundTransparency = 1
+	l.Text = t
+	l.Font = police
+	l.TextScaled = true
+	l.TextColor3 = couleur or BLANC
+	l.AnchorPoint = Vector2.new(0.5, 0)
+	l.Position = pos
+	l.Size = taille
+	l.Parent = parent
+	contour(l, 3, ENCRE)
+	return l
+end
+
+-- argent du joueur (même recherche que le reste du jeu)
 local okCfg, CFG = pcall(function() return require(ReplicatedStorage:WaitForChild("GrassConfig", 10)) end)
 if not okCfg or type(CFG) ~= "table" then CFG = {} end
-
--- infos pour l'écran des joueurs (prix, nombre de touffes)
-local achat = ReplicatedStorage:FindFirstChild("FaucilleAchat") or Instance.new("RemoteEvent")
-achat.Name = "FaucilleAchat"
-achat:SetAttribute("Prix", REGLAGES.PRIX)
-achat:SetAttribute("Touffes", 1 + REGLAGES.TOUFFES_EN_PLUS)
-achat.Parent = ReplicatedStorage
-
----------------------------------------------------------------- Le modèle (le même sur l'établi et dans la main)
--- nom, forme, taille (x, y, z), position (x, y, z), rotation (9 nombres), couleur (r, g, b), matière, reflet
--- Repère : le manche monte selon Y (le poing autour de y = 0), la lame est dans le plan Y-Z.
-local PIECES = {
-	{ "Pommeau", "Ball", 0.36, 0.36, 0.36, 0, -0.8, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 98, 60, 34, "Wood", 0 },
-	{ "Manche", "Cylinder", 1.36, 0.26, 0.26, 0, -0.1, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 176, 112, 62, "Wood", 0 },
-	{ "Bague", "Cylinder", 0.08, 0.31, 0.31, 0, -0.62, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 98, 60, 34, "Wood", 0 },
-	{ "Grip", "Cylinder", 0.66, 0.29, 0.29, 0, -0.18, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 204, 42, 48, "Fabric", 0 },
-	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, -0.51, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
-	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, -0.29, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
-	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, -0.07, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
-	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, 0.15, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
-	{ "Virole", "Cylinder", 0.3, 0.33, 0.33, 0, 0.66, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 172, 178, 190, "Metal", 0.2 },
-	{ "ViroleBord", "Cylinder", 0.05, 0.36, 0.36, 0, 0.52, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 78, 82, 94, "Metal", 0 },
-	{ "Rivet", "Ball", 0.09, 0.09, 0.09, -0.16, 0.66, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 214, 172, 78, "Metal", 0.2 },
-	{ "Rivet", "Ball", 0.09, 0.09, 0.09, 0.16, 0.66, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 214, 172, 78, "Metal", 0.2 },
-	{ "Soie", "Block", 0.07, 0.24, 0.13, 0, 0.9, -0.02, 1, 0, 0, 0, 1, 0, 0, 0, 1, 78, 82, 94, "Metal", 0 },
-	{ "Talon", "Block", 0.06, 0.5389, 0.2, 0, 1.0452, -0.219, 1, 0, 0, 0, 0.3111, 0.9504, 0, -0.9504, 0.3111, 172, 178, 190, "Metal", 0.25 },
-	{ "Lame", "Block", 0.05, 0.2305, 0.1785, 0, 1.1396, -0.4783, 1, 0, 0, 0, -0.9634, 0.2682, 0, -0.2682, -0.9634, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.2796, -0.4393, 1, 0, 0, 0, -0.9634, 0.2682, 0, -0.2682, -0.9634, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.043, -0.5052, 1, 0, 0, 0, -0.9634, 0.2682, 0, -0.2682, -0.9634, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.2216, 0.1785, 0, 1.182, -0.6003, 1, 0, 0, 0, -0.8936, 0.4488, 0, -0.4488, -0.8936, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.3078, -0.5372, 1, 0, 0, 0, -0.8936, 0.4488, 0, -0.4488, -0.8936, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.0964, -0.6433, 1, 0, 0, 0, -0.8936, 0.4488, 0, -0.4488, -0.8936, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.2125, 0.1785, 0, 1.2475, -0.7128, 1, 0, 0, 0, -0.7904, 0.6126, 0, -0.6126, -0.7904, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.3551, -0.6293, 1, 0, 0, 0, -0.7904, 0.6126, 0, -0.6126, -0.7904, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.1753, -0.7686, 1, 0, 0, 0, -0.7904, 0.6126, 0, -0.6126, -0.7904, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.2032, 0.1785, 0, 1.3339, -0.8111, 1, 0, 0, 0, -0.6575, 0.7534, 0, -0.7534, -0.6575, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.4205, -0.712, 1, 0, 0, 0, -0.6575, 0.7534, 0, -0.7534, -0.6575, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.277, -0.8764, 1, 0, 0, 0, -0.6575, 0.7534, 0, -0.7534, -0.6575, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.1939, 0.1785, 0, 1.4385, -0.8915, 1, 0, 0, 0, -0.5, 0.866, 0, -0.866, -0.5, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.5019, -0.7816, 1, 0, 0, 0, -0.5, 0.866, 0, -0.866, -0.5, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.3975, -0.9625, 1, 0, 0, 0, -0.5, 0.866, 0, -0.866, -0.5, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.1844, 0.1785, 0, 1.5573, -0.9508, 1, 0, 0, 0, -0.3237, 0.9461, 0, -0.9461, -0.3237, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.5969, -0.8351, 1, 0, 0, 0, -0.3237, 0.9461, 0, -0.9461, -0.3237, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.5323, -1.0238, 1, 0, 0, 0, -0.3237, 0.9461, 0, -0.9461, -0.3237, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.1748, 0.1785, 0, 1.6863, -0.9863, 1, 0, 0, 0, -0.1353, 0.9908, 0, -0.9908, -0.1353, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.7022, -0.87, 1, 0, 0, 0, -0.1353, 0.9908, 0, -0.9908, -0.1353, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.6765, -1.058, 1, 0, 0, 0, -0.1353, 0.9908, 0, -0.9908, -0.1353, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.1649, 0.1785, 0, 1.8206, -0.9963, 1, 0, 0, 0, 0.0581, 0.9983, 0, -0.9983, 0.0581, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.814, -0.8841, 1, 0, 0, 0, 0.0581, 0.9983, 0, -0.9983, 0.0581, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.8245, -1.0637, 1, 0, 0, 0, 0.0581, 0.9983, 0, -0.9983, 0.0581, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.1549, 0.1785, 0, 1.9552, -0.9803, 1, 0, 0, 0, 0.2494, 0.9684, 0, -0.9684, 0.2494, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.9284, -0.8762, 1, 0, 0, 0, 0.2494, 0.9684, 0, -0.9684, 0.2494, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.9708, -1.0408, 1, 0, 0, 0, 0.2494, 0.9684, 0, -0.9684, 0.2494, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.1447, 0.1785, 0, 2.0853, -0.9384, 1, 0, 0, 0, 0.4314, 0.9022, 0, -0.9022, 0.4314, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.0411, -0.846, 1, 0, 0, 0, 0.4314, 0.9022, 0, -0.9022, 0.4314, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.11, -0.9902, 1, 0, 0, 0, 0.4314, 0.9022, 0, -0.9022, 0.4314, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.1343, 0.1785, 0, 2.2057, -0.8718, 1, 0, 0, 0, 0.5972, 0.8021, 0, -0.8021, 0.5972, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.1477, -0.7939, 1, 0, 0, 0, 0.5972, 0.8021, 0, -0.8021, 0.5972, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.2368, -0.9136, 1, 0, 0, 0, 0.5972, 0.8021, 0, -0.8021, 0.5972, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.1235, 0.1785, 0, 2.3119, -0.7827, 1, 0, 0, 0, 0.7405, 0.672, 0, -0.672, 0.7405, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.2439, -0.721, 1, 0, 0, 0, 0.7405, 0.672, 0, -0.672, 0.7405, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.3465, -0.8141, 1, 0, 0, 0, 0.7405, 0.672, 0, -0.672, 0.7405, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.1125, 0.1785, 0, 2.3997, -0.674, 1, 0, 0, 0, 0.8562, 0.5167, 0, -0.5167, 0.8562, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.3258, -0.6294, 1, 0, 0, 0, 0.8562, 0.5167, 0, -0.5167, 0.8562, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.435, -0.6953, 1, 0, 0, 0, 0.8562, 0.5167, 0, -0.5167, 0.8562, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.101, 0.1785, 0, 2.4655, -0.5495, 1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.3899, -0.522, 1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.4989, -0.5616, 1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.089, 0.1785, 0, 2.5067, -0.4137, 1, 0, 0, 0, 0.988, 0.1545, 0, -0.1545, 0.988, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4331, -0.4021, 1, 0, 0, 0, 0.988, 0.1545, 0, -0.1545, 0.988, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.5358, -0.4182, 1, 0, 0, 0, 0.988, 0.1545, 0, -0.1545, 0.988, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.0762, 0.1785, 0, 2.5213, -0.2712, 1, 0, 0, 0, 0.9992, -0.0388, 0, 0.0388, 0.9992, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4533, -0.2739, 1, 0, 0, 0, 0.9992, -0.0388, 0, 0.0388, 0.9992, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.5444, -0.2703, 1, 0, 0, 0, 0.9992, -0.0388, 0, 0.0388, 0.9992, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.0624, 0.1785, 0, 2.5086, -0.1273, 1, 0, 0, 0, 0.973, -0.2306, 0, 0.2306, 0.973, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4491, -0.1414, 1, 0, 0, 0, 0.973, -0.2306, 0, 0.2306, 0.973, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.5244, -0.1236, 1, 0, 0, 0, 0.973, -0.2306, 0, 0.2306, 0.973, 78, 82, 94, "Metal", 0 },
-	{ "Lame", "Block", 0.05, 0.0464, 0.1785, 0, 2.469, 0.0132, 1, 0, 0, 0, 0.9104, -0.4138, 0, 0.4138, 0.9104, 172, 178, 190, "Metal", 0.25 },
-	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4206, -0.0088, 1, 0, 0, 0, 0.9104, -0.4138, 0, 0.4138, 0.9104, 236, 241, 248, "SmoothPlastic", 0.3 },
-	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.4764, 0.0166, 1, 0, 0, 0, 0.9104, -0.4138, 0, 0.4138, 0.9104, 78, 82, 94, "Metal", 0 },
-}
-
-local function construire(parent, origine, echelle, ancre)
-	local parts = {}
-	for _, d in PIECES do
-		local p = Instance.new("Part")
-		p.Name = d[1]
-		p.Shape = Enum.PartType[d[2]]
-		p.Size = Vector3.new(d[3], d[4], d[5]) * echelle
-		p.CFrame = origine * CFrame.new(d[6] * echelle, d[7] * echelle, d[8] * echelle, d[9], d[10], d[11], d[12], d[13], d[14], d[15], d[16], d[17])
-		p.Color = Color3.fromRGB(d[18], d[19], d[20])
-		p.Material = Enum.Material[d[21]]
-		p.Reflectance = d[22]
-		p.Anchored = ancre
-		p.CanCollide, p.CanTouch, p.CanQuery = false, false, false
-		p.Massless = true
-		p.CastShadow = true
-		p.TopSurface, p.BottomSurface = Enum.SurfaceType.Smooth, Enum.SurfaceType.Smooth
-		p.Parent = parent
-		table.insert(parts, p)
-	end
-	return parts
-end
-
----------------------------------------------------------------- L'outil
-local function construireOutil()
-	local E = REGLAGES.TAILLE_EN_MAIN
-	local outil = Instance.new("Tool")
-	outil.Name = "Faucille"
-	outil.ToolTip = "Coupe " .. (1 + REGLAGES.TOUFFES_EN_PLUS) .. " touffes d'un coup"
-	outil.CanBeDropped = false
-	outil:SetAttribute("CoupeEnPlus", REGLAGES.TOUFFES_EN_PLUS) -- lu par GrassServer
-	outil:SetAttribute("RayonCoupe", REGLAGES.RAYON)
-	CollectionService:AddTag(outil, TAG)
-	local handle = Instance.new("Part")
-	handle.Name = "Handle"
-	handle.Size = Vector3.new(0.3, 0.3, 0.3)
-	handle.Transparency = 1
-	handle.CanCollide, handle.CanTouch, handle.CanQuery = false, false, false
-	handle.Massless = true
-	handle.CFrame = CFrame.identity
-	handle.Parent = outil
-	local modele = Instance.new("Folder")
-	modele.Name = "Modele"
-	modele.Parent = outil
-	for _, p in construire(modele, CFrame.identity, E, false) do
-		local w = Instance.new("Weld")
-		w.Part0, w.Part1 = handle, p
-		w.C0 = p.CFrame
-		w.Parent = p
-	end
-	-- dans la main : le manche vers l'avant, le croissant vers le haut
-	outil.Grip = CFrame.fromMatrix(Vector3.new(0, -0.18 * E, 0), Vector3.new(-1, 0, 0), Vector3.new(0, 0, -1), Vector3.new(0, -1, 0))
-		* CFrame.Angles(math.rad(-REGLAGES.INCLINAISON), 0, 0)
-	-- traînée blanche pendant le coup
-	local a0 = Instance.new("Attachment") a0.Name = "TraineeA" a0.Position = Vector3.new(0, 2.5, -0.3) * E a0.Parent = handle
-	local a1 = Instance.new("Attachment") a1.Name = "TraineeB" a1.Position = Vector3.new(0, 1.8, -1.05) * E a1.Parent = handle
-	local tr = Instance.new("Trail")
-	tr.Name = "Trainee"
-	tr.Attachment0, tr.Attachment1 = a0, a1
-	tr.Lifetime = 0.16
-	tr.Color = ColorSequence.new(Color3.new(1, 1, 1))
-	tr.Transparency = NumberSequence.new(0.35, 1)
-	tr.LightEmission = 0.5
-	tr.Enabled = false
-	tr.Parent = handle
-	local son = Instance.new("Sound")
-	son.Name = "Swoosh"
-	son.SoundId = REGLAGES.SON
-	son.Volume = 0.45
-	son.Parent = handle
-	return outil
-end
-local modeleOutil = construireOutil()
-
----------------------------------------------------------------- Le coup de faucille (bras qui balaie l'herbe)
-local function trouverEpaule(perso)
-	local bras = perso:FindFirstChild("RightUpperArm")
-	if bras then return bras:FindFirstChild("RightShoulder") end
-	local torse = perso:FindFirstChild("Torso")
-	return torse and torse:FindFirstChild("Right Shoulder")
-end
-local animations = setmetatable({}, { __mode = "k" })
-local function animerC0(joint, cible, duree)
-	local depart = joint.C0
-	local id = (animations[joint] or 0) + 1
-	animations[joint] = id
-	task.spawn(function()
-		local t0 = os.clock()
-		while animations[joint] == id do
-			local a = math.min((os.clock() - t0) / duree, 1)
-			local ok = pcall(function() joint.C0 = depart:Lerp(cible, 1 - (1 - a) ^ 2) end)
-			if not ok or a >= 1 then return end
-			RunService.Heartbeat:Wait()
+local function argent()
+	local ls = lp:FindFirstChild("leaderstats")
+	if not ls then return 0 end
+	local v
+	if CFG.MONEY_STAT and CFG.MONEY_STAT ~= "" then v = ls:FindFirstChild(CFG.MONEY_STAT) end
+	if not v then
+		for _, n in { "Money", "Cash", "Argent", "Coins", "Dollars", "Pieces", "Pièces", "$" } do
+			v = ls:FindFirstChild(n)
+			if v then break end
 		end
-	end)
-end
-local function bras(epaule, tangage, lacet, duree)
-	if not (epaule and epaule:IsA("Motor6D")) then return end
-	local origine = epaule:GetAttribute("C0Origine")
-	if not origine then
-		origine = epaule.C0
-		epaule:SetAttribute("C0Origine", origine)
 	end
-	animerC0(epaule, CFrame.new(origine.Position) * CFrame.Angles(math.rad(tangage), math.rad(lacet), 0) * origine.Rotation, duree)
-end
-local function delaiCoupe(qui)
-	-- la faucille a sa propre amélioration de vitesse : Rapidité (pas la Dextérité des ciseaux)
-	local dex = qui and qui:GetAttribute("Upg_FRapidite") or 0
-	return math.max(0.2, (CFG.PICK_COOLDOWN or 0.9) * (1 - (CFG.DEX_PAR_NIVEAU or 0.08) * dex))
+	return v and tonumber(v.Value) or 0
 end
 
-local derniers = setmetatable({}, { __mode = "k" })
-local occupes = setmetatable({}, { __mode = "k" })
-local function coup(outil)
-	local perso = outil.Parent
-	local joueur = perso and Players:GetPlayerFromCharacter(perso)
-	if not joueur or occupes[outil] then return end
-	-- pas de spam : un coup seulement quand le délai pour couper une herbe est passé
-	if os.clock() - (derniers[outil] or -math.huge) < delaiCoupe(joueur) * 0.85 then return end
-	derniers[outil] = os.clock()
-	occupes[outil] = true
-	local epaule = trouverEpaule(perso)
-	local handle = outil:FindFirstChild("Handle")
-	local tr = handle and handle:FindFirstChild("Trainee")
-	local son = handle and handle:FindFirstChild("Swoosh")
-	bras(epaule, -20, -55, 0.1) -- on arme : bras vers la droite
-	task.wait(0.1)
-	if tr then tr.Enabled = true end
-	if son then son.PlaybackSpeed = 1.1 + math.random() * 0.25 son:Play() end
-	bras(epaule, -45, 50, 0.13) -- on balaie vers la gauche, près du sol
-	task.wait(0.15)
-	if tr then tr.Enabled = false end
-	if outil.Parent == perso then bras(epaule, -12, 0, 0.18) end
-	task.wait(0.05)
-	occupes[outil] = nil
+---------------------------------------------------------------- Panneau au-dessus de la faucille
+local panneaux = {}
+local function creerPanneau(article, achat, vitrine)
+	local base = vitrine.PrimaryPart or vitrine:WaitForChild("Base", 10)
+	if not base then return end
+	local function prix() return achat:GetAttribute("Prix") or 0 end
+	local g = Instance.new("BillboardGui")
+	g.Name = "Prix_" .. article.attribut
+	-- taille fixe dans le monde (en studs) : il ne grossit pas quand on s'éloigne
+	g.Size = UDim2.fromScale(4.2, 2)
+	local ancre = vitrine:FindFirstChild("PanneauPrix")
+	if ancre then
+		g.Adornee = ancre -- le panneau est centré sur ce repère
+	else
+		g.Adornee = base -- au-dessus de l'outil
+		g.SizeOffset = Vector2.new(0, 0.5)
+		g.StudsOffsetWorldSpace = Vector3.new(0, 1.3, 0)
+	end
+	g.AlwaysOnTop = true
+	g.LightInfluence = 0
+	g.MaxDistance = 70
+	g.ResetOnSpawn = false
+	local root = Instance.new("Frame")
+	root.AnchorPoint = Vector2.new(0.5, 0.5)
+	root.Position = UDim2.fromScale(0.5, 0.5)
+	root.Size = UDim2.fromOffset(420, 200)
+	root.BackgroundColor3 = BLANC
+	root.Parent = g
+	coin(root, UDim.new(0, 26))
+	local grad = Instance.new("UIGradient")
+	grad.Rotation = 90
+	grad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(206, 150, 94)),
+		ColorSequenceKeypoint.new(0.12, BOIS_A),
+		ColorSequenceKeypoint.new(1, BOIS_B),
+	})
+	grad.Parent = root
+	local bord = contour(root, 6, BOIS_BORD, true)
+	local echelle = Instance.new("UIScale")
+	echelle.Parent = root
+	local pop = Instance.new("UIScale")
+	-- clous aux 4 coins
+	for _, c in { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } } do
+		local n = Instance.new("Frame")
+		n.AnchorPoint = Vector2.new(0.5, 0.5)
+		n.Size = UDim2.fromOffset(12, 12)
+		n.Position = UDim2.new(c[1], c[1] == 0 and 18 or -18, c[2], c[2] == 0 and 18 or -18)
+		n.BackgroundColor3 = Color3.fromRGB(64, 62, 66)
+		n.Parent = root
+		coin(n)
+	end
+	texte(root, article.titre, Enum.Font.FredokaOne, UDim2.new(0.5, 0, 0, 12), UDim2.fromOffset(#article.titre > 10 and 380 or 300, 52))
+	-- ligne du prix : [pièce] $7.99
+	local ligne = Instance.new("Frame")
+	ligne.BackgroundTransparency = 1
+	ligne.AnchorPoint = Vector2.new(0.5, 0)
+	ligne.Position = UDim2.new(0.5, 0, 0, 66)
+	ligne.Size = UDim2.fromOffset(380, 76)
+	ligne.Parent = root
+	pop.Parent = ligne
+	local liste = Instance.new("UIListLayout")
+	liste.FillDirection = Enum.FillDirection.Horizontal
+	liste.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	liste.VerticalAlignment = Enum.VerticalAlignment.Center
+	liste.Padding = UDim.new(0, 8)
+	liste.Parent = ligne
+	local piece = Instance.new("ImageLabel")
+	piece.BackgroundTransparency = 1
+	piece.Image = COIN
+	piece.ScaleType = Enum.ScaleType.Fit
+	piece.Size = UDim2.fromOffset(68, 68)
+	piece.LayoutOrder = 1
+	piece.Parent = ligne
+	local valeur = Instance.new("TextLabel")
+	valeur.BackgroundTransparency = 1
+	valeur.Font = Enum.Font.LuckiestGuy
+	valeur.TextSize = 60
+	valeur.Size = UDim2.fromOffset(0, 70)
+	valeur.AutomaticSize = Enum.AutomaticSize.X
+	valeur.TextColor3 = BLANC
+	valeur.Text = argentTexte(prix())
+	valeur.LayoutOrder = 2
+	valeur.Parent = ligne
+	contour(valeur, 4, ENCRE)
+	local vg = Instance.new("UIGradient")
+	vg.Rotation = 90
+	vg.Color = ColorSequence.new(BLANC, Color3.fromRGB(255, 228, 140))
+	vg.Parent = valeur
+	local info = texte(root, "Coupe " .. (achat:GetAttribute("Touffes") or 4) .. " touffes d'un coup !", Enum.Font.FredokaOne,
+		UDim2.new(0.5, 0, 0, 148), UDim2.fromOffset(360, 36), Color3.fromRGB(255, 240, 205))
+	g.Parent = pgui
+	local p = { g = g, root = root, echelle = echelle, pop = pop, bord = bord, piece = piece, valeur = valeur, vg = vg, info = info, base = base, article = article, prix = prix }
+	panneaux[article.attribut] = p
+	return p
 end
 
-local branches = setmetatable({}, { __mode = "k" })
-local function brancher(outil)
-	if not outil:IsA("Tool") or branches[outil] then return end
-	branches[outil] = true
-	outil.Equipped:Connect(function()
-		bras(trouverEpaule(outil.Parent), -12, 0, 0.2)
+local function majPanneau(p, t)
+	if not p.g.Parent then return end
+	local prix = p.prix
+	p.echelle.Scale = p.g.AbsoluteSize.X / 420
+	if lp:GetAttribute(p.article.attribut) then
+		p.piece.Visible = false
+		p.vg.Enabled = false
+		p.valeur.Text = "✓ ACHETÉE"
+		p.valeur.TextColor3 = VERT
+		p.info.Text = "Elle est dans ta barre d'outils"
+		p.bord.Color = BOIS_BORD
+		p.pop.Scale = 1
+	else
+		local assez = argent() + 1e-6 >= prix()
+		p.piece.Visible = true
+		p.vg.Enabled = true
+		p.valeur.Text = argentTexte(prix())
+		p.valeur.TextColor3 = BLANC
+		-- tu as assez d'argent : le panneau brille doucement
+		p.bord.Color = assez and OR or BOIS_BORD
+		p.pop.Scale = assez and 1 + 0.05 * math.abs(math.sin(t * 3)) or 1
+	end
+end
+
+-- on cache le bouton "Acheter" si on l'a déjà
+local function majBouton(p)
+	local prompt = p.base:FindFirstChildOfClass("ProximityPrompt")
+	if prompt then prompt.Enabled = not lp:GetAttribute(p.article.attribut) end
+end
+
+local reponse -- (plus bas)
+for _, article in ARTICLES do
+	task.spawn(function()
+		local achat = ReplicatedStorage:WaitForChild(article.remote, 30)
+		if not achat then return end -- cet outil n'est pas installé
+		achat.OnClientEvent:Connect(function(quoi, manque) reponse(article, quoi, manque) end)
+		local vitrine = workspace:FindFirstChild(article.vitrine, true)
+		for _ = 1, 30 do
+			if vitrine then break end
+			task.wait(1)
+			vitrine = workspace:FindFirstChild(article.vitrine, true)
+		end
+		if not vitrine then return end
+		local p = creerPanneau(article, achat, vitrine)
+		if not p then return end
+		majBouton(p)
+		p.base.ChildAdded:Connect(function() majBouton(p) end)
+		lp:GetAttributeChangedSignal(article.attribut):Connect(function() majBouton(p) end)
 	end)
-	outil.Unequipped:Connect(function()
-		local joueur = outil:FindFirstAncestorOfClass("Player")
-		local perso = joueur and joueur.Character
-		local epaule = perso and trouverEpaule(perso)
-		local origine = epaule and epaule:GetAttribute("C0Origine")
-		if origine then animerC0(epaule, origine, 0.12) end
-	end)
-	outil.Activated:Connect(function() coup(outil) end)
 end
-CollectionService:GetInstanceAddedSignal(TAG):Connect(brancher)
-for _, o in CollectionService:GetTagged(TAG) do brancher(o) end
 
--- GrassServer prévient quand une touffe est vraiment coupée (aussi en restant appuyé)
-local signal = ServerStorage:WaitForChild("CiseauxCoupe", 5)
-if not signal then
-	signal = Instance.new("BindableEvent")
-	signal.Name = "CiseauxCoupe"
-	signal.Parent = ServerStorage
-end
-signal.Event:Connect(function(joueur)
-	local outil = joueur.Character and joueur.Character:FindFirstChildOfClass("Tool")
-	if outil and CollectionService:HasTag(outil, TAG) then task.spawn(coup, outil) end
+RunService.RenderStepped:Connect(function()
+	local t = os.clock()
+	for _, p in panneaux do
+		local proche = (cam.CFrame.Position - p.g.Adornee.Position).Magnitude < 80
+		p.g.Enabled = proche and not lp:GetAttribute("IntroEnCours")
+		if p.g.Enabled then majPanneau(p, t) end
+	end
 end)
 
----------------------------------------------------------------- Achat et sauvegarde
-local store
-if REGLAGES.SAUVEGARDER then
-	local ok, s = pcall(function() return DataStoreService:GetDataStore("Faucille_v1") end)
-	if ok then store = s end
-end
-local avertiSauvegarde = false
-local function charger(joueur)
-	if not store then return false end
-	local ok, v = pcall(function() return store:GetAsync("u" .. joueur.UserId) end)
-	if not ok and not avertiSauvegarde then
-		avertiSauvegarde = true
-		warn("[Faucille] Sauvegarde impossible. Dans Studio : Home > Game Settings > Security > Enable Studio Access to API Services")
+---------------------------------------------------------------- La tête de la débroussailleuse tourne
+local CollectionService = game:GetService("CollectionService")
+local VITESSE_TETE = 28 -- tours... en radians par seconde
+RunService.RenderStepped:Connect(function()
+	local a = os.clock() * VITESSE_TETE
+	for _, m in CollectionService:GetTagged("TeteDebroussailleuse") do
+		-- seulement quand elle est en main (dans le monde), pas dans le sac
+		if m:IsA("Motor6D") and m:IsDescendantOf(workspace) then m.Transform = CFrame.Angles(0, a % (2 * math.pi), 0) end
 	end
-	return ok and v == true
+end)
+
+---------------------------------------------------------------- Réponse du serveur
+local ecran = Instance.new("ScreenGui")
+ecran.Name = "BoutiqueMessages"
+ecran.ResetOnSpawn = false
+ecran.DisplayOrder = 20
+ecran.Parent = pgui
+
+local function son(id, vol)
+	local s = Instance.new("Sound")
+	s.SoundId = id
+	s.Volume = vol or 0.6
+	s.Parent = ecran
+	s:Play()
+	game:GetService("Debris"):AddItem(s, 4)
 end
-local function sauver(joueur)
-	if not store then return end
-	task.spawn(function()
-		for _ = 1, 3 do
-			if pcall(function() store:SetAsync("u" .. joueur.UserId, true) end) then return end
-			task.wait(3)
-		end
+
+local function message(t, couleur, duree)
+	local l = Instance.new("TextLabel")
+	l.BackgroundTransparency = 1
+	l.AnchorPoint = Vector2.new(0.5, 0.5)
+	l.Position = UDim2.fromScale(0.5, 0.3)
+	l.Size = UDim2.fromScale(0.7, 0.1)
+	l.Font = Enum.Font.LuckiestGuy
+	l.TextScaled = true
+	l.Text = t
+	l.TextColor3 = couleur
+	l.Parent = ecran
+	local st = contour(l, 5, ENCRE)
+	local sc = Instance.new("UIScale")
+	sc.Scale = 0
+	sc.Parent = l
+	TweenService:Create(sc, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+	task.delay(duree, function()
+		TweenService:Create(l, TweenInfo.new(0.3), { TextTransparency = 1, Position = UDim2.fromScale(0.5, 0.25) }):Play()
+		TweenService:Create(st, TweenInfo.new(0.3), { Transparency = 1 }):Play()
+		task.wait(0.35)
+		l:Destroy()
 	end)
 end
 
-local NOMS_ARGENT = { "Money", "Cash", "Argent", "Coins", "Dollars", "Pieces", "Pièces", "$" }
-local function argent(joueur)
-	local ls = joueur:FindFirstChild("leaderstats")
-	if not ls then return nil end
-	if CFG.MONEY_STAT and CFG.MONEY_STAT ~= "" then return ls:FindFirstChild(CFG.MONEY_STAT) end
-	for _, n in NOMS_ARGENT do
-		local v = ls:FindFirstChild(n)
-		if v and (v:IsA("IntValue") or v:IsA("NumberValue")) then return v end
-	end
-	return nil
-end
-
-local function donner(joueur, equiper)
-	local gear = joueur:FindFirstChild("StarterGear") or joueur:WaitForChild("StarterGear", 5)
-	if gear and not gear:FindFirstChild("Faucille") then modeleOutil:Clone().Parent = gear end -- gardée après la mort
-	local sac = joueur:FindFirstChildOfClass("Backpack") or joueur:WaitForChild("Backpack", 5)
-	local perso = joueur.Character
-	local outil = (sac and sac:FindFirstChild("Faucille")) or (perso and perso:FindFirstChild("Faucille"))
-	if not outil and sac then
-		outil = modeleOutil:Clone()
-		outil.Parent = sac
-	end
-	if equiper and outil and sac and outil.Parent == sac and perso then
-		local h = perso:FindFirstChildOfClass("Humanoid")
-		if h and h.Health > 0 then h:EquipTool(outil) end
-	end
-end
-
-local enCours = {}
-local function acheter(joueur)
-	if enCours[joueur] then return end
-	enCours[joueur] = true
-	if joueur:GetAttribute("Faucille") then
-		donner(joueur, true)
-	else
-		local m = argent(joueur)
-		local v = m and tonumber(m.Value) or 0
-		local prix = REGLAGES.PRIX
-		if m and m:IsA("IntValue") then prix = math.ceil(prix) end
-		if not m or v + 1e-6 < prix then
-			achat:FireClient(joueur, "manque", prix - v)
-		else
-			m.Value = if m:IsA("IntValue") then v - prix else math.floor((v - prix) * 100 + 0.5) / 100
-			joueur:SetAttribute("Faucille", true)
-			sauver(joueur)
-			donner(joueur, REGLAGES.EQUIPER_APRES_ACHAT)
-			achat:FireClient(joueur, "ok")
-			print("[Faucille] " .. joueur.Name .. " a acheté la faucille")
+reponse = function(article, quoi, manque)
+	local panneau = panneaux[article.attribut]
+	if quoi == "ok" then
+		son("rbxassetid://129348077985519", 0.7)
+		message("✨ " .. article.titre .. " ACHETÉE ! ✨", OR, 2.2)
+	elseif quoi == "manque" then
+		message("Il te manque " .. argentTexte(math.max(0, tonumber(manque) or 0)), ROUGE, 1.6)
+		-- le prix tremble en rouge
+		if panneau then
+			local p = panneau
+			task.spawn(function()
+				for i = 1, 8 do
+					p.valeur.TextColor3 = ROUGE
+					p.root.Rotation = (i % 2 == 0 and 3 or -3)
+					task.wait(0.04)
+				end
+				p.root.Rotation = 0
+				p.valeur.TextColor3 = BLANC
+			end)
 		end
 	end
-	task.wait(0.3)
-	enCours[joueur] = nil
 end
-
-local function arrivee(joueur)
-	if charger(joueur) then
-		joueur:SetAttribute("Faucille", true)
-		if not joueur.Character then joueur.CharacterAdded:Wait() end
-		task.wait(1)
-		donner(joueur, false)
-	end
-end
--- sécurité : personne n'a la faucille sans l'avoir achetée (même si une copie traîne dans StarterPack)
-local function estFaucille(o) return o:IsA("Tool") and (o.Name == "Faucille" or CollectionService:HasTag(o, TAG)) end
-for _, o in game:GetService("StarterPack"):GetChildren() do
-	if estFaucille(o) then
-		warn("[Faucille] Une faucille était dans StarterPack : retirée (il faut l'acheter)")
-		o:Destroy()
-	end
-end
-local function surveiller(joueur)
-	local function verifier(o)
-		if estFaucille(o) and not joueur:GetAttribute("Faucille") then task.defer(function() o:Destroy() end) end
-	end
-	local function suivre(conteneur)
-		if not conteneur then return end
-		for _, o in conteneur:GetChildren() do verifier(o) end
-		conteneur.ChildAdded:Connect(verifier)
-	end
-	suivre(joueur:FindFirstChild("StarterGear") or joueur:WaitForChild("StarterGear", 10))
-	local function surPerso(perso)
-		suivre(perso)
-		suivre(joueur:FindFirstChildOfClass("Backpack") or joueur:WaitForChild("Backpack", 10))
-	end
-	if joueur.Character then surPerso(joueur.Character) end
-	joueur.CharacterAdded:Connect(surPerso)
-end
-Players.PlayerAdded:Connect(function(j) task.spawn(surveiller, j) end)
-for _, j in Players:GetPlayers() do task.spawn(surveiller, j) end
-
-Players.PlayerAdded:Connect(arrivee)
-for _, j in Players:GetPlayers() do task.spawn(arrivee, j) end
-Players.PlayerRemoving:Connect(function(joueur) enCours[joueur] = nil end)
-
----------------------------------------------------------------- La faucille sur l'établi
-local function vitrine()
-	local v = workspace:FindFirstChild("FaucilleVitrine", true)
-	if v then return v end
-	-- pas de vitrine : on la pose sur le tapis vert de l'établi
-	local meuble = workspace:FindFirstChild("MeubleOutils", true)
-	local tapis = (meuble and meuble:FindFirstChild("Tapis", true)) or workspace:FindFirstChild("Tapis", true)
-	if not (tapis and tapis:IsA("BasePart")) then
-		warn("[Faucille] Pas de 'FaucilleVitrine' ni d'établi 'MeubleOutils' avec un 'Tapis' : la faucille n'est pas en vente")
-		return nil
-	end
-	v = Instance.new("Model")
-	v.Name = "FaucilleVitrine"
-	local dessus = tapis.CFrame * CFrame.new(0, tapis.Size.Y / 2, 0)
-	local base = Instance.new("Part")
-	base.Name = "Base"
-	base.Size = Vector3.new(3.4, 0.1, 2.2)
-	base.CFrame = dessus * CFrame.new(0, 0.05, 0)
-	base.Transparency = 1
-	base.Anchored = true
-	base.CanCollide, base.CanTouch, base.CanQuery = false, false, false
-	base.Parent = v
-	v.PrimaryPart = base
-	-- couchée sur le tapis, le croissant vers le fond
-	local pose = dessus * CFrame.new(-0.4, 0.18, -0.3) * CFrame.Angles(0, math.rad(14), 0)
-		* CFrame.fromMatrix(Vector3.zero, Vector3.new(0, 1, 0), Vector3.new(1, 0, 0), Vector3.new(0, 0, -1))
-		* CFrame.Angles(0, math.rad(-8), 0)
-	construire(v, pose, 0.9, true)
-	v.Parent = meuble or workspace
-	return v
-end
-
-local v = vitrine()
-if v then
-	local base = v.PrimaryPart or v:FindFirstChild("Base")
-	local prompt = base:FindFirstChildOfClass("ProximityPrompt") or Instance.new("ProximityPrompt")
-	prompt.Name = "Acheter"
-	prompt.ActionText = string.format("Acheter  $%.2f", REGLAGES.PRIX)
-	prompt.ObjectText = "Faucille"
-	prompt.HoldDuration = 0.35
-	prompt.MaxActivationDistance = 10
-	prompt.RequiresLineOfSight = false
-	prompt.KeyboardKeyCode = Enum.KeyCode.E
-	prompt.Parent = base
-	prompt.Triggered:Connect(acheter)
-	print("[Faucille] En vente sur l'établi : $" .. REGLAGES.PRIX)
-end
-]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX3"><Properties><string name="Name">GrassClient</string><ProtectedString name="Source"><![CDATA[-- GrassClient (LocalScript dans StarterPlayerScripts)
+]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX74"><Properties><string name="Name">GrassClient</string><ProtectedString name="Source"><![CDATA[-- GrassClient (LocalScript dans StarterPlayerScripts)
 -- ANTI-LAG : n'affiche que les touffes proches du joueur, construites petit à petit.
 if not game:GetService("RunService"):IsClient() then
 	warn("[Herbe] GrassClient doit être un LocalScript dans StarterPlayer > StarterPlayerScripts (pas un Script) !")
@@ -1916,7 +2230,7 @@ remotes:WaitForChild("Deposited").OnClientEvent:Connect(function(plr,c,n,gain)
 		end)
 	end
 end)
-]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX4"><Properties><string name="Name">CiseauxVue</string><ProtectedString name="Source"><![CDATA[-- CiseauxVue (LocalScript dans StarterPlayer > StarterPlayerScripts)
+]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX75"><Properties><string name="Name">CiseauxVue</string><ProtectedString name="Source"><![CDATA[-- CiseauxVue (LocalScript dans StarterPlayer > StarterPlayerScripts)
 -- Vue à la 1re personne : l'outil en main (ciseaux, faucille ou débroussailleuse) suit la caméra (en bas à droite de l'écran),
 -- se balance quand on tourne ou marche, les ciseaux font "clic-clac" et la faucille donne un coup à chaque coupe.
 -- Vue de loin : on voit les ciseaux dans la main du personnage, comme les autres joueurs.
@@ -2214,7 +2528,7 @@ RunService:BindToRenderStep("CiseauxVue", Enum.RenderPriority.Camera.Value + 1, 
 		moteur.C0 = moteur:GetAttribute("C0Origine") * CFrame.Angles(0, FERMETURE * fermeture * moteur:GetAttribute("Sens"), 0)
 	end
 end)
-]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX5"><Properties><string name="Name">InventoryUI</string><ProtectedString name="Source"><![CDATA[-- InventoryUI (LocalScript dans StarterGui)
+]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX76"><Properties><string name="Name">InventoryUI</string><ProtectedString name="Source"><![CDATA[-- InventoryUI (LocalScript dans StarterGui)
 -- Menu des améliorations des outils : bouton BOOSTS (ou touche TAB) -> panneau au centre.
 if not game:GetService("RunService"):IsClient() then
 	warn("[Améliorations] InventoryUI doit être un LocalScript dans StarterGui !")
@@ -2766,4 +3080,58 @@ UIS.InputBegan:Connect(function(input)
 	if input.KeyCode==Enum.KeyCode.Tab or input.KeyCode==Enum.KeyCode.ButtonY then setOpen(not open)
 	elseif input.KeyCode==Enum.KeyCode.ButtonB and open then setOpen(false) end
 end)
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX77"><Properties><string name="Name">Installer</string><ProtectedString name="Source"><![CDATA[-- Installe la débroussailleuse (accrochée au panneau de l'établi) + scripts, lancé depuis la barre de commande.
+-- Les anciennes versions sont rangées (désactivées) dans ServerStorage > AnciensScripts, rien n'est supprimé.
+return function()
+	local f = workspace:FindFirstChild("InstallationDebroussailleuse")
+	assert(f, "Insère d'abord le fichier InstallationDebroussailleuse.rbxmx (Workspace > Insert from File)")
+	local b = game.ServerStorage:FindFirstChild("AnciensScripts") or Instance.new("Folder")
+	b.Name = "AnciensScripts"
+	b.Parent = game.ServerStorage
+
+	-- 1) la débroussailleuse sur les crochets du panneau de l'établi
+	local vitrine = f.DebroussailleuseVitrine
+	local ancienne = workspace:FindFirstChild("DebroussailleuseVitrine", true)
+	if ancienne and not ancienne:IsDescendantOf(f) then
+		ancienne.Name = "DebroussailleuseVitrine_ANCIENNE"
+		ancienne.Parent = b
+	end
+	local meuble = workspace:FindFirstChild("MeubleOutils", true)
+	local place = meuble and meuble:FindFirstChild("Emplacement_Debroussailleuse", true)
+	local ok = place and place:IsA("BasePart")
+	if ok then
+		vitrine:PivotTo(place.CFrame)
+		vitrine.Parent = meuble
+	else
+		local c = workspace.CurrentCamera.CFrame
+		local p = c.Position + Vector3.new(c.LookVector.X, 0, c.LookVector.Z).Unit * 10
+		vitrine:PivotTo(CFrame.new(p))
+		vitrine.Parent = workspace
+	end
+
+	-- 2) les scripts (BoutiqueClient remplace FaucilleClient)
+	local sss, sps = game.ServerScriptService, game.StarterPlayer.StarterPlayerScripts
+	for _, n in { "FaucilleClient" } do
+		local v = sps:FindFirstChild(n)
+		while v do
+			v.Enabled = false
+			v.Name = n .. "_ANCIEN"
+			v.Parent = b
+			v = sps:FindFirstChild(n)
+		end
+	end
+	for n, parent in { DebroussailleuseServer = sss, GrassServer = sss, BoutiqueClient = sps, GrassClient = sps, CiseauxVue = sps, InventoryUI = game.StarterGui } do
+		local v = parent:FindFirstChild(n)
+		while v do
+			pcall(function() v.Enabled = false end)
+			v.Name = n .. "_ANCIEN"
+			v.Parent = b
+			v = parent:FindFirstChild(n)
+		end
+		f[n].Parent = parent
+	end
+	f:Destroy()
+	pcall(function() game:GetService("Selection"):Set({ vitrine }) end)
+	print(ok and "Débroussailleuse installée sur l'établi !" or "Établi introuvable : la débroussailleuse est devant ta caméra (déplace-la où tu veux)")
+end
 ]]></ProtectedString></Properties></Item></Item></roblox>

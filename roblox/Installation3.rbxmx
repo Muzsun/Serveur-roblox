@@ -369,8 +369,8 @@ end
 
 print("[Ciseaux] Prêts : chaque joueur apparaît avec les ciseaux en main.")
 ]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX2"><Properties><string name="Name">CiseauxVue</string><ProtectedString name="Source"><![CDATA[-- CiseauxVue (LocalScript dans StarterPlayer > StarterPlayerScripts)
--- Vue à la 1re personne : les ciseaux suivent la caméra (en bas à droite de l'écran),
--- se balancent quand on tourne ou marche, et font "clic-clac" à chaque coupe.
+-- Vue à la 1re personne : l'outil en main (ciseaux, faucille ou débroussailleuse) suit la caméra (en bas à droite de l'écran),
+-- se balance quand on tourne ou marche, les ciseaux font "clic-clac" et la faucille donne un coup à chaque coupe.
 -- Vue de loin : on voit les ciseaux dans la main du personnage, comme les autres joueurs.
 if not game:GetService("RunService"):IsClient() then
 	warn("[Ciseaux] CiseauxVue doit être un LocalScript dans StarterPlayer > StarterPlayerScripts !")
@@ -383,6 +383,15 @@ local REGLAGES = {
 	DIRECTION = Vector3.new(-0.42, 0.7, -0.58), -- vers où pointent les lames (gauche, haut, devant)
 	FACE = Vector3.new(0.2, 0.3, 1), -- le côté plat des ciseaux regarde vers la caméra
 	BALANCEMENT = 1, -- 0 = les ciseaux ne bougent pas quand on tourne / marche
+	FAUCILLE = {
+		POSITION = Vector3.new(0.75, -1.3, -2.7), -- place du poing par rapport à la caméra (droite, bas, devant)
+		MANCHE = Vector3.new(0.2, 0.85, -0.35), -- vers où pointe le manche (droite, haut, devant)
+		FACE = Vector3.new(-0.15, 0, 1), -- le plat de la lame : (-0.15, 0, 1) = croissant vers la droite, (0.15, 0, -1) = vers la gauche
+	},
+	DEBROUSSAILLEUSE = {
+		POSITION = Vector3.new(1.2, -1.25, -0.3), -- place de la poignée arrière par rapport à la caméra
+		TUBE = Vector3.new(-0.27, -0.1, -0.96), -- vers où pointe le tube (gauche, bas, devant)
+	},
 }
 
 local Players = game:GetService("Players")
@@ -393,6 +402,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local joueur = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
+local SON_CISEAUX = "rbxassetid://9114794521" -- bruit des ciseaux (clic-clac)
 local FERMETURE = math.rad(11)
 local DUREE_COUPE = 0.32
 local DUREE_SORTIE = 0.25
@@ -401,16 +411,38 @@ local DUREE_SORTIE = 0.25
 local axeLames = REGLAGES.DIRECTION.Unit
 local axeFace = (REGLAGES.FACE - axeLames * axeLames:Dot(REGLAGES.FACE)).Unit
 local REPERE = CFrame.fromMatrix(REGLAGES.POSITION, axeLames, axeFace, axeLames:Cross(axeFace))
+-- Repère de la faucille : X = plat de la lame, Y = le manche (comme dans FaucilleServer)
+local RF = REGLAGES.FAUCILLE
+local axeManche = RF.MANCHE.Unit
+local axePlat = (RF.FACE - axeManche * axeManche:Dot(RF.FACE)).Unit
+local REPERE_FAUCILLE = CFrame.fromMatrix(RF.POSITION, axePlat, axeManche, axePlat:Cross(axeManche))
+local DUREE_COUP_FAUCILLE = 0.42
+-- Repère de la débroussailleuse : X = le tube, Y = le haut (comme dans DebroussailleuseServer)
+local RD = REGLAGES.DEBROUSSAILLEUSE
+local axeTube = RD.TUBE.Unit
+local axeHaut = (Vector3.yAxis - axeTube * axeTube:Dot(Vector3.yAxis)).Unit
+local REPERE_DEBROU = CFrame.fromMatrix(RD.POSITION, axeTube, axeHaut, axeTube:Cross(axeHaut))
+local DUREE_COUP_DEBROU = 0.4
 
 local function estCiseaux(objet)
 	return objet:IsA("Tool") and (CollectionService:HasTag(objet, "OutilCiseaux") or objet.Name == "Ciseaux")
 end
+local function estFaucille(objet)
+	return objet:IsA("Tool") and (CollectionService:HasTag(objet, "OutilFaucille") or objet.Name == "Faucille")
+end
+local function estDebrou(objet)
+	return objet:IsA("Tool") and (CollectionService:HasTag(objet, "OutilDebroussailleuse") or objet.Name == "Debroussailleuse")
+end
+local function estOutilVue(objet) return estCiseaux(objet) or estFaucille(objet) or estDebrou(objet) end
 
 ---------------------------------------------------------------- État
 
 local outil = nil -- les ciseaux tenus en main
 local vue = nil -- copie locale affichée devant la caméra
 local vueHandle, vueDecalage, vueMoteurs = nil, nil, {}
+local faucille = false -- l'outil en main est la faucille (ou la débroussailleuse : pas de clic-clac)
+local debrou = false -- l'outil en main est la débroussailleuse
+local vueTrainee = nil
 local outilCache = false
 local debutCoupe, debutClac, debutSortie = -math.huge, -math.huge, -math.huge
 local balancement = CFrame.identity
@@ -427,7 +459,7 @@ end
 
 local function detruireVue()
 	if vue then vue:Destroy() end
-	vue, vueHandle, vueDecalage, vueMoteurs = nil, nil, nil, {}
+	vue, vueHandle, vueDecalage, vueMoteurs, vueTrainee = nil, nil, nil, {}, nil
 end
 
 local function creerVue()
@@ -438,8 +470,16 @@ local function creerVue()
 	for _, enfant in copie:GetChildren() do enfant.Parent = modele end
 	copie:Destroy()
 	vueHandle = modele:FindFirstChild("Handle")
-	local fente = modele:FindFirstChild("Fente", true)
+	-- point de repère : la vis des ciseaux, ou le poing (Handle) de la faucille
+	local fente = if faucille then vueHandle else modele:FindFirstChild("Fente", true)
+	if vueHandle and faucille then
+		-- la tête de la débroussailleuse reste sur son moteur (BoutiqueClient la fait tourner)
+		for _, d in modele:GetDescendants() do
+			if d:IsA("Motor6D") and d.Name == "TeteMoteur" then d.Transform = CFrame.identity end
+		end
+	end
 	if not vueHandle or not fente then modele:Destroy() return end
+	vueTrainee = modele:FindFirstChild("Trainee", true)
 	for _, d in modele:GetDescendants() do
 		if d:IsA("BasePart") then
 			d.CastShadow = false
@@ -459,10 +499,32 @@ local function creerVue()
 	debutSortie = os.clock()
 end
 
+local son = Instance.new("Sound")
+son.Name = "BruitCiseaux"
+son.SoundId = SON_CISEAUX
+son.Parent = game:GetService("SoundService")
+local function bruitCiseaux(volume)
+	son.Volume = volume
+	son.PlaybackSpeed = 0.95 + math.random() * 0.1
+	son.TimePosition = 0
+	son:Play()
+end
+
+
+-- délai entre 2 coupes (le même que pour couper une herbe, réduit par la Dextérité)
+local okCfg, CFG_HERBE = pcall(function() return require(game:GetService("ReplicatedStorage"):WaitForChild("GrassConfig", 10)) end)
+if not okCfg or type(CFG_HERBE) ~= "table" then CFG_HERBE = {} end
+local function delaiCoupe(qui)
+	local nom = if debrou then "Upg_DRapidite" elseif faucille then "Upg_FRapidite" else "Upg_Dexterite"
+	local dex = qui and qui:GetAttribute(nom) or 0 -- faucille / débroussailleuse : Rapidité, ciseaux : Dextérité
+	return math.max(0.2, (CFG_HERBE.PICK_COOLDOWN or 0.9) * (1 - (CFG_HERBE.DEX_PAR_NIVEAU or 0.08) * dex))
+end
 local function coupe()
 	local maintenant = os.clock()
-	if maintenant - debutCoupe < DUREE_COUPE * 0.8 then return end
+	-- pas de spam : on attend que le délai pour couper une herbe soit passé
+	if maintenant - debutCoupe < math.max(DUREE_COUPE * 0.8, delaiCoupe(joueur) * 0.85) then return end
 	debutCoupe, debutClac = maintenant, maintenant
+	if not faucille then bruitCiseaux(0.7) end -- la faucille a son propre "swoosh" (FaucilleServer)
 end
 
 ---------------------------------------------------------------- Ciseaux en main ou pas
@@ -473,8 +535,11 @@ local function surOutil(nouvel)
 	cacherOutil(false)
 	detruireVue()
 	outil, outilCache = nouvel, false
+	debrou = outil ~= nil and estDebrou(outil)
+	faucille = outil ~= nil and (estFaucille(outil) or debrou)
 	if outil then
 		debutClac = os.clock()
+		if not faucille then bruitCiseaux(0.4) end -- petit clic-clac quand on sort les ciseaux
 		if not branches[outil] then
 			branches[outil] = true
 			outil.Activated:Connect(function()
@@ -487,10 +552,10 @@ end
 local function surPersonnage(perso)
 	surOutil(nil)
 	for _, enfant in perso:GetChildren() do
-		if estCiseaux(enfant) then surOutil(enfant) end
+		if estOutilVue(enfant) then surOutil(enfant) end
 	end
 	perso.ChildAdded:Connect(function(enfant)
-		if estCiseaux(enfant) then surOutil(enfant) end
+		if estOutilVue(enfant) then surOutil(enfant) end
 	end)
 	perso.ChildRemoved:Connect(function(enfant)
 		if enfant == outil then surOutil(nil) end
@@ -555,6 +620,42 @@ RunService:BindToRenderStep("CiseauxVue", Enum.RenderPriority.Camera.Value + 1, 
 	local decalage = Vector3.new(-0.15 * k, -1.2 * s - 0.25 * k, -0.3 * k)
 	local inclinaison = CFrame.Angles(-0.5 * s - 0.45 * k, 0, 0.12 * k) -- tourne autour de la vis
 
+	if debrou then
+		-- débroussailleuse : on balaie à droite puis à gauche, la tête près du sol
+		local d = math.clamp((maintenant - debutCoupe) / DUREE_COUP_DEBROU, 0, 1)
+		local lacet = if d < 1 then -0.42 * math.sin(d * math.pi * 2) else 0
+		local plonge = if d < 1 then math.sin(d * math.pi) else 0
+		local poing = camera.CFrame * balade * balancement
+			* CFrame.new(REPERE_DEBROU.Position + Vector3.new(0, -1.2 * s - 0.15 * plonge, 0))
+			* CFrame.Angles(-0.5 * s - 0.08 * plonge, lacet, 0) * REPERE_DEBROU.Rotation
+		vueHandle.CFrame = poing * vueDecalage
+		return
+	end
+	if faucille then
+		-- coup de faucille : on arme vers la droite, on balaie vers le bas à gauche, puis on revient
+		local d = math.clamp((maintenant - debutCoupe) / DUREE_COUP_FAUCILLE, 0, 1)
+		local pos, rot = Vector3.zero, Vector3.zero -- rot = (tangage, lacet, roulis)
+		local ARME_P, ARME_R = Vector3.new(0.35, 0.25, 0.1), Vector3.new(0.25, -0.35, -0.35)
+		local FRAPPE_P, FRAPPE_R = Vector3.new(-1.45, -0.55, -0.35), Vector3.new(-0.55, 0.55, 0.95)
+		if d < 1 then
+			if d < 0.22 then
+				local a = adoucir(d / 0.22)
+				pos, rot = ARME_P * a, ARME_R * a
+			elseif d < 0.5 then
+				local a = ((d - 0.22) / 0.28) ^ 1.6 -- de plus en plus vite
+				pos, rot = ARME_P:Lerp(FRAPPE_P, a), ARME_R:Lerp(FRAPPE_R, a)
+			else
+				local a = adoucir((d - 0.5) / 0.5)
+				pos, rot = FRAPPE_P:Lerp(Vector3.zero, a), FRAPPE_R:Lerp(Vector3.zero, a)
+			end
+		end
+		if vueTrainee then vueTrainee.Enabled = d > 0.2 and d < 0.55 end
+		local poing = camera.CFrame * balade * balancement
+			* CFrame.new(REPERE_FAUCILLE.Position + pos + Vector3.new(0, -1.2 * s, 0))
+			* CFrame.Angles(rot.X - 0.5 * s, rot.Y, rot.Z) * REPERE_FAUCILLE.Rotation
+		vueHandle.CFrame = poing * vueDecalage
+		return
+	end
 	local fente = camera.CFrame * balade * balancement * CFrame.new(REPERE.Position + decalage) * inclinaison * REPERE.Rotation
 	vueHandle.CFrame = fente * vueDecalage
 
