@@ -1,0 +1,1 @@
+local b=game.ServerStorage:FindFirstChild("AnciensScripts") or Instance.new("Folder",game.ServerStorage) b.Name="AnciensScripts" local p=game.StarterPlayer.StarterPlayerScripts local v=p:FindFirstChild("Chrono") while v do v.Enabled=false v.Name="Chrono_ANCIEN" v.Parent=b v=p:FindFirstChild("Chrono") end workspace.Chrono.Parent=p print("Installation OK !")
