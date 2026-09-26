@@ -1,4 +1,4 @@
--- Tutoriel (LocalScript dans StarterPlayer > StarterPlayerScripts)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="LocalScript" referent="RBX0"><Properties><string name="Name">Tutoriel</string><ProtectedString name="Source"><![CDATA[-- Tutoriel (LocalScript dans StarterPlayer > StarterPlayerScripts)
 -- Tutoriel sans texte : des icônes et des flèches montrent quoi faire.
 -- 1) couper l'herbe  2) vendre au composteur  3) acheter une amélioration dans BOOSTS.
 -- Il s'arrête après le premier achat.
@@ -373,3 +373,4 @@ task.spawn(function()
 	task.wait(1.5)
 	if not fini() then intro() end
 end)
+]]></ProtectedString></Properties></Item></roblox>
