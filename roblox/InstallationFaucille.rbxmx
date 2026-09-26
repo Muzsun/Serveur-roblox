@@ -633,7 +633,8 @@ end
 local nextId,ready,total,doorTotal=0,false,0,0
 -- ===== zones une par une =====
 -- Au début, l'herbe ne pousse que dans la 1re zone. Quand elle est toute coupée, la zone suivante pousse, etc.
--- Ordre : GrassConfig.ZONES_ORDER = {"Zone","ZonePorte",...} si tu le mets, sinon de la plus proche du spawn à la plus loin.
+-- Ordre : ZonePorte -> ZoneParc -> ZoneLabyrinthe -> Zone -> ZoneStade (ou GrassConfig.ZONES_ORDER si tu le mets).
+-- Une zone qui n'est pas dans la liste passe après, de la plus proche du spawn à la plus loin.
 local PROGRESSIVE=CFG.ZONES_UNE_PAR_UNE~=false
 local reserve={}          -- toutes les touffes créées (pas encore poussées)
 local stages,stage={},0   -- ordre des zones, zone en cours
@@ -703,7 +704,9 @@ task.spawn(function()
 	local spawnLoc=workspace:FindFirstChildWhichIsA("SpawnLocation",true)
 	local origin=spawnLoc and spawnLoc.Position or Vector3.zero
 	local rank={}
-	if typeof(CFG.ZONES_ORDER)=="table" then for i,n in CFG.ZONES_ORDER do rank[n]=i end end
+	-- ordre du jeu : Porte -> Parc -> Labyrinthe -> Zone -> Stade (modifiable avec GrassConfig.ZONES_ORDER)
+	local order=typeof(CFG.ZONES_ORDER)=="table" and CFG.ZONES_ORDER or {"ZonePorte","ZoneParc","ZoneLabyrinthe","Zone","ZoneStade"}
+	for i,n in order do rank[n]=i end
 	for g,list in byGroup do table.insert(stages,{name=g,list=list,dist=(center[g]/#list-origin).Magnitude}) end
 	table.sort(stages,function(a,b)
 		local ra,rb=rank[a.name] or math.huge,rank[b.name] or math.huge
