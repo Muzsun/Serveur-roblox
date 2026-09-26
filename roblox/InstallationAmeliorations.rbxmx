@@ -1187,6 +1187,7 @@ end)
 -- clic avec les ciseaux = coupe l'herbe visée ; amélioration "Maintenir" = rester appuyé coupe en continu là où tu vises
 local holding,holdInput=false,nil
 local lastHint=0
+local requestCut -- (défini plus bas) : demande la coupe + coupe tout de suite chez nous quand les lames se ferment
 local lastCut=-math.huge
 UIS.InputBegan:Connect(function(input,gp)
 	local t=input.UserInputType
@@ -1203,7 +1204,7 @@ UIS.InputBegan:Connect(function(input,gp)
 				-- pas de spam : on ne peut recouper qu'une fois le délai passé (même délai que le serveur)
 				local dex=holdingRealScissors() and (lp:GetAttribute("Upg_Dexterite") or 0) or 0
 				local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
-				if os.clock()-lastCut>=cd then lastCut=os.clock() snipT=os.clock() remotes.PickRequest:FireServer(id) end
+				if os.clock()-lastCut>=cd then lastCut=os.clock() snipT=os.clock() requestCut(id) end
 			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
 		end
 	end
@@ -1222,7 +1223,7 @@ task.spawn(function()
 			elseif hi and hi.UserInputType==Enum.UserInputType.Touch then ray=cam:ScreenPointToRay(hi.Position.X,hi.Position.Y)
 			else local m=UIS:GetMouseLocation() ray=cam:ViewportPointToRay(m.X,m.Y) end
 			local id=idFromRay(ray)
-			if id then lastCut=os.clock() remotes.PickRequest:FireServer(id) end
+			if id then lastCut=os.clock() requestCut(id) end
 		end
 	end
 end)
@@ -1411,7 +1412,7 @@ local function gainPopup(pos,n)
 end
 
 -- ===== coupe d'une touffe =====
-remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rarity)
+local function cutVisual(id,picker,size,rarity)
 	size=size or 1
 	rarity=rarity or "Normal"
 	local mine=picker==lp
@@ -1474,6 +1475,80 @@ remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rar
 		fake:Destroy()
 		arrived()
 	end)
+end
+
+-- ===== pas de délai : l'herbe est coupée chez nous au moment où les lames se ferment =====
+-- (sans attendre la réponse du serveur ; si le serveur refuse, la touffe revient)
+local CLOSE_SCISSORS,CLOSE_SICKLE=.08,.15 -- secondes entre le clic et les lames qui se ferment
+local scheduled,predicted={},{}
+local function heldTool() local ch=lp.Character return ch and ch:FindFirstChildOfClass("Tool") end
+local function pendingSize()
+	local n=0
+	for _,e in scheduled do n+=e.size or 1 end
+	for _,v in predicted do n+=v.e.size or 1 end
+	return n
+end
+requestCut=function(id)
+	remotes.PickRequest:FireServer(id)
+	local e=data[id] if not e then return end
+	local tool=heldTool()
+	local sickle=tool~=nil and not holdingRealScissors()
+	local room=maxBag()-realBag()-pendingSize()
+	if (e.size or 1)>room then return end -- sac plein : le serveur répondra
+	local list={e} room-=(e.size or 1)
+	-- touffes voisines coupées en même temps (faucille, Saisir) : les plus proches d'abord, comme le serveur
+	local extra=(CFG.SCISSORS_EXTRA or 0)+(tool and tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	if not sickle then extra+=lp:GetAttribute("Upg_Saisir") or 0 end
+	if extra>0 then
+		local radius=math.max(CFG.SCISSORS_RADIUS or 4,tool and tonumber(tool:GetAttribute("RayonCoupe")) or 0)
+		local near={}
+		for id2,e2 in data do
+			if id2~=id and not scheduled[id2] and not predicted[id2] then
+				local d=(e2.p-e.p).Magnitude
+				if d<=radius then table.insert(near,{e2,d}) end
+			end
+		end
+		table.sort(near,function(a,b) return a[2]<b[2] end)
+		for _,n in near do
+			if #list>extra then break end
+			if (n[1].size or 1)<=room then table.insert(list,n[1]) room-=(n[1].size or 1) end
+		end
+	end
+	for _,x in list do scheduled[x.id]=x end
+	task.delay(sickle and CLOSE_SICKLE or CLOSE_SCISSORS,function()
+		for _,x in list do
+			local st=scheduled[x.id] scheduled[x.id]=nil
+			if st and data[x.id] then
+				if st~="ok" then predicted[x.id]={e=x,t=os.clock()} end
+				cutVisual(x.id,lp,x.size,x.r)
+			end
+		end
+	end)
+end
+remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rarity)
+	if picker==lp then
+		if predicted[id] then predicted[id]=nil return end -- déjà coupée chez nous
+		if scheduled[id] then scheduled[id]="ok" return end -- elle sera coupée quand les lames se ferment
+	else
+		predicted[id]=nil
+		if scheduled[id] then scheduled[id]=nil end
+	end
+	cutVisual(id,picker,size,rarity)
+end)
+-- le serveur n'a pas confirmé (trop loin, trop tôt...) : la touffe revient
+task.spawn(function()
+	while true do
+		task.wait(.5)
+		local now=os.clock()
+		for id,v in predicted do
+			if now-v.t>2.5 then
+				predicted[id]=nil
+				gone[id]=nil
+				data[id]=v.e
+				sync()
+			end
+		end
+	end
 end)
 
 -- ===== pas assez de place =====
