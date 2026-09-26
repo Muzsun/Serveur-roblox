@@ -13,6 +13,7 @@ local REGLAGES = {
 	-- sinon la zone nommée ici, sinon la zone la plus loin du départ.
 	DERNIERE_ZONE = "",
 	CHIEN_SUIT_LE_JOUEUR = true,
+	CHIENS_DES_AUTRES = true, -- on voit aussi le chiot des autres joueurs
 	SONS = {
 		lancer = "rbxasset://sounds/swordlunge.wav", -- le "whoosh" de la balle
 		rebond = "rbxasset://sounds/action_jump.mp3", -- le coup de tête
@@ -183,6 +184,154 @@ local function construireBalle()
 end
 --[[CHIEN_FIN]]
 
+---------------------------------------------------------------- Les chiots des autres joueurs
+-- Chaque joueur a son chiot qui le suit : on dessine ici ceux des AUTRES joueurs
+-- (le tien est géré plus bas, avec la cinématique).
+if REGLAGES.CHIENS_DES_AUTRES then
+	local dossierAutres = Instance.new("Folder")
+	dossierAutres.Name = "ChiotsDesAutres"
+	dossierAutres.Parent = workspace
+	local autres = {} -- [joueur] = { model, rig, pose, piste, marque, bloque, t, perso }
+	local paramsA = RaycastParams.new()
+	paramsA.FilterType = Enum.RaycastFilterType.Exclude
+	local function majFiltre()
+		local l = { dossierAutres }
+		for _, n in { "GrassHit", "GrassFX", "GrassVisuals", "Chiot", "BalleDuChien" } do
+			local f = workspace:FindFirstChild(n)
+			if f then table.insert(l, f) end
+		end
+		for _, p in Players:GetPlayers() do
+			if p.Character then table.insert(l, p.Character) end
+		end
+		paramsA.FilterDescendantsInstances = l
+	end
+	-- rayon qui ignore les pièces invisibles et celles qu'on traverse (CanCollide désactivé)
+	local function rayonA(origine, direction)
+		local liste = paramsA.FilterDescendantsInstances
+		local params = RaycastParams.new()
+		params.FilterType = Enum.RaycastFilterType.Exclude
+		for _ = 1, 8 do
+			params.FilterDescendantsInstances = liste
+			local hit = workspace:Raycast(origine, direction, params)
+			if not hit then return nil end
+			local inst = hit.Instance
+			if inst:IsA("BasePart") and (inst.Transparency >= 0.9 or not inst.CanCollide) then
+				liste = table.clone(liste)
+				table.insert(liste, inst)
+			else
+				return hit
+			end
+		end
+		return nil
+	end
+	local function solA(p, depuisY)
+		local hit = rayonA(Vector3.new(p.X, depuisY, p.Z), -UP * 60)
+		return hit and hit.Position or nil
+	end
+	local function plat(v) return Vector3.new(v.X, 0, v.Z) end
+
+	local function retirer(joueur)
+		local a = autres[joueur]
+		if a then a.model:Destroy() autres[joueur] = nil end
+	end
+	local function placerPres(a, r)
+		local derriere = (r.CFrame * CFrame.new(2.5, 0, 3.5)).Position
+		local p = solA(derriere, r.Position.Y + 2) or (r.Position - UP * 3)
+		local dir = plat(r.CFrame.LookVector)
+		a.pose.cf = CFrame.lookAt(p, p + (dir.Magnitude > 0.01 and dir.Unit or Vector3.new(0, 0, -1)))
+		a.piste, a.marque, a.bloque = {}, nil, 0
+	end
+	local function ajouter(joueur)
+		if joueur == lp or autres[joueur] then return end
+		local model, rig = construireChien()
+		model.Name = "Chiot_" .. joueur.Name
+		local a = { model = model, rig = rig, pose = nouvellePose(CFrame.new(0, -500, 0)), piste = {}, bloque = 0, t = math.random() * 10 }
+		a.pose.langue = 1
+		autres[joueur] = a
+	end
+	majFiltre()
+	for _, j in Players:GetPlayers() do ajouter(j) end
+	Players.PlayerAdded:Connect(ajouter)
+	Players.PlayerRemoving:Connect(retirer)
+
+	local acc = 0
+	Run.Heartbeat:Connect(function(dt)
+		acc += dt
+		if acc > 1 then acc = 0 majFiltre() end
+		local camPos = cam.CFrame.Position
+		local parts, cfs = {}, {}
+		for joueur, a in autres do
+			local c = joueur.Character
+			local r = c and c:FindFirstChild("HumanoidRootPart")
+			local h = c and c:FindFirstChildOfClass("Humanoid")
+			-- trop loin de nous (ou pas de personnage) : on ne l'affiche pas, ça évite le lag
+			if not r or not h or h.Health <= 0 or (r.Position - camPos).Magnitude > 220 then
+				if a.model.Parent then a.model.Parent = nil end
+				a.perso = nil
+				continue
+			end
+			if a.perso ~= c or not a.model.Parent then
+				a.perso = c
+				placerPres(a, r)
+				a.model.Parent = dossierAutres
+			end
+			local pose = a.pose
+			-- il retient le chemin de son maître (pour ne pas traverser les murs)
+			if not a.marque or plat(r.Position - a.marque).Magnitude > 1.5 then
+				table.insert(a.piste, r.Position)
+				a.marque = r.Position
+				if #a.piste > 80 then table.remove(a.piste, 1) end
+			end
+			local cur = pose.cf.Position
+			local dist = plat(r.Position - cur).Magnitude
+			if dist > 50 then placerPres(a, r) cur = pose.cf.Position dist = plat(r.Position - cur).Magnitude end
+			local cible
+			if dist > 4.5 then
+				local bas, haut = cur + UP * 0.7, cur + UP * 1.8
+				if not rayonA(bas, r.Position - UP * 1.5 - bas) and not rayonA(haut, r.Position - haut) then
+					cible = r.Position
+					a.piste = { r.Position }
+				else
+					while a.piste[1] and plat(a.piste[1] - cur).Magnitude < 1.2 do table.remove(a.piste, 1) end
+					cible = a.piste[1]
+				end
+			else
+				a.piste = { r.Position }
+			end
+			local vitesse = 0
+			local dir = pose.cf.LookVector
+			if cible then
+				local vec = plat(cible - cur)
+				if vec.Magnitude > 0.05 then
+					vitesse = math.clamp(dist * 2.2, 8, 26)
+					cur += vec.Unit * math.min(vitesse * dt, vec.Magnitude)
+					dir = dir:Lerp(vec.Unit, math.min(dt * 10, 1))
+				end
+				a.bloque = 0
+			elseif dist > 8 then
+				a.bloque += dt
+				if a.bloque > 1.5 then placerPres(a, r) cur = pose.cf.Position end
+			else
+				local vers = plat(r.Position - cur)
+				if vers.Magnitude > 0.1 then dir = dir:Lerp(vers.Unit, math.min(dt * 3, 1)) end
+			end
+			local p = solA(cur, r.Position.Y + 2) or cur
+			local y = pose.cf.Position.Y + (p.Y - pose.cf.Position.Y) * math.min(dt * 12, 1)
+			local pos = Vector3.new(cur.X, y, cur.Z)
+			local d = plat(dir)
+			pose.cf = CFrame.lookAt(pos, pos + (d.Magnitude > 0.01 and d.Unit or Vector3.new(0, 0, -1)))
+			pose.marche += ((vitesse > 0 and 1 or 0) - pose.marche) * math.min(dt * 8, 1)
+			pose.pas += dt * (6 + vitesse * 0.5)
+			pose.saut = math.abs(math.sin(pose.pas)) * 0.15 * pose.marche
+			a.t += dt
+			local ps, cs = calculerChien(a.rig, pose, a.t)
+			table.move(ps, 1, #ps, #parts + 1, parts)
+			table.move(cs, 1, #cs, #cfs + 1, cfs)
+		end
+		if #parts > 0 then workspace:BulkMoveTo(parts, cfs, Enum.BulkMoveMode.FireCFrameChanged) end
+	end)
+end
+
 ---------------------------------------------------------------- Préparation
 local character = lp.Character or lp.CharacterAdded:Wait()
 local hrp = character:WaitForChild("HumanoidRootPart", 10)
@@ -233,7 +382,7 @@ else
 end
 
 local exclus = { character }
-for _, n in { "GrassHit", "GrassFX", "GrassVisuals" } do
+for _, n in { "GrassHit", "GrassFX", "GrassVisuals", "ChiotsDesAutres" } do
 	local f = workspace:FindFirstChild(n)
 	if f then table.insert(exclus, f) end
 end
