@@ -711,9 +711,10 @@ remotes:WaitForChild("BagFull").OnClientEvent:Connect(function(id,size,free)
 end)
 
 -- ===== composteur : panneau "1 herbe = $" + vidage =====
--- Au-dessus du composteur : une touffe (en 3D, qui tourne) = pièce + prix d'une herbe.
+-- Au-dessus du composteur : image d'herbe = pièce + prix d'une herbe.
 -- Quand le sac n'est pas vide : 2e petit panneau "sac 12 → +$0.12" et une flèche qui rebondit.
 local MPP=CFG.MONEY_PER_PLACE or 0
+local HERB_IMAGE="rbxassetid://90182525256912"
 local INK=Color3.fromRGB(26,22,28)
 local WOOD_A,WOOD_B,WOOD_DARK=Color3.fromRGB(170,114,64),Color3.fromRGB(122,78,42),Color3.fromRGB(72,44,22)
 local function money(v) if v>=1 and v==math.floor(v) then return "$"..v end return string.format("$%.2f",v) end
@@ -746,23 +747,6 @@ local function iconImg(parent,img,size,order)
 	i.Size=UDim2.fromOffset(px(size),px(size)) i.LayoutOrder=order i.Parent=parent
 	return i
 end
--- touffe d'herbe en 3D dans le panneau (la vraie touffe du jeu)
-local function tuftView(parent,size,order)
-	local vp=Instance.new("ViewportFrame") vp.BackgroundTransparency=1 vp.Size=UDim2.fromOffset(px(size),px(size)) vp.LayoutOrder=order
-	vp.Ambient=Color3.fromRGB(175,175,175) vp.LightColor=WHITE vp.LightDirection=Vector3.new(-.4,-1,-.5) vp.Parent=parent
-	local vc=Instance.new("Camera") vc.FieldOfView=28 vc.Parent=vp vp.CurrentCamera=vc
-	local ok,m=pcall(K.Build,CFrame.new(),1,424242,true)
-	if not ok or not m then vp:Destroy() return word(parent,"🌿",size-10,order),nil end
-	for _,d in m:GetDescendants() do if d:IsA("ParticleEmitter") or d:IsA("Light") then d:Destroy() end end
-	m.Parent=vp
-	local cf,sz=m:GetBoundingBox()
-	local r=math.max(sz.X,sz.Y,sz.Z)*.5
-	local dist=r/math.tan(math.rad(vc.FieldOfView/2))*1.08
-	return vp,function(t)
-		local a=t*.9
-		vc.CFrame=CFrame.lookAt(cf.Position+Vector3.new(math.sin(a)*dist*.94,dist*.34,math.cos(a)*dist*.94),cf.Position)
-	end
-end
 -- flèche (chevron) dessinée avec 2 barres
 local function chevron(parent)
 	local f=Instance.new("Frame") f.AnchorPoint=Vector2.new(.5,1) f.BackgroundTransparency=1 f.Size=UDim2.fromOffset(px(40),px(30)) f.Parent=parent
@@ -786,9 +770,9 @@ local function addHint(c)
 	local root=Instance.new("Frame") root.BackgroundTransparency=1 root.Size=UDim2.fromScale(1,1) root.Parent=g
 	-- panneau principal : [touffe] = [pièce] $0.01
 	local main=board(root,72,0)
-	local _,spin=tuftView(main,64,1)
+	iconImg(main,HERB_IMAGE,66,1)
 	word(main,"=",40,2)
-	iconImg(main,COIN,46,3)
+	iconImg(main,COIN,50,3)
 	local val=word(main,MPP>0 and money(MPP) or "+1",42,4)
 	local vg=Instance.new("UIGradient") vg.Rotation=90 vg.Color=ColorSequence.new(WHITE,Color3.fromRGB(255,228,140)) vg.Parent=val
 	-- ce que contient ton sac : [sac] 12 → +$0.12
@@ -800,7 +784,7 @@ local function addHint(c)
 	local gTx=word(gain,"+$0",28,4,GOLD)
 	local arrow=chevron(root) arrow.Position=UDim2.new(.5,0,1,0)
 	g.Parent=pgui
-	table.insert(hints,{g=g,top=top or hb,spin=spin,gain=gain,gst=gst,gScale=gScale,nTx=nTx,gTx=gTx,arrow=arrow})
+	table.insert(hints,{g=g,top=top or hb,gain=gain,gst=gst,gScale=gScale,nTx=nTx,gTx=gTx,arrow=arrow})
 end
 for _,c in CS:GetTagged("GrassCompost") do task.spawn(addHint,c) end
 CS:GetInstanceAddedSignal("GrassCompost"):Connect(addHint)
@@ -827,7 +811,6 @@ Run.RenderStepped:Connect(function(dt)
 		end
 		-- animations seulement si le panneau est proche (pas de calcul pour rien)
 		if h.g.Enabled and (cam.CFrame.Position-h.top.Position).Magnitude<95 then
-			if h.spin then h.spin(t) end
 			if hasBag then
 				h.arrow.Position=UDim2.new(.5,0,1,-px(math.abs(math.sin(t*4.5))*9))
 				h.gScale.Scale=isFull and 1+.06*math.abs(math.sin(t*5)) or 1

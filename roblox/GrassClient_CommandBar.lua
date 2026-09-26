@@ -1,0 +1,1 @@
+local b=game.ServerStorage:FindFirstChild("AnciensScripts") or Instance.new("Folder",game.ServerStorage) b.Name="AnciensScripts" local p=game.StarterPlayer.StarterPlayerScripts local v=p:FindFirstChild("GrassClient") while v do v.Enabled=false v.Name="GrassClient_ANCIEN" v.Parent=b v=p:FindFirstChild("GrassClient") end workspace.GrassClient.Parent=p print("Installation OK !")
