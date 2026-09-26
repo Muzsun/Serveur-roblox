@@ -654,6 +654,24 @@ nextStage=function()
 	end
 end
 
+-- ===== TEST : finir la zone en cours d'un coup =====
+-- En Play (barre de commande côté Server) : game.ServerStorage.TestFinirZone:Fire()
+local testZone=game:GetService("ServerStorage"):FindFirstChild("TestFinirZone") or Instance.new("BindableEvent")
+testZone.Name="TestFinirZone" testZone.Parent=game:GetService("ServerStorage")
+testZone.Event:Connect(function()
+	local n=0
+	for id,t in tufts do
+		tufts[id]=nil n+=1
+		remotes:SetAttribute("GrassLeft",math.max(0,(remotes:GetAttribute("GrassLeft") or 1)-1))
+		if t.door then remotes:SetAttribute("DoorLeft",math.max(0,(remotes:GetAttribute("DoorLeft") or 1)-1)) end
+		if t.group then local k="Left_"..t.group remotes:SetAttribute(k,math.max(0,(remotes:GetAttribute(k) or 1)-1)) end
+		Picked:FireAllClients(id,nil,t.size,t.r)
+	end
+	stageLeft=0
+	print("[Herbe] TEST : zone terminée ("..n.." touffes)")
+	nextStage()
+end)
+
 -- chaque joueur récupère la liste au démarrage
 GetGrass.OnServerInvoke=function()
 	while not ready do task.wait(.1) end
@@ -1556,6 +1574,12 @@ requestCut=function(id)
 	end)
 end
 remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rarity)
+	if picker==nil then -- test : zone vidée d'un coup, sans effets (pas de lag)
+		data[id]=nil queued[id]=nil predicted[id]=nil scheduled[id]=nil
+		if hovered==id then setHover(nil) end
+		despawnVisual(id)
+		return
+	end
 	if picker==lp then
 		if predicted[id] then predicted[id]=nil return end -- déjà coupée chez nous
 		if scheduled[id] then scheduled[id]="ok" return end -- elle sera coupée quand les lames se ferment

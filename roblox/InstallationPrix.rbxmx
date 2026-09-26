@@ -305,6 +305,24 @@ nextStage=function()
 	end
 end
 
+-- ===== TEST : finir la zone en cours d'un coup =====
+-- En Play (barre de commande côté Server) : game.ServerStorage.TestFinirZone:Fire()
+local testZone=game:GetService("ServerStorage"):FindFirstChild("TestFinirZone") or Instance.new("BindableEvent")
+testZone.Name="TestFinirZone" testZone.Parent=game:GetService("ServerStorage")
+testZone.Event:Connect(function()
+	local n=0
+	for id,t in tufts do
+		tufts[id]=nil n+=1
+		remotes:SetAttribute("GrassLeft",math.max(0,(remotes:GetAttribute("GrassLeft") or 1)-1))
+		if t.door then remotes:SetAttribute("DoorLeft",math.max(0,(remotes:GetAttribute("DoorLeft") or 1)-1)) end
+		if t.group then local k="Left_"..t.group remotes:SetAttribute(k,math.max(0,(remotes:GetAttribute(k) or 1)-1)) end
+		Picked:FireAllClients(id,nil,t.size,t.r)
+	end
+	stageLeft=0
+	print("[Herbe] TEST : zone terminée ("..n.." touffes)")
+	nextStage()
+end)
+
 -- chaque joueur récupère la liste au démarrage
 GetGrass.OnServerInvoke=function()
 	while not ready do task.wait(.1) end

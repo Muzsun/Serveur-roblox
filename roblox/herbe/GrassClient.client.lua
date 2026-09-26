@@ -793,6 +793,12 @@ requestCut=function(id)
 	end)
 end
 remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rarity)
+	if picker==nil then -- test : zone vidée d'un coup, sans effets (pas de lag)
+		data[id]=nil queued[id]=nil predicted[id]=nil scheduled[id]=nil
+		if hovered==id then setHover(nil) end
+		despawnVisual(id)
+		return
+	end
 	if picker==lp then
 		if predicted[id] then predicted[id]=nil return end -- déjà coupée chez nous
 		if scheduled[id] then scheduled[id]="ok" return end -- elle sera coupée quand les lames se ferment
