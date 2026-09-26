@@ -1435,6 +1435,71 @@ local function slash(center,w)
 	end)
 end
 -- petit chaume coupé qui reste au sol quelques secondes
+-- ===== débroussailleuse : l'herbe est broyée et projetée (pas coupée net) =====
+local function holdsTrimmer(plr)
+	local ch=plr and plr.Character
+	local t=ch and ch:FindFirstChildOfClass("Tool")
+	return t~=nil and (CS:HasTag(t,"OutilDebroussailleuse") or t.Name=="Debroussailleuse")
+end
+-- brins hachés projetés dans le sens de rotation de la tête (+ un peu de terre)
+local function shred(pos,col,dir,n,rarityCol)
+	local side=dir:Cross(Vector3.new(0,1,0)).Unit
+	local bits={}
+	for i=1,n do
+		local dirt=i<=math.floor(n/6)
+		local p=fxPart("Part")
+		if dirt then
+			local d=math.random(8,15)/100 p.Size=Vector3.new(d,d,d) p.Color=DIRT[math.random(1,3)]
+		else
+			p.Size=Vector3.new(.05,.05,math.random(14,32)/100)
+			if rarityCol=="rainbow" then p.Color=Color3.fromHSV(math.random(),.7,1)
+			elseif rarityCol then p.Color=rarityCol
+			else p.Color=col:Lerp(Color3.fromRGB(150+math.random(0,60),220,90),math.random()*.5) end
+		end
+		p.CFrame=CFrame.new(pos+Vector3.new((math.random()-.5)*.3,(math.random()-.2)*.25,(math.random()-.5)*.3)) p.Parent=fx
+		-- projetés sur le côté (rotation du fil) et vers l'avant, assez bas
+		local v=side*math.random(50,120)/10+dir*math.random(10,50)/10+Vector3.new((math.random()-.5)*3,math.random(20,55)/10,(math.random()-.5)*3)
+		bits[i]={p=p,v=v,r=Vector3.new(math.random(-25,25),math.random(-25,25),math.random(-25,25)),s=p.Size}
+	end
+	task.spawn(function()
+		tween(.55,function(a)
+			local t=a*.55
+			for _,b in bits do
+				b.p.CFrame=CFrame.new(pos+b.v*t*(1-.35*a)+Vector3.new(0,-24*t*t,0))*CFrame.Angles(b.r.X*t,b.r.Y*t,b.r.Z*t)
+				if a>.5 then b.p.Size=b.s*math.max(1-(a-.5)/.5,.01) end
+			end
+		end)
+		for _,b in bits do b.p:Destroy() end
+	end)
+end
+-- petit nuage vert (poussière d'herbe hachée)
+local function greenDust(pos,col)
+	for i=1,4 do
+		local a=i/4*math.pi*2+math.random()*.6
+		local p=fxPart("Part",Enum.PartType.Ball)
+		p.Size=Vector3.new(.3,.3,.3) p.Color=col:Lerp(Color3.fromRGB(200,230,150),.5) p.Transparency=.45
+		p.CFrame=CFrame.new(pos) p.Parent=fx
+		local dir=Vector3.new(math.cos(a),.5,math.sin(a))
+		task.spawn(function()
+			tween(.45,function(t)
+				local e=outQuad(t)
+				p.CFrame=CFrame.new(pos+dir*.9*e)
+				local s=.3+.9*e p.Size=Vector3.new(s,s,s) p.Transparency=.45+.55*t
+			end)
+			p:Destroy()
+		end)
+	end
+end
+local lastTrim=0
+local function trimSound(pos)
+	if os.clock()-lastTrim<.09 then return end -- 6 à 10 touffes d'un coup : un seul bruit
+	lastTrim=os.clock()
+	local id=(CFG.PICK_SOUND and CFG.PICK_SOUND~="") and CFG.PICK_SOUND or SNIP_SOUND
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local s=Instance.new("Sound") s.SoundId=id s.Volume=.45 s.PlaybackSpeed=1.35+math.random()*.2 s.RollOffMaxDistance=60 s.Parent=at
+	s:Play() game:GetService("Debris"):AddItem(at,3)
+end
+
 local function stubble(cf,w,h,col)
 	local m=Instance.new("Model") m.Name="Chaume"
 	local parts={}
@@ -1513,6 +1578,34 @@ local function cutVisual(id,picker,size,rarity)
 	local cutPos=P.Position+Vector3.new(0,cutH,0)
 	local col=leafColor(fake)
 	if mine then gainPopup(cutPos+Vector3.new(0,.8,0),size) end
+	if holdsTrimmer(picker) then
+		-- DÉBROUSSAILLEUSE : le fil hache la touffe, les brins giclent sur le côté, il reste un chaume ras
+		local hrp1=picker.Character and picker.Character:FindFirstChild("HumanoidRootPart")
+		local dir=hrp1 and Vector3.new(P.Position.X-hrp1.Position.X,0,P.Position.Z-hrp1.Position.Z) or Vector3.zero
+		if dir.Magnitude<.1 then local a=math.random()*math.pi*2 dir=Vector3.new(math.cos(a),0,math.sin(a)) end
+		dir=dir.Unit
+		local low=P.Position+Vector3.new(0,cutH*.5,0)
+		trimSound(low)
+		stubble(P,math.min(sz.X,sz.Z),cutH*.6,col)
+		local rc=(rarity=="ArcEnCiel" and "rainbow") or (rarity~="Normal" and K.OUTLINE[rarity]) or nil
+		shred(low+Vector3.new(0,h*.25,0),col,dir,rarity=="Normal" and 16 or 22,rc)
+		greenDust(low+Vector3.new(0,.2,0),col)
+		-- la touffe est déchiquetée : elle tremble, tourne et rétrécit en volant en morceaux
+		local side=dir:Cross(Vector3.new(0,1,0)).Unit
+		local top=P*CFrame.new(0,cutH*.6,0)
+		fake:PivotTo(top)
+		task.spawn(function()
+			local spin=math.random()*6.28
+			tween(.16,function(a)
+				local j=Vector3.new((math.random()-.5)*.12,0,(math.random()-.5)*.12)
+				fake:PivotTo(CFrame.new(top.Position+side*.9*a+Vector3.new(0,.25*a,0)+j)*CFrame.Angles(0,spin+a*9,a*1.2)*top.Rotation)
+				fake:ScaleTo(base*math.max(1-a,.05))
+			end)
+			fake:Destroy()
+			arrived()
+		end)
+		return
+	end
 	-- 1) les lames se referment : "snip"
 	snipSound(cutPos)
 	slash(cutPos,math.max(sz.X,sz.Z))
@@ -1551,7 +1644,7 @@ end
 
 -- ===== pas de délai : l'herbe est coupée chez nous au moment où les lames se ferment =====
 -- (sans attendre la réponse du serveur ; si le serveur refuse, la touffe revient)
-local CLOSE_SCISSORS,CLOSE_SICKLE,CLOSE_TRIMMER=.08,.15,.12 -- secondes entre le clic et le moment où l'outil touche l'herbe
+local CLOSE_SCISSORS,CLOSE_SICKLE,CLOSE_TRIMMER=.08,.15,.2 -- secondes entre le clic et le moment où l'outil touche l'herbe
 local scheduled,predicted={},{}
 local function heldTool() local ch=lp.Character return ch and ch:FindFirstChildOfClass("Tool") end
 local function pendingSize()

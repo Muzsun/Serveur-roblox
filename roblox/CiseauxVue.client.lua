@@ -52,7 +52,7 @@ local RD = REGLAGES.DEBROUSSAILLEUSE
 local axeTube = RD.TUBE.Unit
 local axeHaut = (Vector3.yAxis - axeTube * axeTube:Dot(Vector3.yAxis)).Unit
 local REPERE_DEBROU = CFrame.fromMatrix(RD.POSITION, axeTube, axeHaut, axeTube:Cross(axeHaut))
-local DUREE_COUP_DEBROU = 0.4
+local DUREE_COUP_DEBROU = 0.5
 
 local function estCiseaux(objet)
 	return objet:IsA("Tool") and (CollectionService:HasTag(objet, "OutilCiseaux") or objet.Name == "Ciseaux")
@@ -155,6 +155,8 @@ local function coupe()
 	if maintenant - debutCoupe < math.max(DUREE_COUPE * 0.8, delaiCoupe(joueur) * 0.85) then return end
 	debutCoupe, debutClac = maintenant, maintenant
 	if not faucille then bruitCiseaux(0.7) end -- la faucille a son propre "swoosh" (FaucilleServer)
+	-- débroussailleuse : le moteur accélère tout de suite chez nous (BoutiqueClient)
+	if debrou and outil then outil:SetAttribute("CoupeLocale", maintenant) end
 end
 
 ---------------------------------------------------------------- Ciseaux en main ou pas
@@ -251,13 +253,28 @@ RunService:BindToRenderStep("CiseauxVue", Enum.RenderPriority.Camera.Value + 1, 
 	local inclinaison = CFrame.Angles(-0.5 * s - 0.45 * k, 0, 0.12 * k) -- tourne autour de la vis
 
 	if debrou then
-		-- débroussailleuse : on balaie à droite puis à gauche, la tête près du sol
+		-- débroussailleuse : on arme à droite, on fauche en arc vers la gauche (tête au ras de l'herbe), on revient
 		local d = math.clamp((maintenant - debutCoupe) / DUREE_COUP_DEBROU, 0, 1)
-		local lacet = if d < 1 then -0.42 * math.sin(d * math.pi * 2) else 0
-		local plonge = if d < 1 then math.sin(d * math.pi) else 0
+		local lacet, plonge = 0, 0
+		if d < 1 then
+			if d < 0.22 then
+				local a = adoucir(d / 0.22)
+				lacet, plonge = -0.38 * a, 0.2 * a
+			elseif d < 0.72 then
+				local a = (d - 0.22) / 0.5
+				a = a * a * (3 - 2 * a) -- régulier au milieu du coup
+				lacet, plonge = -0.38 + 0.8 * a, 0.2 + 0.8 * math.sin(a * math.pi)
+			else
+				local a = adoucir((d - 0.72) / 0.28)
+				lacet, plonge = 0.42 * (1 - a), 0.2 * (1 - a)
+			end
+		end
+		-- vibrations du moteur : légères au ralenti, fortes pendant la coupe
+		local vib = (if d < 1 then 0.03 else 0.008) * force
+		local tremble = Vector3.new((math.random() - 0.5) * vib, (math.random() - 0.5) * vib, (math.random() - 0.5) * vib)
 		local poing = camera.CFrame * balade * balancement
-			* CFrame.new(REPERE_DEBROU.Position + Vector3.new(0, -1.2 * s - 0.15 * plonge, 0))
-			* CFrame.Angles(-0.5 * s - 0.08 * plonge, lacet, 0) * REPERE_DEBROU.Rotation
+			* CFrame.new(REPERE_DEBROU.Position + tremble + Vector3.new(0.12 * lacet, -1.2 * s - 0.18 * plonge, -0.1 * plonge))
+			* CFrame.Angles(-0.5 * s - 0.1 * plonge, lacet, -0.12 * lacet) * REPERE_DEBROU.Rotation
 		vueHandle.CFrame = poing * vueDecalage
 		return
 	end

@@ -229,6 +229,20 @@ local function bras(epaule, tangage, lacet, duree)
 	end
 	animerC0(epaule, CFrame.new(origine.Position) * CFrame.Angles(math.rad(tangage), math.rad(lacet), 0) * origine.Rotation, duree)
 end
+-- le buste tourne aussi (R15 : articulation "Waist") pour un vrai geste de fauchage
+local function trouverTaille(perso)
+	local torse = perso:FindFirstChild("UpperTorso")
+	return torse and torse:FindFirstChild("Waist")
+end
+local function buste(taille, lacet, duree)
+	if not (taille and taille:IsA("Motor6D")) then return end
+	local origine = taille:GetAttribute("C0Origine")
+	if not origine then
+		origine = taille.C0
+		taille:SetAttribute("C0Origine", origine)
+	end
+	animerC0(taille, CFrame.new(origine.Position) * CFrame.Angles(0, math.rad(lacet), 0) * origine.Rotation, duree)
+end
 local function delaiCoupe(qui)
 	-- amélioration de vitesse de la débroussailleuse : Rapidité
 	local dex = qui and qui:GetAttribute("Upg_DRapidite") or 0
@@ -247,15 +261,24 @@ local function coup(outil)
 	occupes[outil] = true
 	local epaule = trouverEpaule(perso)
 	local handle = outil:FindFirstChild("Handle")
-	-- balayage : à droite, à gauche, puis on revient
+	-- fauchage : on arme à droite, on fauche en arc vers la gauche au ras du sol, puis on revient
+	-- "EnCoupe" = le moteur accélère (BoutiqueClient : la tête tourne plus vite, l'herbe gicle)
+	local taille = trouverTaille(perso)
 	local son = handle and handle:FindFirstChild("Swoosh")
-	if son then son.PlaybackSpeed = 0.9 + math.random() * 0.2 son:Play() end
-	bras(epaule, -30, -35, 0.1)
-	task.wait(0.1)
-	bras(epaule, -34, 35, 0.16)
-	task.wait(0.17)
-	if outil.Parent == perso then bras(epaule, -22, 0, 0.16) end
-	task.wait(0.04)
+	outil:SetAttribute("EnCoupe", true)
+	bras(epaule, -30, -50, 0.12)
+	buste(taille, -16, 0.12)
+	task.wait(0.12)
+	if son then son.PlaybackSpeed = 1.1 + math.random() * 0.2 son:Play() end
+	bras(epaule, -42, 48, 0.28) -- le coup : la tête passe au ras de l'herbe
+	buste(taille, 18, 0.28)
+	task.wait(0.3)
+	if outil.Parent == perso then
+		bras(epaule, -22, 0, 0.2)
+		buste(taille, 0, 0.2)
+	end
+	task.wait(0.08)
+	outil:SetAttribute("EnCoupe", false)
 	occupes[outil] = nil
 end
 
@@ -267,11 +290,15 @@ local function brancher(outil)
 		bras(trouverEpaule(outil.Parent), -22, 0, 0.2)
 	end)
 	outil.Unequipped:Connect(function()
+		outil:SetAttribute("EnCoupe", false)
 		local joueur = outil:FindFirstAncestorOfClass("Player")
 		local perso = joueur and joueur.Character
 		local epaule = perso and trouverEpaule(perso)
 		local origine = epaule and epaule:GetAttribute("C0Origine")
 		if origine then animerC0(epaule, origine, 0.12) end
+		local taille = perso and trouverTaille(perso)
+		local o2 = taille and taille:GetAttribute("C0Origine")
+		if o2 then animerC0(taille, o2, 0.12) end
 	end)
 	outil.Activated:Connect(function() coup(outil) end)
 end

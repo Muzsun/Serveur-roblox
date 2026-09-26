@@ -227,14 +227,110 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
----------------------------------------------------------------- La tête de la débroussailleuse tourne
+---------------------------------------------------------------- La débroussailleuse : tête qui tourne, moteur qui accélère
+-- Au ralenti la tête tourne doucement. Quand on fauche ("EnCoupe" du serveur, ou tout de suite chez nous),
+-- elle accélère : les fils deviennent un disque flou et l'herbe hachée + un peu de terre giclent devant.
 local CollectionService = game:GetService("CollectionService")
-local VITESSE_TETE = 28 -- tours... en radians par seconde
-RunService.RenderStepped:Connect(function()
-	local a = os.clock() * VITESSE_TETE
+local RALENTI, PLEIN_GAZ = 14, 75 -- vitesse de la tête (radians par seconde)
+local tetes = setmetatable({}, { __mode = "k" }) -- [moteur] = { angle, vitesse, disque, fils, herbe, terre }
+
+local function outilDe(m)
+	local o = m:FindFirstAncestorOfClass("Tool")
+	if o then return o end
+	-- la copie affichée à la 1re personne (CiseauxVue) : c'est notre outil en main
+	local ch = lp.Character
+	return ch and ch:FindFirstChildOfClass("Tool")
+end
+local function enCoupe(o)
+	if not o then return false end
+	if o:GetAttribute("EnCoupe") then return true end
+	local t = o:GetAttribute("CoupeLocale") -- mis par CiseauxVue dès notre clic (pas d'attente du serveur)
+	return t ~= nil and os.clock() - t < 0.5
+end
+local function emetteur(parent, couleurs, taille, vitesse, taux)
+	local e = Instance.new("ParticleEmitter")
+	e.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	e.Color = ColorSequence.new(couleurs[1], couleurs[2])
+	e.Size = NumberSequence.new(taille, taille * 0.4)
+	e.Squash = NumberSequence.new(1.6)
+	e.Orientation = Enum.ParticleOrientation.VelocityParallel
+	e.Lifetime = NumberRange.new(0.3, 0.55)
+	e.Speed = NumberRange.new(vitesse * 0.7, vitesse)
+	e.SpreadAngle = Vector2.new(70, 35)
+	e.Acceleration = Vector3.new(0, -45, 0)
+	e.Drag = 3
+	e.RotSpeed = NumberRange.new(-300, 300)
+	e.LightEmission = 0
+	e.LightInfluence = 1
+	e.Rate = 0
+	e:SetAttribute("Taux", taux)
+	e.Parent = parent
+	return e
+end
+local function preparer(m)
+	local pivot, handle = m.Part1, m.Part0
+	if not (pivot and handle) then return nil end
+	local modele = pivot.Parent
+	-- copie de l'outil (vue 1re personne) : on enlève le disque et les projections copiés, on refait les nôtres
+	for _, d in modele:GetChildren() do if d.Name == "DisqueFlou" then d:Destroy() end end
+	for _, d in handle:GetChildren() do if d.Name == "Projections" then d:Destroy() end end
+	local fils = {}
+	local bobine
+	for _, d in modele:GetChildren() do
+		if d:IsA("BasePart") and d:GetAttribute("Tete") then
+			if d.Name == "Fil" then table.insert(fils, d) elseif d.Name == "Bobine" then bobine = d end
+		end
+	end
+	-- disque flou (les fils qui tournent très vite)
+	local long = fils[1] and fils[1].Size.X or 1
+	local disque = Instance.new("Part")
+	disque.Name = "DisqueFlou"
+	disque.Shape = Enum.PartType.Cylinder
+	disque.Size = Vector3.new(0.03, long, long)
+	disque.Color = Color3.fromRGB(245, 220, 120)
+	disque.Material = Enum.Material.SmoothPlastic
+	disque.Transparency = 1
+	disque.CanCollide, disque.CanTouch, disque.CanQuery, disque.CastShadow = false, false, false, false
+	disque.Massless = true
+	disque.CFrame = (fils[1] and fils[1].CFrame or pivot.CFrame) * CFrame.Angles(0, 0, math.rad(90)) -- à plat, comme les fils
+	local w = Instance.new("Weld")
+	w.Part0, w.Part1 = pivot, disque
+	w.C0 = pivot.CFrame:ToObjectSpace(disque.CFrame)
+	w.Parent = disque
+	disque.Parent = modele
+	-- projections : repère fixe sur l'outil (pas sur la tête qui tourne), dirigé vers l'avant de la tête
+	local at = Instance.new("Attachment")
+	at.Name = "Projections"
+	at.CFrame = m.C0 * CFrame.Angles(0, 0, math.rad(-90))
+	at.Parent = handle
+	local herbe = emetteur(at, { Color3.fromRGB(150, 220, 90), Color3.fromRGB(70, 150, 50) }, 0.3, 22, 150)
+	local terre = emetteur(at, { Color3.fromRGB(122, 90, 58), Color3.fromRGB(86, 60, 36) }, 0.18, 14, 25)
+	local e = { angle = math.random() * 6.28, vitesse = RALENTI, disque = disque, fils = fils, bobine = bobine, herbe = herbe, terre = terre }
+	tetes[m] = e
+	return e
+end
+
+RunService.RenderStepped:Connect(function(dt)
 	for _, m in CollectionService:GetTagged("TeteDebroussailleuse") do
 		-- seulement quand elle est en main (dans le monde), pas dans le sac
-		if m:IsA("Motor6D") and m:IsDescendantOf(workspace) then m.Transform = CFrame.Angles(0, a % (2 * math.pi), 0) end
+		if m:IsA("Motor6D") and m:IsDescendantOf(workspace) then
+			local e = tetes[m] or preparer(m)
+			if e then
+				local coupe = enCoupe(outilDe(m))
+				local cible = coupe and PLEIN_GAZ or RALENTI
+				e.vitesse += (cible - e.vitesse) * math.min(dt * (coupe and 10 or 3), 1) -- ça monte vite, ça redescend doucement
+				e.angle = (e.angle + e.vitesse * dt) % (2 * math.pi)
+				m.Transform = CFrame.Angles(0, e.angle, 0)
+				local k = math.clamp((e.vitesse - RALENTI) / (PLEIN_GAZ - RALENTI), 0, 1) -- 0 = ralenti, 1 = plein gaz
+				local cache = e.bobine and e.bobine.LocalTransparencyModifier or 0 -- caché à la 1re personne (vraie débroussailleuse)
+				e.disque.Transparency = 1 - 0.35 * k
+				e.disque.LocalTransparencyModifier = cache
+				for _, f in e.fils do f.LocalTransparencyModifier = math.max(cache, k > 0.5 and 1 or 0) end
+				local actif = coupe and cache < 1
+				e.herbe.Rate = actif and e.herbe:GetAttribute("Taux") or 0
+				e.terre.Rate = actif and e.terre:GetAttribute("Taux") or 0
+			end
+		end
 	end
 end)
 
