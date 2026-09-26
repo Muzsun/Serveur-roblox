@@ -250,6 +250,45 @@ local function sol(p, depuisY)
 	local hit = workspace:Raycast(origine, -UP * 60, rayParams)
 	return hit and hit.Position or nil
 end
+-- rayon qui traverse les pièces invisibles (murs invisibles...) : seuls les vrais obstacles comptent
+local function rayVisible(origine, direction)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	local liste = rayParams.FilterDescendantsInstances
+	for _ = 1, 8 do
+		params.FilterDescendantsInstances = liste
+		local hit = workspace:Raycast(origine, direction, params)
+		if not hit then return nil end
+		local inst = hit.Instance
+		if inst and inst:IsA("BasePart") and inst.Transparency >= 0.9 then
+			liste = table.clone(liste)
+			table.insert(liste, inst)
+		else
+			return hit
+		end
+	end
+	return nil
+end
+local overlap = OverlapParams.new()
+overlap.FilterType = Enum.RaycastFilterType.Exclude
+-- nombre de pièces visibles autour d'un point (arbres, haies, murs...)
+local function encombre(centre, rayon)
+	overlap.FilterDescendantsInstances = rayParams.FilterDescendantsInstances
+	local n = 0
+	for _, part in workspace:GetPartBoundsInRadius(centre, rayon, overlap) do
+		if part.Transparency < 0.9 then n += 1 end
+	end
+	return n
+end
+-- un endroit libre pour le chiot : rien de solide autour, et visible depuis "depuis"
+local function placeLibre(p, depuis)
+	overlap.FilterDescendantsInstances = rayParams.FilterDescendantsInstances
+	for _, part in workspace:GetPartBoundsInBox(CFrame.new(p + UP * 1.7), Vector3.new(2.4, 2.6, 3.4), overlap) do
+		if part.CanCollide and part.Transparency < 0.9 then return false end
+	end
+	return rayVisible(depuis, (p + UP * 1.5) - depuis) == nil
+end
+
 local function dansUneZone(p)
 	for _, z in zones do
 		local rel = z.CFrame:PointToObjectSpace(p)
@@ -277,13 +316,19 @@ vers = vers.Unit
 
 -- place du chiot : devant le joueur, hors de l'herbe si possible
 local solDepart = sol(depart) or (depart - UP * 3)
-local placeChien = nil
-for _, angle in { 0, 35, -35, 70, -70, 110, -110, 150, -150, 180 } do
-	local dir = CFrame.Angles(0, math.rad(angle), 0):VectorToWorldSpace(vers)
-	local p = sol(depart + dir * 6)
-	if p and math.abs(p.Y - solDepart.Y) < 3 and not dansUneZone(p) then placeChien = p break end
+local placeChien, secours = nil, nil
+for _, dist in { 6, 4.5, 7.5 } do
+	for _, angle in { 0, 35, -35, 70, -70, 110, -110, 150, -150, 180 } do
+		local dir = CFrame.Angles(0, math.rad(angle), 0):VectorToWorldSpace(vers)
+		local p = sol(depart + dir * dist)
+		if p and math.abs(p.Y - solDepart.Y) < 3 and placeLibre(p, depart) then
+			if not dansUneZone(p) then placeChien = p break end
+			secours = secours or p
+		end
+	end
+	if placeChien then break end
 end
-placeChien = placeChien or sol(depart + vers * 6) or (solDepart + vers * 6)
+placeChien = placeChien or secours or sol(depart + vers * 6) or (solDepart + vers * 6)
 local droite = vers:Cross(UP).Unit
 
 ---------------------------------------------------------------- Construction
@@ -471,10 +516,28 @@ flou.Parent = Lighting
 -- caméra qui ne rentre pas dans les murs
 local function camSure(regard, voulu)
 	local d = voulu - regard
-	local hit = workspace:Raycast(regard, d, rayParams)
+	if d.Magnitude < 0.01 then return voulu end
+	local hit = rayVisible(regard, d)
 	if hit then return hit.Position - d.Unit * 0.8 end
 	return voulu
 end
+-- essaie plusieurs angles autour de "centre" et garde la vue la plus dégagée
+local TOUR = { 0, 25, -25, 50, -50, 80, -80, 110, -110, 140, -140, 180 }
+local DEVANT = { 0, 20, -20, 40, -40, 60, -60, 80, -80 }
+local function meilleurAngle(centre, base, distance, dy, angles)
+	local bestDir, bestScore = base, -math.huge
+	for i, ang in angles do
+		local dir = CFrame.Angles(0, math.rad(ang), 0):VectorToWorldSpace(base)
+		local voulu = centre + dir * distance + UP * dy
+		local d = voulu - centre
+		local hit = rayVisible(centre, d)
+		local libre = hit and (hit.Position - centre).Magnitude / d.Magnitude or 1
+		local score = libre * 10 - encombre(voulu, 1.6) * 3 - i * 0.05
+		if score > bestScore then bestDir, bestScore = dir, score end
+	end
+	return bestDir
+end
+local function aPlat(v) local f = Vector3.new(v.X, 0, v.Z) return f.Magnitude > 0.01 and f.Unit or Vector3.new(0, 0, -1) end
 
 local function ease(a) return a < 0.5 and 2 * a * a or 1 - (-2 * a + 2) ^ 2 / 2 end -- doux au début et à la fin
 local function jouer(duree, f)
@@ -489,8 +552,9 @@ end
 
 ---------------------------------------------------------------- LA CINÉMATIQUE
 local sujet = placeChien + UP * 1.4
-local A0 = camSure(sujet, placeChien + droite * 7 + vers * 3.2 + UP * 2.8)
-local A1 = camSure(sujet, placeChien + droite * 4.8 + vers * 2.2 + UP * 2.0)
+local dirA = meilleurAngle(sujet, aPlat(droite * 4.8 + vers * 2.2), 5.3, 0.6, TOUR)
+local A0 = camSure(sujet, sujet + dirA * 7.7 + UP * 1.4)
+local A1 = camSure(sujet, sujet + dirA * 5.3 + UP * 0.6)
 local camCF = CFrame.lookAt(A0, sujet)
 cam.CFrame = camCF
 cam.FieldOfView = 55
@@ -547,6 +611,8 @@ local ok, erreur = pcall(function()
 	local distance = (p1 - p0).Magnitude
 	local hauteur = math.clamp(distance * 0.35, 25, 90)
 	local function vol(u) return p0:Lerp(p1, u) + UP * (4 * hauteur * u * (1 - u)) end
+	local dirVue = meilleurAngle(p1 + UP, aPlat(-vers * 8 + droite * 3), 8.5, 10, TOUR)
+	local vueAtterrissage = camSure(p1 + UP, p1 + UP + dirVue * 8.5 + UP * 10)
 	trail.Enabled = true
 	sonJouer(REGLAGES.SONS.lancer, 0.8, 0.9)
 	local camPos = cam.CFrame.Position
@@ -564,10 +630,11 @@ local ok, erreur = pcall(function()
 			regard = bp:Lerp(p1, math.clamp((a - 0.03) / 0.2, 0, 1) * 0.25)
 		else
 			-- la caméra ralentit et prend de la hauteur pour voir où la balle tombe
-			voulu = p1 + UP * 11 - vers * 8 + droite * 3
+			voulu = vueAtterrissage
 			regard = bp
 		end
 		if a < 0.12 then regard = teteDepart:Lerp(regard, a / 0.12) end -- on quitte le chiot en douceur
+		voulu = camSure(bp, voulu) -- jamais à travers un mur, un toit ou un arbre
 		camPos = camPos:Lerp(voulu, 1 - math.exp(-dt * (a < 0.15 and 6 or 14)))
 		local secousse = a < 0.12 and (Vector3.new(math.random() - 0.5, math.random() - 0.5, 0) * 0.3 * (1 - a / 0.12)) or Vector3.zero
 		cam.CFrame = CFrame.lookAt(camPos + secousse, regard)
@@ -578,8 +645,8 @@ local ok, erreur = pcall(function()
 
 	-- 3) atterrissage dans la dernière zone
 	trail.Enabled = false
-	local vue = camSure(p1 + UP, p1 + UP * 11 - vers * 8 + droite * 3)
-	local vueProche = camSure(p1 + UP, p1 + UP * 8 - vers * 6 + droite * 2.2)
+	local vue = vueAtterrissage
+	local vueProche = camSure(p1 + UP, p1 + UP + dirVue * 6.4 + UP * 7)
 	local camDepart = cam.CFrame.Position
 	local rebonds, colonne = false, false
 	jouer(1.5, function(a, dt)
@@ -631,8 +698,9 @@ local ok2, erreur2 = pcall(function()
 	TS:Create(noir, TweenInfo.new(0.1), { BackgroundTransparency = 0 }):Play()
 	task.wait(0.12)
 	local tete = teteChien()
-	local D0 = camSure(tete, tete + vers * 4.4 + UP * 0.5 + droite * 0.9)
-	local D1 = camSure(tete, tete + vers * 3.6 + UP * 0.35 + droite * 0.6)
+	local dirD = meilleurAngle(tete, aPlat(vers * 4.4 + droite * 0.9), 4.5, 0.5, DEVANT)
+	local D0 = camSure(tete, tete + dirD * 4.5 + UP * 0.5)
+	local D1 = camSure(tete, tete + dirD * 3.7 + UP * 0.35)
 	cam.CFrame = CFrame.lookAt(D0, tete)
 	cam.FieldOfView = 45
 	pose.couTangage = 18 pose.couLacet = 0
@@ -665,13 +733,14 @@ local ok2, erreur2 = pcall(function()
 
 	-- il se retourne vers toi (yeux de chiot) et la caméra revient dans tes yeux
 	local cfDepart = CFrame.lookAt(placeChien, placeChien + vers)
-	local oeil = head.Position + UP * 0.25
+	-- un peu devant ton visage (sinon on verrait l'intérieur de ta tête et de tes accessoires)
+	local oeil = head.Position + UP * 0.25 + aPlat(placeChien - head.Position) * 1.6
 	local teteFixe = placeChien + UP * 2.2
 	local offsetCam = cam.CFrame.Position - teteFixe -- la caméra tourne autour du chiot avec lui : on voit toujours son visage
 	jouer(1.4, function(a, dt)
 		local t = a * 1.4
 		local k = ease(math.min(t / 0.5, 1))
-		local orbite = teteFixe + CFrame.Angles(0, math.pi * k, 0):VectorToWorldSpace(offsetCam)
+		local orbite = camSure(teteFixe, teteFixe + CFrame.Angles(0, math.pi * k, 0):VectorToWorldSpace(offsetCam))
 		local vers_oeil = ease(math.clamp((t - 0.45) / 0.95, 0, 1))
 		pose.cf = cfDepart * CFrame.Angles(0, math.pi * k, 0) -- demi-tour vers le joueur
 		pose.saut = math.sin(math.min(t / 0.5, 1) * math.pi) * 0.4
@@ -749,42 +818,79 @@ task.spawn(function()
 	lp:SetAttribute("IntroEnCours", false)
 end)
 
----------------------------------------------------------------- Le chiot te suit
+---------------------------------------------------------------- Le chiot te suit (sur ton chemin : il ne traverse pas les murs)
 local dernierPerso = nil
+local piste, derniereMarque, bloque = {}, nil, 0
+local function aPlat3(v) return Vector3.new(v.X, 0, v.Z) end
+local function teleporterPres(r)
+	for _, off in { Vector3.new(3, 0, 3.5), Vector3.new(-3, 0, 3.5), Vector3.new(0, 0, 4.5), Vector3.new(3, 0, -2), Vector3.new(-3, 0, -2) } do
+		local p = sol((r.CFrame * CFrame.new(off)).Position, r.Position.Y + 2)
+		if p and placeLibre(p, r.Position) then
+			pose.cf = CFrame.lookAt(p, p + aPlat(r.CFrame.LookVector))
+			piste, derniereMarque, bloque = {}, nil, 0
+			return
+		end
+	end
+	local p = sol(r.Position, r.Position.Y + 2) or (r.Position - UP * 3)
+	pose.cf = CFrame.lookAt(p, p + aPlat(r.CFrame.LookVector))
+	piste, derniereMarque, bloque = {}, nil, 0
+end
 local function suivre(dt)
 	local c = lp.Character
 	local r = c and c:FindFirstChild("HumanoidRootPart")
 	if not r then majChien(dt) return end
 	if c ~= dernierPerso then
+		local reapparition = dernierPerso ~= nil
 		dernierPerso = c
 		exclus[1] = c
 		majExclus({ chienModel, balleModel })
+		if reapparition then teleporterPres(r) end -- après une réapparition, il te rejoint
+	end
+	-- on retient le chemin du joueur
+	if not derniereMarque or aPlat3(r.Position - derniereMarque).Magnitude > 1.5 then
+		table.insert(piste, r.Position)
+		derniereMarque = r.Position
+		if #piste > 80 then table.remove(piste, 1) end
 	end
 	local cur = pose.cf.Position
-	local but = (r.CFrame * CFrame.new(3, 0, 3.5)).Position
-	local vec = Vector3.new(but.X - cur.X, 0, but.Z - cur.Z)
-	local dist = vec.Magnitude
-	if dist > 45 then -- trop loin : il te rattrape d'un coup
-		local p = sol(but, r.Position.Y + 2) or (but - UP * 3)
-		pose.cf = CFrame.lookAt(p, p + r.CFrame.LookVector)
-		return
-	end
-	local vitesse = dist > 2.5 and math.min(dist * 3, 26) or 0
-	local dir = pose.cf.LookVector
-	if vitesse > 0 then
-		local pas = vec.Unit * math.min(vitesse * dt, dist)
-		cur += pas
-		dir = dir:Lerp(vec.Unit, math.min(dt * 10, 1))
+	local distJoueur = aPlat3(r.Position - cur).Magnitude
+	if distJoueur > 50 then teleporterPres(r) majChien(dt) return end
+	local cible = nil
+	if distJoueur > 4.5 then
+		-- s'il te voit sans obstacle (en bas et en haut), il vient directement
+		local bas, haut = cur + UP * 0.7, cur + UP * 1.8
+		if not rayVisible(bas, r.Position - UP * 1.5 - bas) and not rayVisible(haut, r.Position - haut) then
+			cible = r.Position
+			piste = { r.Position }
+		else
+			-- sinon il suit ton chemin, point par point
+			while piste[1] and aPlat3(piste[1] - cur).Magnitude < 1.2 do table.remove(piste, 1) end
+			cible = piste[1]
+		end
 	else
-		local versJoueur = Vector3.new(r.Position.X - cur.X, 0, r.Position.Z - cur.Z)
+		piste = { r.Position } -- il est à côté de toi : il repartira d'ici
+	end
+	local vitesse = 0
+	local dir = pose.cf.LookVector
+	if cible then
+		local vec = aPlat3(cible - cur)
+		if vec.Magnitude > 0.05 then
+			vitesse = math.clamp(distJoueur * 2.2, 8, 26)
+			cur += vec.Unit * math.min(vitesse * dt, vec.Magnitude)
+			dir = dir:Lerp(vec.Unit, math.min(dt * 10, 1))
+		end
+		bloque = 0
+	elseif distJoueur > 8 then
+		bloque += dt
+		if bloque > 1.5 then teleporterPres(r) majChien(dt) return end -- coincé : il te rejoint d'un coup
+	else
+		local versJoueur = aPlat3(r.Position - cur)
 		if versJoueur.Magnitude > 0.1 then dir = dir:Lerp(versJoueur.Unit, math.min(dt * 3, 1)) end
 	end
 	local p = sol(cur, r.Position.Y + 2) or cur -- au niveau du joueur (pas sur les toits)
 	local y = pose.cf.Position.Y + (p.Y - pose.cf.Position.Y) * math.min(dt * 12, 1)
-	local flat = Vector3.new(dir.X, 0, dir.Z)
-	if flat.Magnitude < 0.01 then flat = pose.cf.LookVector end
 	local pos = Vector3.new(cur.X, y, cur.Z)
-	pose.cf = CFrame.lookAt(pos, pos + flat.Unit)
+	pose.cf = CFrame.lookAt(pos, pos + aPlat(dir))
 	pose.marche = pose.marche + ((vitesse > 0 and 1 or 0) - pose.marche) * math.min(dt * 8, 1)
 	pose.pas += dt * (6 + vitesse * 0.5)
 	pose.saut = math.abs(math.sin(pose.pas)) * 0.15 * pose.marche
