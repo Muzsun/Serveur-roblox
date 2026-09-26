@@ -125,7 +125,7 @@ end
 local okCfg, CFG_HERBE = pcall(function() return require(game:GetService("ReplicatedStorage"):WaitForChild("GrassConfig", 10)) end)
 if not okCfg or type(CFG_HERBE) ~= "table" then CFG_HERBE = {} end
 local function delaiCoupe(qui)
-	local dex = (qui and not faucille) and qui:GetAttribute("Upg_Dexterite") or 0 -- la Dextérité ne compte pas pour la faucille
+	local dex = qui and qui:GetAttribute(faucille and "Upg_FRapidite" or "Upg_Dexterite") or 0 -- faucille : Rapidité, ciseaux : Dextérité
 	return math.max(0.2, (CFG_HERBE.PICK_COOLDOWN or 0.9) * (1 - (CFG_HERBE.DEX_PAR_NIVEAU or 0.08) * dex))
 end
 local function coupe()

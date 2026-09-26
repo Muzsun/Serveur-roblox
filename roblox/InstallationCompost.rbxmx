@@ -344,11 +344,26 @@ local function holdingScissors()
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
 	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil)
 end
--- les améliorations (Dextérité, Maintenir, Saisir) ne marchent qu'avec les ciseaux, pas avec la faucille
+-- chaque outil a ses améliorations : ciseaux (Maintenir, Dextérité, Saisir) / faucille (FMaintenir, FRapidite, FCoupe)
 local function holdingRealScissors()
 	local ch=lp.Character
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
 	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+end
+local function holdingSickle()
+	local ch=lp.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	return tool~=nil and (CS:HasTag(tool,"OutilFaucille") or tool.Name=="Faucille")
+end
+local function speedLevel()
+	if holdingRealScissors() then return lp:GetAttribute("Upg_Dexterite") or 0 end
+	if holdingSickle() then return lp:GetAttribute("Upg_FRapidite") or 0 end
+	return 0
+end
+local function canHold()
+	if holdingRealScissors() then return (lp:GetAttribute("Upg_Maintenir") or 0)>=1 end
+	if holdingSickle() then return (lp:GetAttribute("Upg_FMaintenir") or 0)>=1 end
+	return false
 end
 local function setHover(id)
 	hovered=id
@@ -438,7 +453,7 @@ UIS.InputBegan:Connect(function(input,gp)
 		if id then
 			if holdingScissors() then
 				-- pas de spam : on ne peut recouper qu'une fois le délai passé (même délai que le serveur)
-				local dex=holdingRealScissors() and (lp:GetAttribute("Upg_Dexterite") or 0) or 0
+				local dex=speedLevel()
 				local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 				if os.clock()-lastCut>=cd then lastCut=os.clock() snipT=os.clock() requestCut(id) end
 			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
@@ -450,10 +465,10 @@ UIS.InputEnded:Connect(function(input)
 end)
 task.spawn(function()
 	while true do
-		local dex=holdingRealScissors() and (lp:GetAttribute("Upg_Dexterite") or 0) or 0
+		local dex=speedLevel()
 		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 		task.wait(cd+.05)
-		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingRealScissors() and holdingScissors() then
+		if holding and canHold() and holdingScissors() then
 			local hi,ray=holdInput,nil
 			if hi and hi.KeyCode==Enum.KeyCode.ButtonR2 then local c=screenCenter() ray=cam:ViewportPointToRay(c.X,c.Y)
 			elseif hi and hi.UserInputType==Enum.UserInputType.Touch then ray=cam:ScreenPointToRay(hi.Position.X,hi.Position.Y)
@@ -734,7 +749,8 @@ requestCut=function(id)
 	local list={e} room-=(e.size or 1)
 	-- touffes voisines coupées en même temps (faucille, Saisir) : les plus proches d'abord, comme le serveur
 	local extra=(CFG.SCISSORS_EXTRA or 0)+(tool and tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
-	if not sickle then extra+=lp:GetAttribute("Upg_Saisir") or 0 end
+	if holdingRealScissors() then extra+=lp:GetAttribute("Upg_Saisir") or 0 end
+	if holdingSickle() then extra+=lp:GetAttribute("Upg_FCoupe") or 0 end
 	if extra>0 then
 		local radius=math.max(CFG.SCISSORS_RADIUS or 4,tool and tonumber(tool:GetAttribute("RayonCoupe")) or 0)
 		local near={}

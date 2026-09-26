@@ -272,8 +272,10 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	end
 	-- Dextérité : chaque niveau réduit le délai de DEX_PAR_NIVEAU (8 % par défaut)
 	-- les améliorations (Dextérité, Saisir, Maintenir) ne marchent qu'avec les ciseaux
+	-- chaque outil a ses améliorations : ciseaux (Dextérité, Saisir) / faucille (Rapidité, Coupe supplémentaire)
 	local scissors=CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux"
-	local dex=scissors and (plr:GetAttribute("Upg_Dexterite") or 0) or 0
+	local sickle=CS:HasTag(tool,"OutilFaucille") or tool.Name=="Faucille"
+	local dex=scissors and (plr:GetAttribute("Upg_Dexterite") or 0) or sickle and (plr:GetAttribute("Upg_FRapidite") or 0) or 0
 	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 	if lastPick[plr] and now-lastPick[plr]<cd then return end
 	lastPick[plr]=now
@@ -290,7 +292,7 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	local anim=game:GetService("ServerStorage"):FindFirstChild("CiseauxCoupe")
 	if anim then anim:Fire(plr) end
 	-- outil + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
-	local extra=SCISSORS_EXTRA+(scissors and (plr:GetAttribute("Upg_Saisir") or 0) or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	local extra=SCISSORS_EXTRA+(scissors and (plr:GetAttribute("Upg_Saisir") or 0) or 0)+(sickle and (plr:GetAttribute("Upg_FCoupe") or 0) or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
 	local radius=math.max(SCISSORS_RADIUS,tonumber(tool:GetAttribute("RayonCoupe")) or 0)
 	if extra>0 then
 		local near={}
@@ -314,6 +316,10 @@ local UPGRADES={
 	Maintenir={prices={1.10},max=1},                      -- rester appuyé = coupe en continu avec les ciseaux
 	Dexterite={prices={0.60,0.90,1.35,2.00,3.00},max=5},  -- les ciseaux coupent plus vite
 	Saisir={prices={0.85,1.90},max=2},                    -- +1 touffe voisine coupée en même temps par niveau
+	-- FAUCILLE (il faut l'avoir achetée pour acheter ses améliorations)
+	FMaintenir={prices={3.50},max=1,requires="Faucille"},                     -- rester appuyé = fauche en continu
+	FRapidite={prices={2.00,3.00,4.50,6.50,9.00},max=5,requires="Faucille"},  -- la faucille frappe plus vite
+	FCoupe={prices={3.00,5.00,8.00},max=3,requires="Faucille"},               -- +1 touffe coupée à chaque coup par niveau
 }
 local GROWTH=1.5 -- seulement si un niveau n'a pas de prix dans la liste
 local function cost(u,lvl)
@@ -338,6 +344,7 @@ BuyUpgrade.OnServerEvent:Connect(function(plr,uid)
 	local now=os.clock() if lastBuy[plr] and now-lastBuy[plr]<.3 then return end lastBuy[plr]=now
 	local lvl=plr:GetAttribute("Upg_"..uid) or 0
 	if lvl>=u.max then return end
+	if u.requires and not plr:GetAttribute(u.requires) then return end -- ex : acheter la faucille d'abord
 	local c=cost(u,lvl)
 	local m=moneyStat(plr) if not m or (tonumber(m.Value) or 0)<c then return end
 	m.Value=math.floor(((tonumber(m.Value) or 0)-c)*100+.5)/100

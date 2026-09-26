@@ -11,8 +11,14 @@ local TS=game:GetService("TweenService")
 local UIS=game:GetService("UserInputService")
 local Lighting=game:GetService("Lighting")
 local StarterGui=game:GetService("StarterGui")
+local GuiService=game:GetService("GuiService")
 local player=Players.LocalPlayer
 local cam=workspace.CurrentCamera
+
+-- plateformes : téléphone / tablette (pas de clavier) et manette (PlayStation / Xbox)
+local TOUCH=UIS.TouchEnabled and not UIS.KeyboardEnabled
+local PADS={[Enum.UserInputType.Gamepad1]=true,[Enum.UserInputType.Gamepad2]=true,[Enum.UserInputType.Gamepad3]=true,[Enum.UserInputType.Gamepad4]=true}
+local function usingGamepad() return PADS[UIS:GetLastInputType()]==true end
 
 -- ================= À COMPLÉTER =================
 local BAG_ICON="rbxassetid://113918337226531"
@@ -24,12 +30,21 @@ local MONEY_STAT=""     -- nom de ta monnaie dans leaderstats ("" = auto : Money
 -- Le prix et le niveau max viennent de GrassServer (UPGRADES) ; ceux d'ici servent si le serveur ne répond pas.
 local OUTILS={
 	{name="Ciseaux",icon="rbxassetid://98821470151953",color=Color3.fromRGB(255,120,110),items={
-		{id="Maintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=1.25,max=1,
+		{id="Maintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=1.10,max=1,
 			desc="Reste appuyé sur le clic pour couper en continu là où tu vises."},
-		{id="Dexterite",name="Dextérité",icon="rbxassetid://78716197209384",price=0.75,max=5,
-			desc="Tes ciseaux coupent plus vite : -15 % d'attente par niveau."},
-		{id="Saisir",name="Saisir",icon="rbxassetid://120921144181867",price=1.00,max=5,
+		{id="Dexterite",name="Dextérité",icon="rbxassetid://78716197209384",price=0.60,max=5,
+			desc="Tes ciseaux coupent un peu plus vite : -8 % d'attente par niveau."},
+		{id="Saisir",name="Saisir",icon="rbxassetid://120921144181867",price=0.85,max=2,
 			desc="Chaque coup coupe aussi une touffe voisine de plus par niveau."},
+	}},
+	-- requires = il faut posséder l'outil (attribut du joueur) pour acheter ses améliorations
+	{name="Faucille",icon="rbxassetid://138905055767473",color=Color3.fromRGB(120,190,255),requires="Faucille",items={
+		{id="FMaintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=3.50,max=1,
+			desc="Reste appuyé sur le clic pour faucher en continu."},
+		{id="FRapidite",name="Rapidité",icon="rbxassetid://78716197209384",price=2.00,max=5,
+			desc="Ta faucille frappe plus vite : -8 % d'attente par niveau."},
+		{id="FCoupe",name="Coupe supplémentaire",icon="rbxassetid://120921144181867",price=3.00,max=3,
+			desc="Chaque coup de faucille coupe une touffe de plus par niveau."},
 	}},
 	{name="Débroussailleuse",locked=true,color=Color3.fromRGB(150,220,110),items={{locked=true},{locked=true},{locked=true}}},
 }
@@ -95,18 +110,29 @@ local buyRemote=RS:FindFirstChild("BuyUpgrade")
 local moneyValue
 local function money() return moneyValue and tonumber(moneyValue.Value) or 0 end
 local function level(it) return player:GetAttribute("Upg_"..it.id) or 0 end
-local function price(it) return (buyRemote and buyRemote:GetAttribute("Price_"..it.id)) or it.price end
+-- prix du prochain niveau : envoyé par GrassServer pour chaque niveau (sinon prix de base × Growth^niveau)
+local function price(it)
+	local exact=buyRemote and buyRemote:GetAttribute("Price_"..it.id.."_"..(level(it)+1))
+	if exact then return exact end
+	local base=(buyRemote and buyRemote:GetAttribute("Price_"..it.id)) or it.price
+	local growth=(buyRemote and buyRemote:GetAttribute("Growth")) or 1.5
+	return math.floor(base*growth^level(it)*100+.5)/100
+end
+local function owned(outil) return not outil.requires or player:GetAttribute(outil.requires)==true end
 local function maxLevel(it) return (buyRemote and buyRemote:GetAttribute("Max_"..it.id)) or it.max end
 local function fmt(v) return string.format("%.2f$",v) end
 
 -- ================= BOUTON BOOSTS (à droite de l'écran) =================
 local SIZE=138
+-- le bouton a son propre écran, dans la zone sûre (encoche des téléphones, bords des télés)
+local boostGui=new("ScreenGui",{Name="BoostsBouton",ResetOnSpawn=false,ZIndexBehavior=Enum.ZIndexBehavior.Sibling,DisplayOrder=9},player:WaitForChild("PlayerGui"))
+pcall(function() boostGui.ScreenInsets=Enum.ScreenInsets.CoreUISafeInsets end)
 local holder=new("Frame",{Name="BoostsHolder",BackgroundTransparency=1,AnchorPoint=Vector2.new(1,.5),
-	Position=UDim2.new(1,-16,.5,0),Size=UDim2.fromOffset(SIZE,SIZE+10)},gui)
+	Position=UDim2.new(1,-16,.5,0),Size=UDim2.fromOffset(SIZE,SIZE+10)},boostGui)
 local fitScale=new("UIScale",{},holder)
 local function fit()
 	local s=math.clamp(cam.ViewportSize.Y/900,.45,1)
-	if UIS.TouchEnabled then s=math.min(s,.6) end
+	if TOUCH then s=math.clamp(s,.45,.6) end
 	fitScale.Scale=s
 end
 fit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(fit)
@@ -120,8 +146,14 @@ corner(discRim,UDim.new(1,0)) stroke(discRim,2,WHITE,.55)
 local icon=new("ImageLabel",{BackgroundTransparency=1,Image=BAG_ICON,ScaleType=Enum.ScaleType.Fit,AnchorPoint=Vector2.new(.5,.5),
 	Position=UDim2.fromScale(.5,.4),Size=UDim2.fromScale(.95,.9),ZIndex=5},button)
 lbl(button,"BOOSTS",UDim2.new(0,-10,1,-34),UDim2.new(1,20,0,34),{font=Enum.Font.LuckiestGuy,align=Enum.TextXAlignment.Center,stroke=4,grad={WHITE,Color3.fromRGB(210,255,190)},z=6})
-new("ImageLabel",{Name="TabKey",BackgroundTransparency=1,Image=TAB_ICON,ScaleType=Enum.ScaleType.Fit,AnchorPoint=Vector2.new(.5,.5),
-	Position=UDim2.fromOffset(8,10),Size=UDim2.fromOffset(60,40),Rotation=-10,ZIndex=8,Visible=not UIS.TouchEnabled},button)
+local tabKey=new("ImageLabel",{Name="TabKey",BackgroundTransparency=1,Image=TAB_ICON,ScaleType=Enum.ScaleType.Fit,AnchorPoint=Vector2.new(.5,.5),
+	Position=UDim2.fromOffset(8,10),Size=UDim2.fromOffset(60,40),Rotation=-10,ZIndex=8,Visible=not TOUCH},button)
+-- manette : icône du bouton Y / Triangle
+local padKey=new("Frame",{Name="PadKey",BackgroundTransparency=1,AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromOffset(12,12),
+	Size=UDim2.fromOffset(44,44),ZIndex=8,Visible=false},button)
+local padImage="" pcall(function() padImage=UIS:GetImageForKeyCode(Enum.KeyCode.ButtonY) end)
+if padImage~="" then new("ImageLabel",{BackgroundTransparency=1,Image=padImage,ScaleType=Enum.ScaleType.Fit,Size=UDim2.fromScale(1,1),ZIndex=8},padKey)
+else lbl(padKey,"Y",UDim2.fromScale(0,0),UDim2.fromScale(1,1),{font=Enum.Font.LuckiestGuy,color=WHITE,stroke=3,align=Enum.TextXAlignment.Center,z=8}) end
 -- pastille "!" quand une amélioration est achetable
 local badge=new("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.88,.12),Size=UDim2.fromOffset(36,36),Visible=false,ZIndex=9},button)
 corner(badge,UDim.new(1,0)) stroke(badge,3)
@@ -139,14 +171,14 @@ button.MouseEnter:Connect(function() hovered=true upd() end)
 button.MouseLeave:Connect(function() hovered=false upd() end)
 
 -- ================= FOND =================
-local backdrop=new("TextButton",{Name="Backdrop",Text="",AutoButtonColor=false,Size=UDim2.fromScale(1,1),
+local backdrop=new("TextButton",{Name="Backdrop",Text="",AutoButtonColor=false,Size=UDim2.fromScale(1,1),Selectable=false,
 	BackgroundColor3=Color3.fromRGB(6,14,8),BackgroundTransparency=1,Visible=false,ZIndex=20},gui)
 local blur=new("BlurEffect",{Name="InventoryBlur",Size=0},Lighting)
 
 -- ================= PANNEAU =================
 local panel=new("CanvasGroup",{Name="Panel",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),
 	Size=UDim2.fromScale(.9,.86),BackgroundTransparency=1,GroupTransparency=1,Visible=false,ZIndex=21},gui)
-new("UIAspectRatioConstraint",{AspectRatio=1.7},panel)
+local panelRatio=new("UIAspectRatioConstraint",{AspectRatio=1.7},panel)
 new("UISizeConstraint",{MaxSize=Vector2.new(1180,700)},panel)
 local pScale=new("UIScale",{},panel)
 local card=new("Frame",{Name="Card",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.new(1,-16,1,-16)},panel)
@@ -200,8 +232,9 @@ close.MouseLeave:Connect(function() TS:Create(closeScale,TweenInfo.new(.12),{Sca
 -- titres des colonnes
 lbl(card,"OUTILS",UDim2.fromScale(.03,.165),UDim2.fromScale(.26,.05),{color=WHITE,transp=.15,z=3})
 local pageTitle=lbl(card,"",UDim2.fromScale(.32,.165),UDim2.fromScale(.6,.05),{color=WHITE,transp=.15,z=3})
-lbl(card,"Clique sur un prix pour acheter   •   TAB pour fermer",UDim2.fromScale(.32,.915),UDim2.fromScale(.65,.045),
+local aide=lbl(card,"",UDim2.fromScale(.32,.915),UDim2.fromScale(.65,.045),
 	{color=WHITE,transp=.4,align=Enum.TextXAlignment.Center,z=3})
+local descs={} -- descriptions (cachées sur les petits écrans pour rester lisible)
 
 local tabsFrame=new("Frame",{BackgroundTransparency=1,Position=UDim2.fromScale(.03,.225),Size=UDim2.fromScale(.265,.68)},card)
 new("UIListLayout",{Padding=UDim.new(.04,0),SortOrder=Enum.SortOrder.LayoutOrder},tabsFrame)
@@ -244,7 +277,8 @@ local function makeRow(page,outil,item,i)
 	end
 	-- textes
 	lbl(row,item.locked and "???" or item.name,UDim2.fromScale(.19,.1),UDim2.fromScale(.4,.3),{z=4})
-	lbl(row,item.locked and "Bientôt disponible" or item.desc or "",UDim2.fromScale(.19,.42),UDim2.fromScale(.5,.26),{z=4,color=GRAY_TEXT,wrap=true})
+	local descLbl=lbl(row,item.locked and "Bientôt disponible" or item.desc or "",UDim2.fromScale(.19,.42),UDim2.fromScale(.5,.26),{z=4,color=GRAY_TEXT,wrap=true})
+	table.insert(descs,descLbl)
 	-- niveau
 	local pips,lv={},nil
 	if not item.locked then
@@ -260,6 +294,7 @@ local function makeRow(page,outil,item,i)
 	-- bouton d'achat en relief
 	local buy=new("TextButton",{Text="",AutoButtonColor=false,AnchorPoint=Vector2.new(1,.5),Position=UDim2.fromScale(.975,.5),
 		Size=UDim2.fromScale(.26,.62),BackgroundTransparency=1,ZIndex=4},row)
+	buy:SetAttribute("UpgradeId",item.id or "") -- repère pour le tutoriel
 	local base=new("Frame",{Position=UDim2.fromScale(0,.12),Size=UDim2.fromScale(1,.88),ZIndex=4},buy)
 	corner(base,UDim.new(.35,0)) stroke(base,3)
 	local baseGrad=gradient(base,{WHITE,WHITE})
@@ -272,7 +307,7 @@ local function makeRow(page,outil,item,i)
 	local buyText=lbl(face,"",UDim2.fromScale(.08,.12),UDim2.fromScale(.84,.76),{font=Enum.Font.LuckiestGuy,color=WHITE,align=Enum.TextXAlignment.Center,z=7})
 	local buyStroke=stroke(buyText,2.5,INK,0,true)
 	local buyScale=new("UIScale",{},buy)
-	local r={row=row,stroke=st,scale=sc,item=item,outil=outil,pips=pips,lv=lv,buy=buy,face=face,faceGrad=faceGrad,
+	local r={row=row,stroke=st,scale=sc,item=item,outil=outil,pips=pips,lv=lv,buy=buy,face=face,faceGrad=faceGrad,desc=descLbl,
 		baseGrad=baseGrad,buyText=buyText,buyStroke=buyStroke,buyScale=buyScale,lastLevel=item.locked and 0 or level(item)}
 	table.insert(rows,r)
 
@@ -280,10 +315,10 @@ local function makeRow(page,outil,item,i)
 	buy.MouseLeave:Connect(function() TS:Create(buyScale,TweenInfo.new(.12),{Scale=1}):Play() face.Position=UDim2.fromScale(0,0) end)
 	buy.MouseButton1Down:Connect(function() face.Position=UDim2.fromScale(0,.1) end)
 	buy.MouseButton1Up:Connect(function() face.Position=UDim2.fromScale(0,0) end)
-	buy.MouseButton1Click:Connect(function()
+	buy.Activated:Connect(function()
 		playClick()
 		if item.locked or level(item)>=maxLevel(item) then return end
-		if money()<price(item) then
+		if not owned(outil) or money()<price(item) then
 			-- pas assez d'argent : le bouton tremble
 			local p0=buy.Position
 			for k=1,4 do
@@ -321,7 +356,7 @@ for i,outil in ipairs(OUTILS) do
 	lbl(t,outil.name,UDim2.fromScale(.42,.14),UDim2.fromScale(.54,.4),{z=4,color=WHITE,stroke=2.5})
 	local sub=lbl(t,"",UDim2.fromScale(.42,.58),UDim2.fromScale(.54,.26),{z=4,color=WHITE,transp=.15})
 	tabs[i]={btn=t,stroke=st,grad=grad,scale=sc,sub=sub,outil=outil}
-	t.MouseButton1Click:Connect(function() playClick() selectOutil(i) end)
+	t.Activated:Connect(function() playClick() selectOutil(i) end)
 	t.MouseEnter:Connect(function() if current~=i then TS:Create(sc,TweenInfo.new(.12),{Scale=1.04}):Play() end end)
 	t.MouseLeave:Connect(function() if current~=i then TS:Create(sc,TweenInfo.new(.12),{Scale=1}):Play() end end)
 	-- page des améliorations de cet outil
@@ -335,7 +370,7 @@ end
 local function affordable()
 	for _,r in rows do
 		local it=r.item
-		if not it.locked and level(it)<maxLevel(it) and money()>=price(it) then return true end
+		if not it.locked and owned(r.outil) and level(it)<maxLevel(it) and money()>=price(it) then return true end
 	end
 	return false
 end
@@ -347,11 +382,18 @@ local function refresh()
 		local it=r.item
 		if it.locked then
 			buyStyle(r,"gray") r.buyText.Text="BIENTÔT"
+			r.buy:SetAttribute("Achetable",false)
 		else
 			local l,mx=level(it),maxLevel(it)
+			r.buy:SetAttribute("Achetable",l<mx and money()>=price(it)) -- utilisé par le tutoriel
 			for p,pip in r.pips do pip.frame.BackgroundColor3=p<=l and r.outil.color or EMPTY_PIP end
 			r.lv.Text=l>=mx and "MAX" or ("NIV "..l.."/"..mx)
-			if l>=mx then buyStyle(r,"gold") r.buyText.Text="MAX"
+			r.desc.Text=owned(r.outil) and (it.desc or "") or ("Achète d'abord la "..r.outil.name:lower().." à l'établi !")
+			if not owned(r.outil) then
+				-- outil pas encore acheté : améliorations bloquées
+				buyStyle(r,"gray") r.buyText.Text="BLOQUÉ"
+				r.buy:SetAttribute("Achetable",false)
+			elseif l>=mx then buyStyle(r,"gold") r.buyText.Text="MAX"
 			else
 				buyStyle(r,money()>=price(it) and "green" or "gray")
 				r.buyText.Text=fmt(price(it))
@@ -371,6 +413,7 @@ local function refresh()
 	end
 	for _,t in tabs do
 		if t.outil.locked then t.sub.Text="Bientôt"
+		elseif not owned(t.outil) then t.sub.Text="À acheter"
 		else
 			local total,maxi=0,0
 			for _,it in t.outil.items do if not it.locked then total+=level(it) maxi+=maxLevel(it) end end
@@ -407,7 +450,7 @@ selectOutil=function(i)
 	end
 end
 
-player.AttributeChanged:Connect(function(a) if a:sub(1,4)=="Upg_" then refresh() end end)
+player.AttributeChanged:Connect(function(a) if a:sub(1,4)=="Upg_" or a=="Faucille" then refresh() end end)
 task.spawn(function()
 	buyRemote=buyRemote or RS:WaitForChild("BuyUpgrade",20)
 	if buyRemote then buyRemote.AttributeChanged:Connect(refresh) refresh() end
@@ -424,6 +467,33 @@ task.spawn(function()
 end)
 selectOutil(1)
 refresh()
+
+-- ================= ADAPTATION À L'APPAREIL =================
+local function adapter()
+	local pad=usingGamepad()
+	tabKey.Visible=not TOUCH and not pad
+	padKey.Visible=pad
+	aide.Text=pad and "A (Croix) : acheter   •   B (Rond) : fermer"
+		or TOUCH and "Touche un prix pour acheter"
+		or "Clique sur un prix pour acheter   •   TAB pour fermer"
+	-- petit écran (téléphone) : panneau plus grand et sans descriptions
+	local small=cam.ViewportSize.Y<520
+	panel.Size=small and UDim2.fromScale(.98,.96) or UDim2.fromScale(.9,.86)
+	panelRatio.AspectRatio=small and 1.9 or 1.7
+	for _,d in descs do d.Visible=not small end
+end
+adapter()
+UIS.LastInputTypeChanged:Connect(adapter)
+cam:GetPropertyChangedSignal("ViewportSize"):Connect(adapter)
+
+-- manette : sélectionne le premier bouton utile du menu
+local function selectionManette()
+	if not usingGamepad() then return end
+	for _,r in rows do
+		if r.outil==OUTILS[current] and not r.item.locked then GuiService.SelectedObject=r.buy return end
+	end
+	GuiService.SelectedObject=tabs[current].btn
+end
 
 -- ================= OUVERTURE / FERMETURE =================
 local busy=false
@@ -448,7 +518,9 @@ local function setOpen(v)
 		TS:Create(rIcon,TweenInfo.new(.6,Enum.EasingStyle.Elastic,Enum.EasingDirection.Out),{Rotation=-12}):Play()
 		local t=TS:Create(pScale,TweenInfo.new(.42,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Scale=1})
 		t:Play() t.Completed:Wait()
+		selectionManette()
 	else
+		if GuiService.SelectedObject and GuiService.SelectedObject:IsDescendantOf(gui) then GuiService.SelectedObject=nil end
 		TS:Create(backdrop,TweenInfo.new(.2),{BackgroundTransparency=1}):Play()
 		TS:Create(blur,TweenInfo.new(.2),{Size=0}):Play()
 		TS:Create(panel,TweenInfo.new(.2),{GroupTransparency=1,Position=UDim2.new(.5,0,.5,40)}):Play()
@@ -460,13 +532,16 @@ local function setOpen(v)
 	busy=false
 end
 
-button.MouseButton1Click:Connect(function() playClick() setOpen(not open) end)
-close.MouseButton1Click:Connect(function() playClick() setOpen(false) end)
+button.Activated:Connect(function() playClick() setOpen(not open) end)
+close.Activated:Connect(function() playClick() setOpen(false) end)
 backdrop.MouseButton1Click:Connect(function() setOpen(false) end)
 -- Tab est aussi utilisé par Roblox (liste des joueurs) : on ne tient pas compte de "gp",
 -- on ignore seulement quand le joueur écrit dans le chat / une zone de texte.
+-- Manette : Y / Triangle ouvre ou ferme, B / Rond ferme.
 UIS.InputBegan:Connect(function(input)
-	if input.KeyCode==Enum.KeyCode.Tab and not UIS:GetFocusedTextBox() then setOpen(not open) end
+	if UIS:GetFocusedTextBox() then return end
+	if input.KeyCode==Enum.KeyCode.Tab or input.KeyCode==Enum.KeyCode.ButtonY then setOpen(not open)
+	elseif input.KeyCode==Enum.KeyCode.ButtonB and open then setOpen(false) end
 end)
 ]]></ProtectedString></Properties></Item><Item class="Script" referent="RBX2"><Properties><string name="Name">GrassServer</string><ProtectedString name="Source"><![CDATA[-- GrassServer (Script dans ServerScriptService)
 -- ANTI-LAG : le serveur ne crée AUCUNE pièce d'herbe. Il garde seulement la liste des touffes
@@ -539,13 +614,15 @@ local lastPick,lastFull,lastDep={},{},{}
 Players.PlayerRemoving:Connect(function(p) lastPick[p]=nil lastFull[p]=nil lastDep[p]=nil end)
 local function hrpOf(plr) return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") end
 
--- ===== ciseaux : on ne peut couper l'herbe qu'avec les ciseaux en main =====
+-- ===== outils de coupe : on ne peut couper l'herbe qu'avec un outil en main (ciseaux, faucille...) =====
 local SCISSORS_EXTRA=CFG.SCISSORS_EXTRA or 0   -- touffes voisines coupées en plus à chaque coup (0 = une par une)
 local SCISSORS_RADIUS=CFG.SCISSORS_RADIUS or 4 -- rayon autour de la touffe visée (studs)
-local function holdsScissors(plr)
+-- un outil peut couper plus : attributs "CoupeEnPlus" (touffes en plus) et "RayonCoupe" (studs) sur l'outil
+local function cutterTool(plr)
 	local ch=plr.Character
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
-	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+	if tool and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil) then return tool end
+	return nil
 end
 
 -- ===== composteur =====
@@ -728,7 +805,8 @@ end
 PickRequest.OnServerEvent:Connect(function(plr,id)
 	if typeof(id)~="number" then return end
 	local t=tufts[id] if not t then return end
-	if not holdsScissors(plr) then return end -- plus d'arrachage à la main
+	local tool=cutterTool(plr)
+	if not tool then return end -- plus d'arrachage à la main
 	local hrp=hrpOf(plr)
 	if not hrp or (hrp.Position-t.p).Magnitude>CFG.CLICK_DIST+8 then return end
 	local now=os.clock()
@@ -737,8 +815,13 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 		if not lastFull[plr] or now-lastFull[plr]>.4 then lastFull[plr]=now BagFull:FireClient(plr,id,t.size,max-bag) end
 		return
 	end
-	-- Dextérité : chaque niveau réduit le délai de 15%
-	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-.15*(plr:GetAttribute("Upg_Dexterite") or 0)))
+	-- Dextérité : chaque niveau réduit le délai de DEX_PAR_NIVEAU (8 % par défaut)
+	-- les améliorations (Dextérité, Saisir, Maintenir) ne marchent qu'avec les ciseaux
+	-- chaque outil a ses améliorations : ciseaux (Dextérité, Saisir) / faucille (Rapidité, Coupe supplémentaire)
+	local scissors=CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux"
+	local sickle=CS:HasTag(tool,"OutilFaucille") or tool.Name=="Faucille"
+	local dex=scissors and (plr:GetAttribute("Upg_Dexterite") or 0) or sickle and (plr:GetAttribute("Upg_FRapidite") or 0) or 0
+	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 	if lastPick[plr] and now-lastPick[plr]<cd then return end
 	lastPick[plr]=now
 	local function take(tid,tt)
@@ -753,13 +836,14 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	-- animation de coupe des ciseaux (script CiseauxServer)
 	local anim=game:GetService("ServerStorage"):FindFirstChild("CiseauxCoupe")
 	if anim then anim:Fire(plr) end
-	-- Ciseaux + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
-	local extra=SCISSORS_EXTRA+(plr:GetAttribute("Upg_Saisir") or 0)
+	-- outil + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
+	local extra=SCISSORS_EXTRA+(scissors and (plr:GetAttribute("Upg_Saisir") or 0) or 0)+(sickle and (plr:GetAttribute("Upg_FCoupe") or 0) or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	local radius=math.max(SCISSORS_RADIUS,tonumber(tool:GetAttribute("RayonCoupe")) or 0)
 	if extra>0 then
 		local near={}
 		for id2,t2 in tufts do
 			local d=(t2.p-t.p).Magnitude
-			if d<=SCISSORS_RADIUS then table.insert(near,{id2,t2,d}) end
+			if d<=radius then table.insert(near,{id2,t2,d}) end
 		end
 		table.sort(near,function(a,b) return a[3]<b[3] end)
 		local got=0
@@ -773,10 +857,20 @@ end)
 -- ===== AMÉLIORATIONS (menu TAB) =====
 -- Les prix et niveaux max d'ici sont envoyés au menu InventoryUI (ce sont eux qui comptent).
 local UPGRADES={
-	Maintenir={price=1.25,max=1},  -- rester appuyé = coupe en continu avec les ciseaux
-	Dexterite={price=0.75,max=5},  -- les ciseaux coupent plus vite (-15% de délai par niveau)
-	Saisir={price=1.00,max=5},     -- +1 touffe voisine coupée en même temps par niveau
+-- prices = prix de chaque niveau (niveau 1, niveau 2, ...)
+	Maintenir={prices={1.10},max=1},                      -- rester appuyé = coupe en continu avec les ciseaux
+	Dexterite={prices={0.60,0.90,1.35,2.00,3.00},max=5},  -- les ciseaux coupent plus vite
+	Saisir={prices={0.85,1.90},max=2},                    -- +1 touffe voisine coupée en même temps par niveau
+	-- FAUCILLE (il faut l'avoir achetée pour acheter ses améliorations)
+	FMaintenir={prices={3.50},max=1,requires="Faucille"},                     -- rester appuyé = fauche en continu
+	FRapidite={prices={2.00,3.00,4.50,6.50,9.00},max=5,requires="Faucille"},  -- la faucille frappe plus vite
+	FCoupe={prices={3.00,5.00,8.00},max=3,requires="Faucille"},               -- +1 touffe coupée à chaque coup par niveau
 }
+local GROWTH=1.5 -- seulement si un niveau n'a pas de prix dans la liste
+local function cost(u,lvl)
+	if u.prices[lvl+1] then return u.prices[lvl+1] end
+	return math.floor(u.prices[#u.prices]*GROWTH^(lvl+1-#u.prices)*100+.5)/100
+end
 local function applyUpgrades(plr)
 	plr:SetAttribute("BagMax",CFG.BAG_CAPACITY)
 end
@@ -784,15 +878,21 @@ Players.PlayerAdded:Connect(function(p) task.wait(1) applyUpgrades(p) end)
 for _,p in Players:GetPlayers() do task.spawn(applyUpgrades,p) end
 local BuyUpgrade=RS:FindFirstChild("BuyUpgrade") or Instance.new("RemoteEvent")
 BuyUpgrade.Name="BuyUpgrade" BuyUpgrade.Parent=RS
-for uid,u in UPGRADES do BuyUpgrade:SetAttribute("Price_"..uid,u.price) BuyUpgrade:SetAttribute("Max_"..uid,u.max) end
+for uid,u in UPGRADES do
+	BuyUpgrade:SetAttribute("Price_"..uid,cost(u,0)) BuyUpgrade:SetAttribute("Max_"..uid,u.max)
+	for lvl=0,u.max-1 do BuyUpgrade:SetAttribute("Price_"..uid.."_"..(lvl+1),cost(u,lvl)) end -- prix de chaque niveau pour le menu
+end
+BuyUpgrade:SetAttribute("Growth",GROWTH)
 local lastBuy={}
 BuyUpgrade.OnServerEvent:Connect(function(plr,uid)
 	local u=typeof(uid)=="string" and UPGRADES[uid] if not u then return end
 	local now=os.clock() if lastBuy[plr] and now-lastBuy[plr]<.3 then return end lastBuy[plr]=now
 	local lvl=plr:GetAttribute("Upg_"..uid) or 0
 	if lvl>=u.max then return end
-	local m=moneyStat(plr) if not m or (tonumber(m.Value) or 0)<u.price then return end
-	m.Value=math.floor(((tonumber(m.Value) or 0)-u.price)*100+.5)/100
+	if u.requires and not plr:GetAttribute(u.requires) then return end -- ex : acheter la faucille d'abord
+	local c=cost(u,lvl)
+	local m=moneyStat(plr) if not m or (tonumber(m.Value) or 0)<c then return end
+	m.Value=math.floor(((tonumber(m.Value) or 0)-c)*100+.5)/100
 	plr:SetAttribute("Upg_"..uid,lvl+1)
 	applyUpgrades(plr)
 end)
@@ -814,6 +914,15 @@ local K=require(RS:WaitForChild("GrassKit"))
 local remotes=RS:WaitForChild("GrassRemotes")
 local cam=workspace.CurrentCamera
 local pgui=lp:WaitForChild("PlayerGui")
+
+-- ===== plateformes =====
+-- TOUCH = téléphone / tablette (pas de clavier) ; manette = PlayStation / Xbox (ou manette sur PC)
+local TOUCH=UIS.TouchEnabled and not UIS.KeyboardEnabled
+local PADS={[Enum.UserInputType.Gamepad1]=true,[Enum.UserInputType.Gamepad2]=true,[Enum.UserInputType.Gamepad3]=true,[Enum.UserInputType.Gamepad4]=true}
+local function usingGamepad() return PADS[UIS:GetLastInputType()]==true end
+local function screenCenter() local v=cam.ViewportSize return Vector2.new(v.X/2,v.Y/2) end
+local BB=TOUCH and .7 or 1 -- taille des bulles dans le monde (plus petites sur téléphone)
+local function safeInsets(g) pcall(function() g.ScreenInsets=Enum.ScreenInsets.CoreUISafeInsets end) end
 
 local BAG_IMAGE="rbxassetid://124953051791395"
 local RENDER=CFG.RENDER_DIST or 120
@@ -857,17 +966,17 @@ end
 local function fmt(g) if g==math.floor(g) then return tostring(g) end return string.format("%.2f",g) end
 
 -- ===== interface du sac (en bas à gauche, sans animation) =====
-local gui=Instance.new("ScreenGui") gui.Name="GrassBagGui" gui.ResetOnSpawn=false gui.IgnoreGuiInset=true
+local gui=Instance.new("ScreenGui") gui.Name="GrassBagGui" gui.ResetOnSpawn=false safeInsets(gui)
 gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling gui.Parent=pgui
 
 local root=Instance.new("Frame") root.Name="Sac" root.AnchorPoint=Vector2.new(0,1)
-root.Position=UIS.TouchEnabled and UDim2.new(0,10,1,-10) or UDim2.new(0,16,1,-16)
+root.Position=UDim2.new(0,16,1,-16)
 root.Size=UDim2.fromOffset(150,172) root.BackgroundTransparency=1 root.Parent=gui
 local uiScale=Instance.new("UIScale") uiScale.Parent=root
 -- plus petit, et encore réduit sur téléphone / tablette
 local function rescale()
 	local s=math.clamp(cam.ViewportSize.Y/950,.4,1)
-	if UIS.TouchEnabled then s*=.8 end
+	if TOUCH then s=math.max(s*.8,.45) end
 	uiScale.Scale=s
 end
 rescale() cam:GetPropertyChangedSignal("ViewportSize"):Connect(rescale)
@@ -979,17 +1088,28 @@ shown=realBag() refresh()
 
 -- ===== argent (en bas à droite) =====
 local COIN="rbxassetid://103593634628600"
-local mRoot=Instance.new("Frame") mRoot.Name="Argent" mRoot.AnchorPoint=Vector2.new(1,1)
-mRoot.Position=UDim2.new(1,-18,1,-14) mRoot.Size=UDim2.fromOffset(230,70) mRoot.BackgroundTransparency=1 mRoot.Parent=gui
+-- (placé juste au-dessus du sac, en bas à gauche)
+local mRoot=Instance.new("Frame") mRoot.Name="Argent" mRoot.AnchorPoint=Vector2.new(0,1)
+mRoot.Size=UDim2.fromOffset(230,70) mRoot.BackgroundTransparency=1 mRoot.Parent=gui
 local mScale=Instance.new("UIScale") mScale.Parent=mRoot
-local function mFit() local s=math.clamp(cam.ViewportSize.Y/950,.45,1) if UIS.TouchEnabled then s=math.min(s,.6) end mScale.Scale=s end
-mFit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(mFit)
+local function mFit()
+	local s=math.clamp(cam.ViewportSize.Y/950,.45,1) if TOUCH then s=math.clamp(s,.45,.6) end mScale.Scale=s
+	if TOUCH then
+		-- téléphone / tablette : en haut à gauche (le joystick est en bas à gauche)
+		mRoot.AnchorPoint=Vector2.new(0,0) mRoot.Position=UDim2.fromOffset(10,6)
+		root.AnchorPoint=Vector2.new(0,0) root.Position=UDim2.fromOffset(10,6+70*s+2)
+	else
+		root.AnchorPoint=Vector2.new(0,1) root.Position=UDim2.new(0,16,1,-16)
+		mRoot.AnchorPoint=Vector2.new(0,1) mRoot.Position=UDim2.new(0,16,1,-(16+172*uiScale.Scale+4))
+	end
+end
+mFit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(mFit) uiScale:GetPropertyChangedSignal("Scale"):Connect(mFit)
 local mIcon=Instance.new("ImageLabel") mIcon.BackgroundTransparency=1 mIcon.Image=COIN mIcon.ScaleType=Enum.ScaleType.Fit
-mIcon.AnchorPoint=Vector2.new(1,.5) mIcon.Position=UDim2.fromScale(1,.5) mIcon.Size=UDim2.fromOffset(70,70) mIcon.ZIndex=3 mIcon.Parent=mRoot
+mIcon.AnchorPoint=Vector2.new(0,.5) mIcon.Position=UDim2.fromScale(0,.5) mIcon.Size=UDim2.fromOffset(70,70) mIcon.ZIndex=3 mIcon.Parent=mRoot
 local mPop=Instance.new("UIScale") mPop.Parent=mIcon
-local mText=Instance.new("TextLabel") mText.BackgroundTransparency=1 mText.AnchorPoint=Vector2.new(1,.5)
-mText.Position=UDim2.new(1,-76,.5,0) mText.Size=UDim2.fromOffset(160,54) mText.Font=Enum.Font.LuckiestGuy
-mText.TextScaled=true mText.TextXAlignment=Enum.TextXAlignment.Right mText.Text="$0.00" mText.TextColor3=WHITE mText.ZIndex=3 mText.Parent=mRoot
+local mText=Instance.new("TextLabel") mText.BackgroundTransparency=1 mText.AnchorPoint=Vector2.new(0,.5)
+mText.Position=UDim2.new(0,76,.5,0) mText.Size=UDim2.fromOffset(160,54) mText.Font=Enum.Font.LuckiestGuy
+mText.TextScaled=true mText.TextXAlignment=Enum.TextXAlignment.Left mText.Text="$0.00" mText.TextColor3=WHITE mText.ZIndex=3 mText.Parent=mRoot
 local mst=stroke(mText,4,Color3.fromRGB(26,22,28)) mst.LineJoinMode=Enum.LineJoinMode.Round
 local mg=Instance.new("UIGradient") mg.Rotation=90 mg.Color=ColorSequence.new(WHITE,Color3.fromRGB(255,228,140)) mg.Parent=mText
 local mTextPop=Instance.new("UIScale") mTextPop.Parent=mText
@@ -1120,7 +1240,28 @@ local function holdingScissors()
 	if lp:GetAttribute("MenuOuvert") then return false end
 	local ch=lp.Character
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil)
+end
+-- chaque outil a ses améliorations : ciseaux (Maintenir, Dextérité, Saisir) / faucille (FMaintenir, FRapidite, FCoupe)
+local function holdingRealScissors()
+	local ch=lp.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
 	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+end
+local function holdingSickle()
+	local ch=lp.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	return tool~=nil and (CS:HasTag(tool,"OutilFaucille") or tool.Name=="Faucille")
+end
+local function speedLevel()
+	if holdingRealScissors() then return lp:GetAttribute("Upg_Dexterite") or 0 end
+	if holdingSickle() then return lp:GetAttribute("Upg_FRapidite") or 0 end
+	return 0
+end
+local function canHold()
+	if holdingRealScissors() then return (lp:GetAttribute("Upg_Maintenir") or 0)>=1 end
+	if holdingSickle() then return (lp:GetAttribute("Upg_FMaintenir") or 0)>=1 end
+	return false
 end
 local function setHover(id)
 	hovered=id
@@ -1135,7 +1276,7 @@ local curGui=Instance.new("ScreenGui") curGui.Name="CurseurCiseaux" curGui.Reset
 curGui.IgnoreGuiInset=true curGui.DisplayOrder=100 curGui.Parent=pgui
 local cursor=Instance.new("Frame") cursor.Name="Ciseaux" cursor.AnchorPoint=Vector2.new(.5,.5)
 cursor.Size=UDim2.fromOffset(44,44) cursor.BackgroundTransparency=1 cursor.Visible=false cursor.Parent=curGui
-local TAILLE_CURSEUR=1  -- taille du curseur ciseaux (0.8 = plus petit, 1.2 = plus grand)
+local TAILLE_CURSEUR=0.7  -- taille du curseur ciseaux (0.8 = plus petit, 1.2 = plus grand)
 local cScale=Instance.new("UIScale") cScale.Scale=TAILLE_CURSEUR cScale.Parent=cursor
 local OPEN=27           -- ouverture des lames (degrés)
 local branches,tinted={},{}
@@ -1163,10 +1304,10 @@ end
 drawScissors(Color3.new(0,0,0),2,.55) -- ombre douce
 drawScissors(WHITE,0,0)
 local cursorShown,savedMouseIcon=false,true
-local function updateCursor(m)
+local function updateCursor(m,pad)
 	-- visible seulement quand on vise de l'herbe (et un court instant après la coupe pour le clic-clac)
 	local e=hovered and visible[hovered] and data[hovered]
-	local show=UIS.MouseEnabled and holdingScissors() and (e~=nil or os.clock()-snipT<.2)
+	local show=(UIS.MouseEnabled or pad) and holdingScissors() and (e~=nil or os.clock()-snipT<.2)
 	if show~=cursorShown then
 		cursorShown=show cursor.Visible=show
 		if show then savedMouseIcon=UIS.MouseIconEnabled UIS.MouseIconEnabled=false
@@ -1183,41 +1324,55 @@ local function updateCursor(m)
 	for _,b in branches do b.h.Rotation=b.s*ang end
 end
 Run.RenderStepped:Connect(function()
-	local m=UIS:GetMouseLocation()
-	if UIS.MouseEnabled then
+	-- manette : on vise au centre de l'écran ; souris : là où est la souris
+	local pad=usingGamepad()
+	local m=pad and screenCenter() or UIS:GetMouseLocation()
+	if UIS.MouseEnabled or pad then
 		local id=holdingScissors() and idFromRay(cam:ViewportPointToRay(m.X,m.Y)) or nil
 		if id~=hovered then setHover(id) end
-	end
-	updateCursor(m)
+	elseif hovered then setHover(nil) end
+	updateCursor(m,pad)
 end)
 -- clic avec les ciseaux = coupe l'herbe visée ; amélioration "Maintenir" = rester appuyé coupe en continu là où tu vises
 local holding,holdInput=false,nil
 local lastHint=0
+local requestCut -- (défini plus bas) : demande la coupe + coupe tout de suite chez nous quand les lames se ferment
+local lastCut=-math.huge
 UIS.InputBegan:Connect(function(input,gp)
-	if gp then return end
 	local t=input.UserInputType
-	if t==Enum.UserInputType.MouseButton1 or t==Enum.UserInputType.Touch then
+	local pad=input.KeyCode==Enum.KeyCode.ButtonR2 -- gâchette droite (PlayStation R2 / Xbox RT)
+	if (gp and not pad) or UIS:GetFocusedTextBox() or lp:GetAttribute("MenuOuvert") then return end
+	if t==Enum.UserInputType.MouseButton1 or t==Enum.UserInputType.Touch or pad then
 		holding=true holdInput=input
-		local id=idFromRay(cam:ScreenPointToRay(input.Position.X,input.Position.Y))
+		local ray
+		if pad then local c=screenCenter() ray=cam:ViewportPointToRay(c.X,c.Y)
+		else ray=cam:ScreenPointToRay(input.Position.X,input.Position.Y) end
+		local id=idFromRay(ray)
 		if id then
-			if holdingScissors() then snipT=os.clock() remotes.PickRequest:FireServer(id)
+			if holdingScissors() then
+				-- pas de spam : on ne peut recouper qu'une fois le délai passé (même délai que le serveur)
+				local dex=speedLevel()
+				local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
+				if os.clock()-lastCut>=cd then lastCut=os.clock() snipT=os.clock() requestCut(id) end
 			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
 		end
 	end
 end)
 UIS.InputEnded:Connect(function(input)
-	if input==holdInput or input.UserInputType==Enum.UserInputType.MouseButton1 then holding=false holdInput=nil end
+	if input==holdInput or input.UserInputType==Enum.UserInputType.MouseButton1 or input.KeyCode==Enum.KeyCode.ButtonR2 then holding=false holdInput=nil end
 end)
 task.spawn(function()
 	while true do
-		local dex=lp:GetAttribute("Upg_Dexterite") or 0
-		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-.15*dex))
+		local dex=speedLevel()
+		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 		task.wait(cd+.05)
-		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingScissors() then
-			local pos=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and holdInput.Position or UIS:GetMouseLocation()
-			local ray=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and cam:ScreenPointToRay(pos.X,pos.Y) or cam:ViewportPointToRay(pos.X,pos.Y)
+		if holding and canHold() and holdingScissors() then
+			local hi,ray=holdInput,nil
+			if hi and hi.KeyCode==Enum.KeyCode.ButtonR2 then local c=screenCenter() ray=cam:ViewportPointToRay(c.X,c.Y)
+			elseif hi and hi.UserInputType==Enum.UserInputType.Touch then ray=cam:ScreenPointToRay(hi.Position.X,hi.Position.Y)
+			else local m=UIS:GetMouseLocation() ray=cam:ViewportPointToRay(m.X,m.Y) end
 			local id=idFromRay(ray)
-			if id then remotes.PickRequest:FireServer(id) end
+			if id then lastCut=os.clock() requestCut(id) end
 		end
 	end
 end)
@@ -1274,7 +1429,7 @@ end
 
 local function popupAt(pos,text,color)
 	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
-	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(180,90) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
+	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(180*BB,90*BB) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
 	local t=Instance.new("TextLabel") t.Size=UDim2.fromScale(1,1) t.BackgroundTransparency=1
 	t.Text=text t.Font=Enum.Font.FredokaOne t.TextScaled=true t.TextColor3=color t.Parent=g
 	local st=stroke(t,3,Color3.fromRGB(20,40,12))
@@ -1382,8 +1537,31 @@ local function stubble(cf,w,h,col)
 	end)
 end
 
+-- "+1" / "+5"... en blanc qui vient vers le joueur
+local function gainPopup(pos,n)
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(90*BB,44*BB) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
+	local t=Instance.new("TextLabel") t.Size=UDim2.fromScale(1,1) t.BackgroundTransparency=1 t.Text="+"..n
+	t.Font=Enum.Font.FredokaOne t.TextScaled=true t.TextColor3=WHITE t.Parent=g
+	local st=stroke(t,2,Color3.fromRGB(20,24,20)) st.Transparency=.3
+	local sc=Instance.new("UIScale") sc.Parent=t
+	g.Parent=pgui
+	task.spawn(function()
+		tween(.15,function(a) sc.Scale=.4+.8*outQuad(a) end) -- petit "pop"
+		local p0=at.WorldPosition
+		tween(.55,function(a)
+			local ch=lp.Character local hrp=ch and ch:FindFirstChild("HumanoidRootPart")
+			local tgt=hrp and hrp.Position+Vector3.new(0,1.5,0) or p0+Vector3.new(0,2,0)
+			at.WorldPosition=p0:Lerp(tgt,a*a)
+			sc.Scale=1.2-.5*a
+			local f=math.clamp((a-.6)/.4,0,1) t.TextTransparency=f st.Transparency=.3+.7*f
+		end)
+		g:Destroy() at:Destroy()
+	end)
+end
+
 -- ===== coupe d'une touffe =====
-remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rarity)
+local function cutVisual(id,picker,size,rarity)
 	size=size or 1
 	rarity=rarity or "Normal"
 	local mine=picker==lp
@@ -1394,7 +1572,6 @@ remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rar
 	if mine then
 		snipT=os.clock() -- le curseur fait clic-clac
 		pendingPicks+=1
-		if RARITY_TEXT[rarity] then showBanner(rarity,size) end
 	end
 	local function arrived()
 		if not mine then return end
@@ -1412,6 +1589,7 @@ remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rar
 	local cutH=math.clamp(h*.18,.12,.4)          -- hauteur de la coupe
 	local cutPos=P.Position+Vector3.new(0,cutH,0)
 	local col=leafColor(fake)
+	if mine then gainPopup(cutPos+Vector3.new(0,.8,0),size) end
 	-- 1) les lames se referment : "snip"
 	snipSound(cutPos)
 	slash(cutPos,math.max(sz.X,sz.Z))
@@ -1446,6 +1624,81 @@ remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rar
 		fake:Destroy()
 		arrived()
 	end)
+end
+
+-- ===== pas de délai : l'herbe est coupée chez nous au moment où les lames se ferment =====
+-- (sans attendre la réponse du serveur ; si le serveur refuse, la touffe revient)
+local CLOSE_SCISSORS,CLOSE_SICKLE=.08,.15 -- secondes entre le clic et les lames qui se ferment
+local scheduled,predicted={},{}
+local function heldTool() local ch=lp.Character return ch and ch:FindFirstChildOfClass("Tool") end
+local function pendingSize()
+	local n=0
+	for _,e in scheduled do n+=e.size or 1 end
+	for _,v in predicted do n+=v.e.size or 1 end
+	return n
+end
+requestCut=function(id)
+	remotes.PickRequest:FireServer(id)
+	local e=data[id] if not e then return end
+	local tool=heldTool()
+	local sickle=tool~=nil and not holdingRealScissors()
+	local room=maxBag()-realBag()-pendingSize()
+	if (e.size or 1)>room then return end -- sac plein : le serveur répondra
+	local list={e} room-=(e.size or 1)
+	-- touffes voisines coupées en même temps (faucille, Saisir) : les plus proches d'abord, comme le serveur
+	local extra=(CFG.SCISSORS_EXTRA or 0)+(tool and tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	if holdingRealScissors() then extra+=lp:GetAttribute("Upg_Saisir") or 0 end
+	if holdingSickle() then extra+=lp:GetAttribute("Upg_FCoupe") or 0 end
+	if extra>0 then
+		local radius=math.max(CFG.SCISSORS_RADIUS or 4,tool and tonumber(tool:GetAttribute("RayonCoupe")) or 0)
+		local near={}
+		for id2,e2 in data do
+			if id2~=id and not scheduled[id2] and not predicted[id2] then
+				local d=(e2.p-e.p).Magnitude
+				if d<=radius then table.insert(near,{e2,d}) end
+			end
+		end
+		table.sort(near,function(a,b) return a[2]<b[2] end)
+		for _,n in near do
+			if #list>extra then break end
+			if (n[1].size or 1)<=room then table.insert(list,n[1]) room-=(n[1].size or 1) end
+		end
+	end
+	for _,x in list do scheduled[x.id]=x end
+	task.delay(sickle and CLOSE_SICKLE or CLOSE_SCISSORS,function()
+		for _,x in list do
+			local st=scheduled[x.id] scheduled[x.id]=nil
+			if st and data[x.id] then
+				if st~="ok" then predicted[x.id]={e=x,t=os.clock()} end
+				cutVisual(x.id,lp,x.size,x.r)
+			end
+		end
+	end)
+end
+remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rarity)
+	if picker==lp then
+		if predicted[id] then predicted[id]=nil return end -- déjà coupée chez nous
+		if scheduled[id] then scheduled[id]="ok" return end -- elle sera coupée quand les lames se ferment
+	else
+		predicted[id]=nil
+		if scheduled[id] then scheduled[id]=nil end
+	end
+	cutVisual(id,picker,size,rarity)
+end)
+-- le serveur n'a pas confirmé (trop loin, trop tôt...) : la touffe revient
+task.spawn(function()
+	while true do
+		task.wait(.5)
+		local now=os.clock()
+		for id,v in predicted do
+			if now-v.t>2.5 then
+				predicted[id]=nil
+				gone[id]=nil
+				data[id]=v.e
+				sync()
+			end
+		end
+	end
 end)
 
 -- ===== pas assez de place =====
@@ -1457,34 +1710,134 @@ remotes:WaitForChild("BagFull").OnClientEvent:Connect(function(id,size,free)
 	end
 end)
 
--- ===== composteur : indication + vidage =====
-local hints={}
-local function addHint(c)
-	local hb=c:WaitForChild("GrassDepositHitbox",15) if not hb then return end
-	local g=Instance.new("BillboardGui") g.Name="CompostHint" g.Adornee=hb g.Size=UDim2.fromOffset(240,64)
-	g.AlwaysOnTop=true g.MaxDistance=90 g.LightInfluence=0 g.ResetOnSpawn=false g.Enabled=false
-	g.StudsOffsetWorldSpace=Vector3.new(0,hb.Size.Y/2+1.6,0)
-	local pill=Instance.new("Frame") pill.Size=UDim2.fromScale(1,1) pill.BackgroundColor3=Color3.fromRGB(34,58,24) pill.BackgroundTransparency=.08 pill.Parent=g
-	corner(pill,UDim.new(0,18)) stroke(pill,3,WHITE,true)
-	local im=Instance.new("ImageLabel") im.BackgroundTransparency=1 im.Image=BAG_IMAGE im.ScaleType=Enum.ScaleType.Fit
-	im.Size=UDim2.fromOffset(48,48) im.Position=UDim2.fromOffset(8,8) im.Parent=pill
-	local tx=Instance.new("TextLabel") tx.BackgroundTransparency=1 tx.Position=UDim2.fromOffset(62,10) tx.Size=UDim2.new(1,-72,1,-20)
-	tx.Font=Enum.Font.FredokaOne tx.TextScaled=true tx.TextColor3=WHITE tx.Text="VIDE TON SAC ICI ⬇" tx.Parent=pill
-	stroke(tx,2,Color3.fromRGB(18,38,10))
-	g.Parent=pgui
-	table.insert(hints,{g=g,tx=tx})
+-- ===== composteur : panneau "1 herbe = $" + vidage =====
+-- Au-dessus du composteur : image d'herbe = pièce + prix d'une herbe.
+-- Quand le sac n'est pas vide : 2e petit panneau "sac 12 → +$0.12" et une flèche qui rebondit.
+local MPP=CFG.MONEY_PER_PLACE or 0
+local HERB_IMAGE="rbxassetid://90182525256912"
+local INK=Color3.fromRGB(26,22,28)
+local WOOD_A,WOOD_B,WOOD_DARK=Color3.fromRGB(170,114,64),Color3.fromRGB(122,78,42),Color3.fromRGB(72,44,22)
+local function money(v) if v>=1 and v==math.floor(v) then return "$"..v end return string.format("$%.2f",v) end
+local function px(n) return math.floor(n*BB+.5) end
+local function board(parent,h,y)
+	local f=Instance.new("Frame") f.AnchorPoint=Vector2.new(.5,0) f.Position=UDim2.new(.5,0,0,px(y))
+	f.Size=UDim2.fromOffset(0,px(h)) f.AutomaticSize=Enum.AutomaticSize.X f.BackgroundColor3=WHITE f.BorderSizePixel=0 f.Parent=parent
+	corner(f,UDim.new(0,px(14)))
+	local gr=Instance.new("UIGradient") gr.Rotation=90 gr.Parent=f -- reflet clair en haut, plus foncé en bas
+	gr.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(206,150,94)),ColorSequenceKeypoint.new(.14,WOOD_A),ColorSequenceKeypoint.new(1,WOOD_B)})
+	local st=stroke(f,px(4),WOOD_DARK,true)
+	local pad=Instance.new("UIPadding") pad.PaddingLeft=UDim.new(0,px(9)) pad.PaddingRight=UDim.new(0,px(9)) pad.Parent=f
+	local l=Instance.new("UIListLayout") l.FillDirection=Enum.FillDirection.Horizontal l.VerticalAlignment=Enum.VerticalAlignment.Center
+	l.HorizontalAlignment=Enum.HorizontalAlignment.Center l.SortOrder=Enum.SortOrder.LayoutOrder l.Padding=UDim.new(0,px(6)) l.Parent=f
+	-- 2 clous aux bouts (comme une planche clouée)
+	for _,o in {0,99} do
+		local n=Instance.new("Frame") n.Size=UDim2.fromOffset(px(7),px(7)) n.LayoutOrder=o
+		n.BackgroundColor3=Color3.fromRGB(64,62,66) n.BorderSizePixel=0 n.Parent=f corner(n)
+	end
+	return f,st
 end
-for _,c in CS:GetTagged("GrassCompost") do task.spawn(addHint,c) end
+local function word(parent,txt,size,order,color)
+	local t=Instance.new("TextLabel") t.BackgroundTransparency=1 t.Font=Enum.Font.LuckiestGuy t.Text=txt t.TextSize=px(size)
+	t.Size=UDim2.fromOffset(0,px(size+6)) t.AutomaticSize=Enum.AutomaticSize.X t.TextColor3=color or WHITE t.LayoutOrder=order t.Parent=parent
+	local s=stroke(t,px(3.5),INK) s.LineJoinMode=Enum.LineJoinMode.Round
+	return t
+end
+local function iconImg(parent,img,size,order)
+	local i=Instance.new("ImageLabel") i.BackgroundTransparency=1 i.Image=img i.ScaleType=Enum.ScaleType.Fit
+	i.Size=UDim2.fromOffset(px(size),px(size)) i.LayoutOrder=order i.Parent=parent
+	return i
+end
+-- flèche (chevron) dessinée avec 2 barres
+local function chevron(parent)
+	local f=Instance.new("Frame") f.AnchorPoint=Vector2.new(.5,1) f.BackgroundTransparency=1 f.Size=UDim2.fromOffset(px(40),px(30)) f.Parent=parent
+	for _,s in {-1,1} do
+		local b=Instance.new("Frame") b.AnchorPoint=Vector2.new(.5,.5) b.Size=UDim2.fromOffset(px(28),px(10)) b.Rotation=45*-s
+		b.Position=UDim2.new(.5,s*px(8.5),.5,0) b.BackgroundColor3=WHITE b.BorderSizePixel=0 b.Parent=f
+		corner(b) stroke(b,px(3),INK,true)
+	end
+	return f
+end
+
+local hints={}
+-- position du panneau : au-dessus du tas "Compost" (sinon au-dessus du modèle)
+local function hintPos(c)
+	local top=c:FindFirstChild("Compost",true)
+	if top and top:IsA("BasePart") then return top.Position+Vector3.new(0,top.Size.Y/2+2.2,0) end
+	local ok,cf,size=pcall(c.GetBoundingBox,c)
+	if ok and cf and size.Magnitude>.1 then return cf.Position+Vector3.new(0,size.Y/2+.4,0) end
+	return nil
+end
+local function makeHint(c)
+	-- le panneau est accroché à un point invisible (marche même si le modèle charge en retard)
+	local at=Instance.new("Attachment") at.Name="CompostHintPoint" at.Parent=workspace.Terrain
+	local g=Instance.new("BillboardGui") g.Name="CompostHint" g.Adornee=at
+	-- taille fixe dans le monde (en studs) : comme un vrai panneau, il ne grossit pas quand on s'éloigne
+	g.Size=UDim2.fromScale(9,4.9) g.SizeOffset=Vector2.new(0,.5) -- le bas du panneau (la flèche) pointe sur le composteur
+	g.AlwaysOnTop=true g.MaxDistance=120 g.LightInfluence=0 g.ResetOnSpawn=false g.Enabled=false
+	local root=Instance.new("Frame") root.BackgroundTransparency=1 root.AnchorPoint=Vector2.new(.5,.5) root.Position=UDim2.fromScale(.5,.5)
+	root.Size=UDim2.fromOffset(px(360),px(196)) root.Parent=g
+	local rs=Instance.new("UIScale") rs.Parent=root
+	-- panneau principal : [herbe] = [pièce] $0.01
+	local main=board(root,72,0)
+	iconImg(main,HERB_IMAGE,66,1)
+	word(main,"=",40,2)
+	iconImg(main,COIN,50,3)
+	local val=word(main,MPP>0 and money(MPP) or "+1",42,4)
+	local vg=Instance.new("UIGradient") vg.Rotation=90 vg.Color=ColorSequence.new(WHITE,Color3.fromRGB(255,228,140)) vg.Parent=val
+	-- ce que contient ton sac : [sac] 12 → +$0.12
+	local gain,gst=board(root,50,84)
+	local gScale=Instance.new("UIScale") gScale.Parent=gain
+	iconImg(gain,BAG_IMAGE,36,1)
+	local nTx=word(gain,"0",28,2)
+	word(gain,"→",28,3)
+	local gTx=word(gain,"+$0",28,4,GOLD)
+	local arrow=chevron(root) arrow.Position=UDim2.new(.5,0,1,0)
+	g.Parent=pgui
+	table.insert(hints,{c=c,at=at,g=g,rs=rs,gain=gain,gst=gst,gScale=gScale,nTx=nTx,gTx=gTx,arrow=arrow})
+	print("[Herbe] Panneau du composteur créé :",c:GetFullName())
+end
+local function addHint(c)
+	if not c:IsA("Model") then return end
+	for _,h in hints do if h.c==c then return end end
+	local ok,err=pcall(makeHint,c)
+	if not ok then warn("[Herbe] Panneau du composteur : erreur ->",err) end
+end
+-- le serveur marque les composteurs (tag) ; on les cherche aussi nous-mêmes par leur nom
+for _,c in CS:GetTagged("GrassCompost") do addHint(c) end
 CS:GetInstanceAddedSignal("GrassCompost"):Connect(addHint)
+local COMPOST_NAME=CFG.COMPOST_NAME or "Composteur"
+for _,d in workspace:GetDescendants() do if d.Name==COMPOST_NAME then addHint(d) end end
+workspace.DescendantAdded:Connect(function(d) if d.Name==COMPOST_NAME then addHint(d) end end)
+task.delay(20,function() if #hints==0 then warn("[Herbe] Aucun composteur trouvé : le modèle doit s'appeler '"..COMPOST_NAME.."' dans Workspace") end end)
 
 local hintAcc=0
-Run.Heartbeat:Connect(function(dt)
-	hintAcc+=dt if hintAcc<.2 then return end hintAcc=0
-	local isFull=shown>=maxBag()
+Run.RenderStepped:Connect(function(dt)
+	hintAcc+=dt
+	local slow=hintAcc>=.2 if slow then hintAcc=0 end
+	local t=os.clock()
+	local m=maxBag()
+	local isFull=shown>=m
+	local hasBag=shown>0 and not depositing
+	local hide=lp:GetAttribute("IntroEnCours")==true
 	for _,h in hints do
-		h.g.Enabled=shown>0 and not depositing
-		h.tx.Text=isFull and "SAC PLEIN ! VIDE-LE ICI ⬇" or "VIDE TON SAC ICI ⬇"
-		h.tx.TextColor3=isFull and GOLD or WHITE
+		if slow then
+			local pos=h.c.Parent and hintPos(h.c)
+			if pos then h.at.WorldPosition=pos end
+			h.g.Enabled=not hide and pos~=nil
+			h.gain.Visible=hasBag h.arrow.Visible=hasBag
+			if hasBag then
+				h.nTx.Text=tostring(shown)
+				h.gTx.Text=MPP>0 and "+"..money(shown*MPP) or "+"..shown.." 🌿"
+				h.gst.Color=isFull and GOLD or WOOD_DARK
+				h.nTx.TextColor3=isFull and GOLD or WHITE
+			end
+		end
+		if h.g.Enabled then h.rs.Scale=h.g.AbsoluteSize.X/px(360) end
+		-- animations seulement si le panneau est proche (pas de calcul pour rien)
+		if hasBag and h.g.Enabled and (cam.CFrame.Position-h.at.WorldPosition).Magnitude<125 then
+			h.arrow.Position=UDim2.new(.5,0,1,-px(math.abs(math.sin(t*4.5))*9))
+			h.gScale.Scale=isFull and 1+.06*math.abs(math.sin(t*5)) or 1
+		end
 	end
 end)
 
