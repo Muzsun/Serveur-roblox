@@ -12,7 +12,7 @@ local CONFIG = {
 	EQUIPER_AU_SPAWN = true, -- les ciseaux sont directement dans la main au spawn
 	TOURNER_EN_MAIN = 0, -- degrés : tourne les ciseaux dans la main si besoin
 	INCLINAISON_AVANT = 55, -- degrés : penche les pointes vers l'avant (mets -55 si elles penchent vers toi)
-	INCLINAISON_COTE = 15, -- degrés : penche les pointes vers le centre de l'écran (mets -15 si c'est vers l'extérieur)
+	INCLINAISON_COTE = -15, -- degrés : penche les pointes vers le centre (mets 15 si elles partent vers l'extérieur)
 }
 
 local Players = game:GetService("Players")
@@ -30,7 +30,7 @@ local FERMETURE = math.rad(11) -- rotation de chaque lame pour fermer les ciseau
 
 local function construireModele()
 	local S, OFF, V = 0.85, Vector3.new(0.00636, 0.017, -0.01891), Vector3.new
-	local ACIER, FIL, DOS = Color3.fromRGB(188, 194, 203), Color3.fromRGB(242, 244, 247), Color3.fromRGB(120, 126, 136)
+	local ACIER, FIL = Color3.fromRGB(188, 194, 203), Color3.fromRGB(242, 244, 247)
 	local ROUGE, ROUGE_CLAIR = Color3.fromRGB(200, 30, 35), Color3.fromRGB(240, 90, 90)
 	local NOIR, LAITON, FENTE = Color3.fromRGB(38, 40, 46), Color3.fromRGB(201, 162, 72), Color3.fromRGB(60, 48, 22)
 	local METAL, LISSE = Enum.Material.Metal, Enum.Material.SmoothPlastic
@@ -70,11 +70,12 @@ local function construireModele()
 		end
 	end
 
-	local function anneau(parent, nom, cx, cz, y, a, b, d, couleur)
-		for i = 0, 23 do
-			local t1, t2 = math.pi * i / 12, math.pi * (i + 1) / 12
+	-- anneau en 12 segments (version allégée)
+	local function anneau(parent, nom, cx, cz, y, a, b, d, couleur, boule)
+		for i = 0, 11 do
+			local t1, t2 = math.pi * i / 6, math.pi * (i + 1) / 6
 			tube(parent, nom, V(cx + a * math.cos(t1), y, cz + b * math.sin(t1)),
-				V(cx + a * math.cos(t2), y, cz + b * math.sin(t2)), d, couleur)
+				V(cx + a * math.cos(t2), y, cz + b * math.sin(t2)), d, couleur, boule)
 		end
 	end
 
@@ -86,7 +87,6 @@ local function construireModele()
 		piece(lame, "Pointe", V(0.08, 0.3, 1.3), CFrame.fromMatrix(V(1.2, y, s * 0.13), V(0, -s, 0), V(0, 0, s), V(-1, 0, 0)),
 			ACIER, METAL, nil, 0, "WedgePart")
 		piece(lame, "FilDeCoupe", V(1.4, 0.086, 0.06), CFrame.new(0.85, y, s * 0.01), FIL, LISSE, nil, 0.45)
-		piece(lame, "DosLame", V(0.45, 0.084, 0.025), CFrame.new(0.325, y, s * 0.2675), DOS, METAL)
 		piece(lame, "Talon", V(0.08, 0.38, 0.38), CFrame.new(0, y, 0) * HAUT, ACIER, METAL, Enum.PartType.Cylinder)
 		piece(lame, "Tige", V(0.72, 0.08, 0.16), CFrame.new(-0.36, y, 0), ACIER, METAL)
 
@@ -96,10 +96,9 @@ local function construireModele()
 		local p2 = V(cx + ra * math.cos(t0), 0.09, cz + rb * math.sin(t0))
 		tube(poignee, "Manche", p0, p1, 0.19, ROUGE)
 		tube(poignee, "Manche", p1, p2, 0.18, ROUGE)
-		piece(poignee, "MancheJoint", V(0.18, 0.18, 0.18), CFrame.new(p2), ROUGE, LISSE, Enum.PartType.Ball)
 		tube(poignee, "Bague", V(-0.47, 0.09, 0), V(-0.53, 0.09, -s * 0.001), 0.22, ROUGE_CLAIR, false)
 		anneau(poignee, "Anneau", cx, cz, 0.09, ra, rb, 0.17, ROUGE)
-		anneau(poignee, "Grip", cx, cz, 0.09, ra - 0.075, rb - 0.075, 0.1, NOIR)
+		anneau(poignee, "Grip", cx, cz, 0.09, ra - 0.075, rb - 0.075, 0.1, NOIR, false)
 	end
 
 	branche("BranchePouce", 1, 0.13, 0.3, 0.3, -math.rad(12))
