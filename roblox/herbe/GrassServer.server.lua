@@ -267,8 +267,8 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 		if not lastFull[plr] or now-lastFull[plr]>.4 then lastFull[plr]=now BagFull:FireClient(plr,id,t.size,max-bag) end
 		return
 	end
-	-- Dextérité : chaque niveau réduit le délai de 15%
-	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-.15*(plr:GetAttribute("Upg_Dexterite") or 0)))
+	-- Dextérité : chaque niveau réduit le délai de DEX_PAR_NIVEAU (8 % par défaut)
+	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*(plr:GetAttribute("Upg_Dexterite") or 0)))
 	if lastPick[plr] and now-lastPick[plr]<cd then return end
 	lastPick[plr]=now
 	local function take(tid,tt)

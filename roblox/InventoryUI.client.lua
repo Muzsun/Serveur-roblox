@@ -27,7 +27,7 @@ local OUTILS={
 		{id="Maintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=1.25,max=1,
 			desc="Reste appuyé sur le clic pour couper en continu là où tu vises."},
 		{id="Dexterite",name="Dextérité",icon="rbxassetid://78716197209384",price=0.75,max=5,
-			desc="Tes ciseaux coupent plus vite : -15 % d'attente par niveau."},
+			desc="Tes ciseaux coupent un peu plus vite : -8 % d'attente par niveau."},
 		{id="Saisir",name="Saisir",icon="rbxassetid://120921144181867",price=1.00,max=2,
 			desc="Chaque coup coupe aussi une touffe voisine de plus par niveau."},
 	}},

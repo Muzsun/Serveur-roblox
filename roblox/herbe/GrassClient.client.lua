@@ -413,7 +413,7 @@ end)
 task.spawn(function()
 	while true do
 		local dex=lp:GetAttribute("Upg_Dexterite") or 0
-		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-.15*dex))
+		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 		task.wait(cd+.05)
 		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingScissors() then
 			local pos=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and holdInput.Position or UIS:GetMouseLocation()

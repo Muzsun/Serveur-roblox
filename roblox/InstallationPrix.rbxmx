@@ -27,7 +27,7 @@ local OUTILS={
 		{id="Maintenir",name="Maintenir",icon="rbxassetid://71762308286130",price=1.25,max=1,
 			desc="Reste appuyé sur le clic pour couper en continu là où tu vises."},
 		{id="Dexterite",name="Dextérité",icon="rbxassetid://78716197209384",price=0.75,max=5,
-			desc="Tes ciseaux coupent plus vite : -15 % d'attente par niveau."},
+			desc="Tes ciseaux coupent un peu plus vite : -8 % d'attente par niveau."},
 		{id="Saisir",name="Saisir",icon="rbxassetid://120921144181867",price=1.00,max=2,
 			desc="Chaque coup coupe aussi une touffe voisine de plus par niveau."},
 	}},
@@ -742,8 +742,8 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 		if not lastFull[plr] or now-lastFull[plr]>.4 then lastFull[plr]=now BagFull:FireClient(plr,id,t.size,max-bag) end
 		return
 	end
-	-- Dextérité : chaque niveau réduit le délai de 15%
-	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-.15*(plr:GetAttribute("Upg_Dexterite") or 0)))
+	-- Dextérité : chaque niveau réduit le délai de DEX_PAR_NIVEAU (8 % par défaut)
+	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*(plr:GetAttribute("Upg_Dexterite") or 0)))
 	if lastPick[plr] and now-lastPick[plr]<cd then return end
 	lastPick[plr]=now
 	local function take(tid,tt)
@@ -1220,7 +1220,7 @@ end)
 task.spawn(function()
 	while true do
 		local dex=lp:GetAttribute("Upg_Dexterite") or 0
-		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-.15*dex))
+		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 		task.wait(cd+.05)
 		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingScissors() then
 			local pos=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and holdInput.Position or UIS:GetMouseLocation()
