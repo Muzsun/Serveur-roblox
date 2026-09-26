@@ -516,11 +516,11 @@ local function armAnim(steps)
 end
 
 -- ===== coupe aux ciseaux : effets =====
-local SNIP_SOUND="rbxasset://sounds/swordslash.wav" -- son intégré à Roblox (remplacé par PICK_SOUND si tu en mets un)
+local SNIP_SOUND="rbxassetid://135446324303740" -- son de l'herbe coupée (remplacé par PICK_SOUND si tu en mets un)
 local function snipSound(pos)
 	local id=(CFG.PICK_SOUND and CFG.PICK_SOUND~="") and CFG.PICK_SOUND or SNIP_SOUND
 	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
-	local s=Instance.new("Sound") s.SoundId=id s.Volume=.45 s.PlaybackSpeed=1.7+math.random()*.2 s.RollOffMaxDistance=60 s.Parent=at
+	local s=Instance.new("Sound") s.SoundId=id s.Volume=.6 s.PlaybackSpeed=.95+math.random()*.1 s.RollOffMaxDistance=60 s.Parent=at
 	s:Play() game:GetService("Debris"):AddItem(at,3)
 end
 local function leafColor(m)
