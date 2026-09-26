@@ -777,9 +777,9 @@ for ordre, article in ARTICLES do
 		}, modele)
 		creerEtiquette(v)
 		achat.OnClientEvent:Connect(function(quoi, manque) reponse(v, quoi, manque) end)
-		-- E (clavier), bouton (manette / téléphone) : ouvre aussi la fiche
+		-- pas de bulle "E Voir" : on clique directement sur l'outil (ou on appuie dessus sur téléphone)
 		local function brancher(p)
-			if p:IsA("ProximityPrompt") then p.Triggered:Connect(function() ouvrir(v) end) end
+			if p:IsA("ProximityPrompt") then p.Enabled = false end
 		end
 		for _, p in base:GetChildren() do brancher(p) end
 		base.ChildAdded:Connect(brancher)
