@@ -1,5 +1,10 @@
 -- GrassClient (LocalScript dans StarterPlayerScripts)
 -- ANTI-LAG : n'affiche que les touffes proches du joueur, construites petit à petit.
+if not game:GetService("RunService"):IsClient() then
+	warn("[Herbe] GrassClient doit être un LocalScript dans StarterPlayer > StarterPlayerScripts (pas un Script) !")
+	return
+end
+print("[Herbe] GrassClient démarré")
 local Players=game:GetService("Players")
 local RS=game:GetService("ReplicatedStorage")
 local Run=game:GetService("RunService")

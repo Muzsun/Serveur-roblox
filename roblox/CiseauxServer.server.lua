@@ -2,6 +2,12 @@
 -- Donne les ciseaux à chaque joueur dès le spawn (déjà en main) + animations de tenue et de coupe.
 -- La coupe de l'herbe elle-même est faite par GrassServer, uniquement avec les ciseaux en main.
 
+if not game:GetService("RunService"):IsServer() then
+	warn("[Ciseaux] CiseauxServer doit être un Script dans ServerScriptService (pas un LocalScript) !")
+	return
+end
+print("[Ciseaux] CiseauxServer démarré")
+
 local CONFIG = {
 	EQUIPER_AU_SPAWN = true, -- les ciseaux sont directement dans la main au spawn
 	TOURNER_EN_MAIN = 0, -- degrés : tourne les ciseaux dans la main si besoin

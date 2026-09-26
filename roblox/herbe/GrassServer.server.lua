@@ -1,6 +1,11 @@
 -- GrassServer (Script dans ServerScriptService)
 -- ANTI-LAG : le serveur ne crée AUCUNE pièce d'herbe. Il garde seulement la liste des touffes
 -- (position, taille, rareté). Chaque joueur affiche lui-même les touffes proches de lui.
+if not game:GetService("RunService"):IsServer() then
+	warn("[Herbe] GrassServer doit être un Script dans ServerScriptService (pas un LocalScript) !")
+	return
+end
+print("[Herbe] GrassServer démarré")
 local CS=game:GetService("CollectionService")
 local Players=game:GetService("Players")
 local RS=game:GetService("ReplicatedStorage")
