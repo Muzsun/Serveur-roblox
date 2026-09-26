@@ -1,4 +1,4 @@
--- CiseauxVue (LocalScript dans StarterPlayer > StarterPlayerScripts)
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="LocalScript" referent="RBX0"><Properties><string name="Name">CiseauxVue</string><ProtectedString name="Source"><![CDATA[-- CiseauxVue (LocalScript dans StarterPlayer > StarterPlayerScripts)
 -- Vue à la 1re personne : l'outil en main (ciseaux ou faucille) suit la caméra (en bas à droite de l'écran),
 -- se balance quand on tourne ou marche, les ciseaux font "clic-clac" et la faucille donne un coup à chaque coupe.
 -- Vue de loin : on voit les ciseaux dans la main du personnage, comme les autres joueurs.
@@ -263,3 +263,4 @@ RunService:BindToRenderStep("CiseauxVue", Enum.RenderPriority.Camera.Value + 1, 
 		moteur.C0 = moteur:GetAttribute("C0Origine") * CFrame.Angles(0, FERMETURE * fermeture * moteur:GetAttribute("Sens"), 0)
 	end
 end)
+]]></ProtectedString></Properties></Item></roblox>
