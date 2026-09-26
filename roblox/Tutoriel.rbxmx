@@ -158,7 +158,7 @@ local function hrp() local c=character() return c and c:FindFirstChild("Humanoid
 local function holdingScissors()
 	local c=character()
 	local t=c and c:FindFirstChildOfClass("Tool")
-	return t~=nil and (CS:HasTag(t,"OutilCiseaux") or t.Name=="Ciseaux")
+	return t~=nil and (CS:HasTag(t,"OutilCiseaux") or CS:HasTag(t,"OutilFaucille") or t.Name=="Ciseaux" or t:GetAttribute("CoupeEnPlus")~=nil)
 end
 local function nearestTuft()
 	local folder=workspace:FindFirstChild("GrassHit")

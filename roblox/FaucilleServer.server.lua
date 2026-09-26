@@ -1,0 +1,417 @@
+-- FaucilleServer (Script dans ServerScriptService)
+-- La faucille est posée sur l'établi (modèle "FaucilleVitrine" sur le tapis vert).
+-- On l'achète avec E (ou en restant appuyé sur le bouton), elle arrive dans la barre d'outils
+-- et coupe plusieurs touffes d'un coup. L'achat est gardé quand le joueur revient.
+if not game:GetService("RunService"):IsServer() then
+	warn("[Faucille] FaucilleServer doit être un Script dans ServerScriptService !")
+	return
+end
+print("[Faucille] FaucilleServer démarré")
+
+local REGLAGES = {
+	PRIX = 7.99,
+	TOUFFES_EN_PLUS = 3, -- touffes voisines coupées en plus à chaque coup (les ciseaux : 0)
+	RAYON = 5.5, -- rayon autour de la touffe visée (studs)
+	TAILLE_EN_MAIN = 0.75, -- taille de la faucille dans la main
+	INCLINAISON = 0, -- degrés : penche la faucille dans la main si besoin (ex : 20 ou -20)
+	EQUIPER_APRES_ACHAT = true, -- la faucille arrive directement dans la main
+	SAUVEGARDER = true, -- garde l'achat quand le joueur revient (DataStore)
+}
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
+local DataStoreService = game:GetService("DataStoreService")
+
+local TAG = "OutilFaucille"
+local okCfg, CFG = pcall(function() return require(ReplicatedStorage:WaitForChild("GrassConfig", 10)) end)
+if not okCfg or type(CFG) ~= "table" then CFG = {} end
+
+-- infos pour l'écran des joueurs (prix, nombre de touffes)
+local achat = ReplicatedStorage:FindFirstChild("FaucilleAchat") or Instance.new("RemoteEvent")
+achat.Name = "FaucilleAchat"
+achat:SetAttribute("Prix", REGLAGES.PRIX)
+achat:SetAttribute("Touffes", 1 + REGLAGES.TOUFFES_EN_PLUS)
+achat.Parent = ReplicatedStorage
+
+---------------------------------------------------------------- Le modèle (le même sur l'établi et dans la main)
+-- nom, forme, taille (x, y, z), position (x, y, z), rotation (9 nombres), couleur (r, g, b), matière, reflet
+-- Repère : le manche monte selon Y (le poing autour de y = 0), la lame est dans le plan Y-Z.
+local PIECES = {
+	{ "Pommeau", "Ball", 0.36, 0.36, 0.36, 0, -0.8, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 98, 60, 34, "Wood", 0 },
+	{ "Manche", "Cylinder", 1.36, 0.26, 0.26, 0, -0.1, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 176, 112, 62, "Wood", 0 },
+	{ "Bague", "Cylinder", 0.08, 0.31, 0.31, 0, -0.62, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 98, 60, 34, "Wood", 0 },
+	{ "Grip", "Cylinder", 0.66, 0.29, 0.29, 0, -0.18, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 204, 42, 48, "Fabric", 0 },
+	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, -0.51, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
+	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, -0.29, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
+	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, -0.07, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
+	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, 0.15, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
+	{ "Virole", "Cylinder", 0.3, 0.33, 0.33, 0, 0.66, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 172, 178, 190, "Metal", 0.2 },
+	{ "ViroleBord", "Cylinder", 0.05, 0.36, 0.36, 0, 0.52, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 78, 82, 94, "Metal", 0 },
+	{ "Rivet", "Ball", 0.09, 0.09, 0.09, -0.16, 0.66, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 214, 172, 78, "Metal", 0.2 },
+	{ "Rivet", "Ball", 0.09, 0.09, 0.09, 0.16, 0.66, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 214, 172, 78, "Metal", 0.2 },
+	{ "Soie", "Block", 0.07, 0.24, 0.13, 0, 0.9, -0.02, 1, 0, 0, 0, 1, 0, 0, 0, 1, 78, 82, 94, "Metal", 0 },
+	{ "Talon", "Block", 0.06, 0.5389, 0.2, 0, 1.0452, -0.219, 1, 0, 0, 0, 0.3111, 0.9504, 0, -0.9504, 0.3111, 172, 178, 190, "Metal", 0.25 },
+	{ "Lame", "Block", 0.05, 0.2305, 0.1785, 0, 1.1396, -0.4783, 1, 0, 0, 0, -0.9634, 0.2682, 0, -0.2682, -0.9634, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.2796, -0.4393, 1, 0, 0, 0, -0.9634, 0.2682, 0, -0.2682, -0.9634, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.043, -0.5052, 1, 0, 0, 0, -0.9634, 0.2682, 0, -0.2682, -0.9634, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.2216, 0.1785, 0, 1.182, -0.6003, 1, 0, 0, 0, -0.8936, 0.4488, 0, -0.4488, -0.8936, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.3078, -0.5372, 1, 0, 0, 0, -0.8936, 0.4488, 0, -0.4488, -0.8936, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.0964, -0.6433, 1, 0, 0, 0, -0.8936, 0.4488, 0, -0.4488, -0.8936, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.2125, 0.1785, 0, 1.2475, -0.7128, 1, 0, 0, 0, -0.7904, 0.6126, 0, -0.6126, -0.7904, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.3551, -0.6293, 1, 0, 0, 0, -0.7904, 0.6126, 0, -0.6126, -0.7904, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.1753, -0.7686, 1, 0, 0, 0, -0.7904, 0.6126, 0, -0.6126, -0.7904, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.2032, 0.1785, 0, 1.3339, -0.8111, 1, 0, 0, 0, -0.6575, 0.7534, 0, -0.7534, -0.6575, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.4205, -0.712, 1, 0, 0, 0, -0.6575, 0.7534, 0, -0.7534, -0.6575, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.277, -0.8764, 1, 0, 0, 0, -0.6575, 0.7534, 0, -0.7534, -0.6575, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1939, 0.1785, 0, 1.4385, -0.8915, 1, 0, 0, 0, -0.5, 0.866, 0, -0.866, -0.5, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.5019, -0.7816, 1, 0, 0, 0, -0.5, 0.866, 0, -0.866, -0.5, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.3975, -0.9625, 1, 0, 0, 0, -0.5, 0.866, 0, -0.866, -0.5, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1844, 0.1785, 0, 1.5573, -0.9508, 1, 0, 0, 0, -0.3237, 0.9461, 0, -0.9461, -0.3237, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.5969, -0.8351, 1, 0, 0, 0, -0.3237, 0.9461, 0, -0.9461, -0.3237, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.5323, -1.0238, 1, 0, 0, 0, -0.3237, 0.9461, 0, -0.9461, -0.3237, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1748, 0.1785, 0, 1.6863, -0.9863, 1, 0, 0, 0, -0.1353, 0.9908, 0, -0.9908, -0.1353, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.7022, -0.87, 1, 0, 0, 0, -0.1353, 0.9908, 0, -0.9908, -0.1353, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.6765, -1.058, 1, 0, 0, 0, -0.1353, 0.9908, 0, -0.9908, -0.1353, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1649, 0.1785, 0, 1.8206, -0.9963, 1, 0, 0, 0, 0.0581, 0.9983, 0, -0.9983, 0.0581, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.814, -0.8841, 1, 0, 0, 0, 0.0581, 0.9983, 0, -0.9983, 0.0581, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.8245, -1.0637, 1, 0, 0, 0, 0.0581, 0.9983, 0, -0.9983, 0.0581, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1549, 0.1785, 0, 1.9552, -0.9803, 1, 0, 0, 0, 0.2494, 0.9684, 0, -0.9684, 0.2494, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.9284, -0.8762, 1, 0, 0, 0, 0.2494, 0.9684, 0, -0.9684, 0.2494, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.9708, -1.0408, 1, 0, 0, 0, 0.2494, 0.9684, 0, -0.9684, 0.2494, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1447, 0.1785, 0, 2.0853, -0.9384, 1, 0, 0, 0, 0.4314, 0.9022, 0, -0.9022, 0.4314, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.0411, -0.846, 1, 0, 0, 0, 0.4314, 0.9022, 0, -0.9022, 0.4314, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.11, -0.9902, 1, 0, 0, 0, 0.4314, 0.9022, 0, -0.9022, 0.4314, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1343, 0.1785, 0, 2.2057, -0.8718, 1, 0, 0, 0, 0.5972, 0.8021, 0, -0.8021, 0.5972, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.1477, -0.7939, 1, 0, 0, 0, 0.5972, 0.8021, 0, -0.8021, 0.5972, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.2368, -0.9136, 1, 0, 0, 0, 0.5972, 0.8021, 0, -0.8021, 0.5972, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1235, 0.1785, 0, 2.3119, -0.7827, 1, 0, 0, 0, 0.7405, 0.672, 0, -0.672, 0.7405, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.2439, -0.721, 1, 0, 0, 0, 0.7405, 0.672, 0, -0.672, 0.7405, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.3465, -0.8141, 1, 0, 0, 0, 0.7405, 0.672, 0, -0.672, 0.7405, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1125, 0.1785, 0, 2.3997, -0.674, 1, 0, 0, 0, 0.8562, 0.5167, 0, -0.5167, 0.8562, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.3258, -0.6294, 1, 0, 0, 0, 0.8562, 0.5167, 0, -0.5167, 0.8562, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.435, -0.6953, 1, 0, 0, 0, 0.8562, 0.5167, 0, -0.5167, 0.8562, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.101, 0.1785, 0, 2.4655, -0.5495, 1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.3899, -0.522, 1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.4989, -0.5616, 1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.089, 0.1785, 0, 2.5067, -0.4137, 1, 0, 0, 0, 0.988, 0.1545, 0, -0.1545, 0.988, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4331, -0.4021, 1, 0, 0, 0, 0.988, 0.1545, 0, -0.1545, 0.988, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.5358, -0.4182, 1, 0, 0, 0, 0.988, 0.1545, 0, -0.1545, 0.988, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.0762, 0.1785, 0, 2.5213, -0.2712, 1, 0, 0, 0, 0.9992, -0.0388, 0, 0.0388, 0.9992, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4533, -0.2739, 1, 0, 0, 0, 0.9992, -0.0388, 0, 0.0388, 0.9992, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.5444, -0.2703, 1, 0, 0, 0, 0.9992, -0.0388, 0, 0.0388, 0.9992, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.0624, 0.1785, 0, 2.5086, -0.1273, 1, 0, 0, 0, 0.973, -0.2306, 0, 0.2306, 0.973, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4491, -0.1414, 1, 0, 0, 0, 0.973, -0.2306, 0, 0.2306, 0.973, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.5244, -0.1236, 1, 0, 0, 0, 0.973, -0.2306, 0, 0.2306, 0.973, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.0464, 0.1785, 0, 2.469, 0.0132, 1, 0, 0, 0, 0.9104, -0.4138, 0, 0.4138, 0.9104, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4206, -0.0088, 1, 0, 0, 0, 0.9104, -0.4138, 0, 0.4138, 0.9104, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.4764, 0.0166, 1, 0, 0, 0, 0.9104, -0.4138, 0, 0.4138, 0.9104, 78, 82, 94, "Metal", 0 },
+}
+
+local function construire(parent, origine, echelle, ancre)
+	local parts = {}
+	for _, d in PIECES do
+		local p = Instance.new("Part")
+		p.Name = d[1]
+		p.Shape = Enum.PartType[d[2]]
+		p.Size = Vector3.new(d[3], d[4], d[5]) * echelle
+		p.CFrame = origine * CFrame.new(d[6] * echelle, d[7] * echelle, d[8] * echelle, d[9], d[10], d[11], d[12], d[13], d[14], d[15], d[16], d[17])
+		p.Color = Color3.fromRGB(d[18], d[19], d[20])
+		p.Material = Enum.Material[d[21]]
+		p.Reflectance = d[22]
+		p.Anchored = ancre
+		p.CanCollide, p.CanTouch, p.CanQuery = false, false, false
+		p.Massless = true
+		p.CastShadow = true
+		p.TopSurface, p.BottomSurface = Enum.SurfaceType.Smooth, Enum.SurfaceType.Smooth
+		p.Parent = parent
+		table.insert(parts, p)
+	end
+	return parts
+end
+
+---------------------------------------------------------------- L'outil
+local function construireOutil()
+	local E = REGLAGES.TAILLE_EN_MAIN
+	local outil = Instance.new("Tool")
+	outil.Name = "Faucille"
+	outil.ToolTip = "Coupe " .. (1 + REGLAGES.TOUFFES_EN_PLUS) .. " touffes d'un coup"
+	outil.CanBeDropped = false
+	outil:SetAttribute("CoupeEnPlus", REGLAGES.TOUFFES_EN_PLUS) -- lu par GrassServer
+	outil:SetAttribute("RayonCoupe", REGLAGES.RAYON)
+	CollectionService:AddTag(outil, TAG)
+	local handle = Instance.new("Part")
+	handle.Name = "Handle"
+	handle.Size = Vector3.new(0.3, 0.3, 0.3)
+	handle.Transparency = 1
+	handle.CanCollide, handle.CanTouch, handle.CanQuery = false, false, false
+	handle.Massless = true
+	handle.CFrame = CFrame.identity
+	handle.Parent = outil
+	local modele = Instance.new("Folder")
+	modele.Name = "Modele"
+	modele.Parent = outil
+	for _, p in construire(modele, CFrame.identity, E, false) do
+		local w = Instance.new("Weld")
+		w.Part0, w.Part1 = handle, p
+		w.C0 = p.CFrame
+		w.Parent = p
+	end
+	-- dans la main : le manche vers l'avant, le croissant vers le haut
+	outil.Grip = CFrame.fromMatrix(Vector3.new(0, -0.18 * E, 0), Vector3.new(-1, 0, 0), Vector3.new(0, 0, -1), Vector3.new(0, -1, 0))
+		* CFrame.Angles(math.rad(-REGLAGES.INCLINAISON), 0, 0)
+	-- traînée blanche pendant le coup
+	local a0 = Instance.new("Attachment") a0.Name = "TraineeA" a0.Position = Vector3.new(0, 2.5, -0.3) * E a0.Parent = handle
+	local a1 = Instance.new("Attachment") a1.Name = "TraineeB" a1.Position = Vector3.new(0, 1.8, -1.05) * E a1.Parent = handle
+	local tr = Instance.new("Trail")
+	tr.Name = "Trainee"
+	tr.Attachment0, tr.Attachment1 = a0, a1
+	tr.Lifetime = 0.16
+	tr.Color = ColorSequence.new(Color3.new(1, 1, 1))
+	tr.Transparency = NumberSequence.new(0.35, 1)
+	tr.LightEmission = 0.5
+	tr.Enabled = false
+	tr.Parent = handle
+	local son = Instance.new("Sound")
+	son.Name = "Swoosh"
+	son.SoundId = "rbxasset://sounds/swordslash.wav"
+	son.Volume = 0.45
+	son.Parent = handle
+	return outil
+end
+local modeleOutil = construireOutil()
+
+---------------------------------------------------------------- Le coup de faucille (bras qui balaie l'herbe)
+local function trouverEpaule(perso)
+	local bras = perso:FindFirstChild("RightUpperArm")
+	if bras then return bras:FindFirstChild("RightShoulder") end
+	local torse = perso:FindFirstChild("Torso")
+	return torse and torse:FindFirstChild("Right Shoulder")
+end
+local animations = setmetatable({}, { __mode = "k" })
+local function animerC0(joint, cible, duree)
+	local depart = joint.C0
+	local id = (animations[joint] or 0) + 1
+	animations[joint] = id
+	task.spawn(function()
+		local t0 = os.clock()
+		while animations[joint] == id do
+			local a = math.min((os.clock() - t0) / duree, 1)
+			local ok = pcall(function() joint.C0 = depart:Lerp(cible, 1 - (1 - a) ^ 2) end)
+			if not ok or a >= 1 then return end
+			RunService.Heartbeat:Wait()
+		end
+	end)
+end
+local function bras(epaule, tangage, lacet, duree)
+	if not (epaule and epaule:IsA("Motor6D")) then return end
+	local origine = epaule:GetAttribute("C0Origine")
+	if not origine then
+		origine = epaule.C0
+		epaule:SetAttribute("C0Origine", origine)
+	end
+	animerC0(epaule, CFrame.new(origine.Position) * CFrame.Angles(math.rad(tangage), math.rad(lacet), 0) * origine.Rotation, duree)
+end
+local function delaiCoupe(qui)
+	local dex = qui and qui:GetAttribute("Upg_Dexterite") or 0
+	return math.max(0.2, (CFG.PICK_COOLDOWN or 0.9) * (1 - (CFG.DEX_PAR_NIVEAU or 0.08) * dex))
+end
+
+local derniers = setmetatable({}, { __mode = "k" })
+local occupes = setmetatable({}, { __mode = "k" })
+local function coup(outil)
+	local perso = outil.Parent
+	local joueur = perso and Players:GetPlayerFromCharacter(perso)
+	if not joueur or occupes[outil] then return end
+	-- pas de spam : un coup seulement quand le délai pour couper une herbe est passé
+	if os.clock() - (derniers[outil] or -math.huge) < delaiCoupe(joueur) * 0.85 then return end
+	derniers[outil] = os.clock()
+	occupes[outil] = true
+	local epaule = trouverEpaule(perso)
+	local handle = outil:FindFirstChild("Handle")
+	local tr = handle and handle:FindFirstChild("Trainee")
+	local son = handle and handle:FindFirstChild("Swoosh")
+	bras(epaule, -20, -55, 0.1) -- on arme : bras vers la droite
+	task.wait(0.1)
+	if tr then tr.Enabled = true end
+	if son then son.PlaybackSpeed = 1.1 + math.random() * 0.25 son:Play() end
+	bras(epaule, -45, 50, 0.13) -- on balaie vers la gauche, près du sol
+	task.wait(0.15)
+	if tr then tr.Enabled = false end
+	if outil.Parent == perso then bras(epaule, -12, 0, 0.18) end
+	task.wait(0.05)
+	occupes[outil] = nil
+end
+
+local branches = setmetatable({}, { __mode = "k" })
+local function brancher(outil)
+	if not outil:IsA("Tool") or branches[outil] then return end
+	branches[outil] = true
+	outil.Equipped:Connect(function()
+		bras(trouverEpaule(outil.Parent), -12, 0, 0.2)
+	end)
+	outil.Unequipped:Connect(function()
+		local joueur = outil:FindFirstAncestorOfClass("Player")
+		local perso = joueur and joueur.Character
+		local epaule = perso and trouverEpaule(perso)
+		local origine = epaule and epaule:GetAttribute("C0Origine")
+		if origine then animerC0(epaule, origine, 0.12) end
+	end)
+	outil.Activated:Connect(function() coup(outil) end)
+end
+CollectionService:GetInstanceAddedSignal(TAG):Connect(brancher)
+for _, o in CollectionService:GetTagged(TAG) do brancher(o) end
+
+-- GrassServer prévient quand une touffe est vraiment coupée (aussi en restant appuyé)
+local signal = ServerStorage:WaitForChild("CiseauxCoupe", 5)
+if not signal then
+	signal = Instance.new("BindableEvent")
+	signal.Name = "CiseauxCoupe"
+	signal.Parent = ServerStorage
+end
+signal.Event:Connect(function(joueur)
+	local outil = joueur.Character and joueur.Character:FindFirstChildOfClass("Tool")
+	if outil and CollectionService:HasTag(outil, TAG) then task.spawn(coup, outil) end
+end)
+
+---------------------------------------------------------------- Achat et sauvegarde
+local store
+if REGLAGES.SAUVEGARDER then
+	local ok, s = pcall(function() return DataStoreService:GetDataStore("Faucille_v1") end)
+	if ok then store = s end
+end
+local avertiSauvegarde = false
+local function charger(joueur)
+	if not store then return false end
+	local ok, v = pcall(function() return store:GetAsync("u" .. joueur.UserId) end)
+	if not ok and not avertiSauvegarde then
+		avertiSauvegarde = true
+		warn("[Faucille] Sauvegarde impossible. Dans Studio : Home > Game Settings > Security > Enable Studio Access to API Services")
+	end
+	return ok and v == true
+end
+local function sauver(joueur)
+	if not store then return end
+	task.spawn(function()
+		for _ = 1, 3 do
+			if pcall(function() store:SetAsync("u" .. joueur.UserId, true) end) then return end
+			task.wait(3)
+		end
+	end)
+end
+
+local NOMS_ARGENT = { "Money", "Cash", "Argent", "Coins", "Dollars", "Pieces", "Pièces", "$" }
+local function argent(joueur)
+	local ls = joueur:FindFirstChild("leaderstats")
+	if not ls then return nil end
+	if CFG.MONEY_STAT and CFG.MONEY_STAT ~= "" then return ls:FindFirstChild(CFG.MONEY_STAT) end
+	for _, n in NOMS_ARGENT do
+		local v = ls:FindFirstChild(n)
+		if v and (v:IsA("IntValue") or v:IsA("NumberValue")) then return v end
+	end
+	return nil
+end
+
+local function donner(joueur, equiper)
+	local gear = joueur:FindFirstChild("StarterGear") or joueur:WaitForChild("StarterGear", 5)
+	if gear and not gear:FindFirstChild("Faucille") then modeleOutil:Clone().Parent = gear end -- gardée après la mort
+	local sac = joueur:FindFirstChildOfClass("Backpack") or joueur:WaitForChild("Backpack", 5)
+	local perso = joueur.Character
+	local outil = (sac and sac:FindFirstChild("Faucille")) or (perso and perso:FindFirstChild("Faucille"))
+	if not outil and sac then
+		outil = modeleOutil:Clone()
+		outil.Parent = sac
+	end
+	if equiper and outil and sac and outil.Parent == sac and perso then
+		local h = perso:FindFirstChildOfClass("Humanoid")
+		if h and h.Health > 0 then h:EquipTool(outil) end
+	end
+end
+
+local enCours = {}
+local function acheter(joueur)
+	if enCours[joueur] then return end
+	enCours[joueur] = true
+	if joueur:GetAttribute("Faucille") then
+		donner(joueur, true)
+	else
+		local m = argent(joueur)
+		local v = m and tonumber(m.Value) or 0
+		local prix = REGLAGES.PRIX
+		if m and m:IsA("IntValue") then prix = math.ceil(prix) end
+		if not m or v + 1e-6 < prix then
+			achat:FireClient(joueur, "manque", prix - v)
+		else
+			m.Value = if m:IsA("IntValue") then v - prix else math.floor((v - prix) * 100 + 0.5) / 100
+			joueur:SetAttribute("Faucille", true)
+			sauver(joueur)
+			donner(joueur, REGLAGES.EQUIPER_APRES_ACHAT)
+			achat:FireClient(joueur, "ok")
+			print("[Faucille] " .. joueur.Name .. " a acheté la faucille")
+		end
+	end
+	task.wait(0.3)
+	enCours[joueur] = nil
+end
+
+local function arrivee(joueur)
+	if charger(joueur) then
+		joueur:SetAttribute("Faucille", true)
+		if not joueur.Character then joueur.CharacterAdded:Wait() end
+		task.wait(1)
+		donner(joueur, false)
+	end
+end
+Players.PlayerAdded:Connect(arrivee)
+for _, j in Players:GetPlayers() do task.spawn(arrivee, j) end
+Players.PlayerRemoving:Connect(function(joueur) enCours[joueur] = nil end)
+
+---------------------------------------------------------------- La faucille sur l'établi
+local function vitrine()
+	local v = workspace:FindFirstChild("FaucilleVitrine", true)
+	if v then return v end
+	-- pas de vitrine : on la pose sur le tapis vert de l'établi
+	local meuble = workspace:FindFirstChild("MeubleOutils", true)
+	local tapis = (meuble and meuble:FindFirstChild("Tapis", true)) or workspace:FindFirstChild("Tapis", true)
+	if not (tapis and tapis:IsA("BasePart")) then
+		warn("[Faucille] Pas de 'FaucilleVitrine' ni d'établi 'MeubleOutils' avec un 'Tapis' : la faucille n'est pas en vente")
+		return nil
+	end
+	v = Instance.new("Model")
+	v.Name = "FaucilleVitrine"
+	local dessus = tapis.CFrame * CFrame.new(0, tapis.Size.Y / 2, 0)
+	local base = Instance.new("Part")
+	base.Name = "Base"
+	base.Size = Vector3.new(3.4, 0.1, 2.2)
+	base.CFrame = dessus * CFrame.new(0, 0.05, 0)
+	base.Transparency = 1
+	base.Anchored = true
+	base.CanCollide, base.CanTouch, base.CanQuery = false, false, false
+	base.Parent = v
+	v.PrimaryPart = base
+	-- couchée sur le tapis, le croissant vers le fond
+	local pose = dessus * CFrame.new(-0.4, 0.18, -0.3) * CFrame.Angles(0, math.rad(14), 0)
+		* CFrame.fromMatrix(Vector3.zero, Vector3.new(0, 1, 0), Vector3.new(1, 0, 0), Vector3.new(0, 0, -1))
+		* CFrame.Angles(0, math.rad(-8), 0)
+	construire(v, pose, 0.9, true)
+	v.Parent = meuble or workspace
+	return v
+end
+
+local v = vitrine()
+if v then
+	local base = v.PrimaryPart or v:FindFirstChild("Base")
+	local prompt = base:FindFirstChildOfClass("ProximityPrompt") or Instance.new("ProximityPrompt")
+	prompt.Name = "Acheter"
+	prompt.ActionText = string.format("Acheter  $%.2f", REGLAGES.PRIX)
+	prompt.ObjectText = "Faucille"
+	prompt.HoldDuration = 0.35
+	prompt.MaxActivationDistance = 10
+	prompt.RequiresLineOfSight = false
+	prompt.KeyboardKeyCode = Enum.KeyCode.E
+	prompt.Parent = base
+	prompt.Triggered:Connect(acheter)
+	print("[Faucille] En vente sur l'établi : $" .. REGLAGES.PRIX)
+end

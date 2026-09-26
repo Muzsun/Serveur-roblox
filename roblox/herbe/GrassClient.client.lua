@@ -342,7 +342,7 @@ local function holdingScissors()
 	if lp:GetAttribute("MenuOuvert") then return false end
 	local ch=lp.Character
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
-	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil)
 end
 local function setHover(id)
 	hovered=id

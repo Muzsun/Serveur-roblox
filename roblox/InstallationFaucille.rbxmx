@@ -1,0 +1,2355 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="Folder" referent="RBX76"><Properties><string name="Name">InstallationFaucille</string></Properties><Item class="Model" referent="RBX69"><Properties><string name="Name">FaucilleVitrine</string><Ref name="PrimaryPart">RBXBASEF</Ref></Properties><Item class="Part" referent="RBXBASEF"><Properties><string name="Name">Base</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0</X><Y>0.05</Y><Z>0</Z><R00>1</R00><R01>0</R01><R02>0</R02><R10>0</R10><R11>1</R11><R12>0</R12><R20>0</R20><R21>0</R21><R22>1</R22></CoordinateFrame><Vector3 name="size"><X>3.4</X><Y>0.1</Y><Z>2.2</Z></Vector3><Color3uint8 name="Color3uint8">4294967295</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">1</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX1"><Properties><string name="Name">Pommeau</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-1.0986</X><Y>0.18</Y><Z>-0.1258</Z><R00>-0.0337</R00><R01>0.9703</R01><R02>-0.2396</R02><R10>0.9903</R10><R11>0</R11><R12>-0.1392</R12><R20>-0.135</R20><R21>-0.2419</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.324</X><Y>0.324</Y><Z>0.324</Z></Vector3><Color3uint8 name="Color3uint8">4284628002</Color3uint8><token name="Material">512</token><token name="shape">0</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX2"><Properties><string name="Name">Manche</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-0.4873</X><Y>0.18</Y><Z>-0.2782</Z><R00>0.9703</R00><R01>0.0337</R01><R02>-0.2396</R02><R10>0</R10><R11>-0.9903</R11><R12>-0.1392</R12><R20>-0.2419</R20><R21>0.135</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>1.224</X><Y>0.234</Y><Z>0.234</Z></Vector3><Color3uint8 name="Color3uint8">4289753150</Color3uint8><token name="Material">512</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX3"><Properties><string name="Name">Bague</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-0.9414</X><Y>0.18</Y><Z>-0.165</Z><R00>0.9703</R00><R01>0.0337</R01><R02>-0.2396</R02><R10>0</R10><R11>-0.9903</R11><R12>-0.1392</R12><R20>-0.2419</R20><R21>0.135</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.072</X><Y>0.279</Y><Z>0.279</Z></Vector3><Color3uint8 name="Color3uint8">4284628002</Color3uint8><token name="Material">512</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX4"><Properties><string name="Name">Grip</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-0.5572</X><Y>0.18</Y><Z>-0.2608</Z><R00>0.9703</R00><R01>0.0337</R01><R02>-0.2396</R02><R10>0</R10><R11>-0.9903</R11><R12>-0.1392</R12><R20>-0.2419</R20><R21>0.135</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.594</X><Y>0.261</Y><Z>0.261</Z></Vector3><Color3uint8 name="Color3uint8">4291570224</Color3uint8><token name="Material">1312</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX5"><Properties><string name="Name">GripBande</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-0.8454</X><Y>0.18</Y><Z>-0.189</Z><R00>0.9703</R00><R01>0.0337</R01><R02>-0.2396</R02><R10>0</R10><R11>-0.9903</R11><R12>-0.1392</R12><R20>-0.2419</R20><R21>0.135</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.2745</Y><Z>0.2745</Z></Vector3><Color3uint8 name="Color3uint8">4288027168</Color3uint8><token name="Material">1312</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX6"><Properties><string name="Name">GripBande</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-0.6532</X><Y>0.18</Y><Z>-0.2369</Z><R00>0.9703</R00><R01>0.0337</R01><R02>-0.2396</R02><R10>0</R10><R11>-0.9903</R11><R12>-0.1392</R12><R20>-0.2419</R20><R21>0.135</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.2745</Y><Z>0.2745</Z></Vector3><Color3uint8 name="Color3uint8">4288027168</Color3uint8><token name="Material">1312</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX7"><Properties><string name="Name">GripBande</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-0.4611</X><Y>0.18</Y><Z>-0.2848</Z><R00>0.9703</R00><R01>0.0337</R01><R02>-0.2396</R02><R10>0</R10><R11>-0.9903</R11><R12>-0.1392</R12><R20>-0.2419</R20><R21>0.135</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.2745</Y><Z>0.2745</Z></Vector3><Color3uint8 name="Color3uint8">4288027168</Color3uint8><token name="Material">1312</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX8"><Properties><string name="Name">GripBande</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-0.269</X><Y>0.18</Y><Z>-0.3327</Z><R00>0.9703</R00><R01>0.0337</R01><R02>-0.2396</R02><R10>0</R10><R11>-0.9903</R11><R12>-0.1392</R12><R20>-0.2419</R20><R21>0.135</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.2745</Y><Z>0.2745</Z></Vector3><Color3uint8 name="Color3uint8">4288027168</Color3uint8><token name="Material">1312</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX9"><Properties><string name="Name">Virole</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.1764</X><Y>0.18</Y><Z>-0.4437</Z><R00>0.9703</R00><R01>0.0337</R01><R02>-0.2396</R02><R10>0</R10><R11>-0.9903</R11><R12>-0.1392</R12><R20>-0.2419</R20><R21>0.135</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.27</X><Y>0.297</Y><Z>0.297</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">2</token><float name="Reflectance">0.2</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX10"><Properties><string name="Name">ViroleBord</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.0541</X><Y>0.18</Y><Z>-0.4132</Z><R00>0.9703</R00><R01>0.0337</R01><R02>-0.2396</R02><R10>0</R10><R11>-0.9903</R11><R12>-0.1392</R12><R20>-0.2419</R20><R21>0.135</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.324</Y><Z>0.324</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">2</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX11"><Properties><string name="Name">Rivet</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.1812</X><Y>0.0374</Y><Z>-0.4243</Z><R00>-0.0337</R00><R01>0.9703</R01><R02>-0.2396</R02><R10>0.9903</R10><R11>0</R11><R12>-0.1392</R12><R20>-0.135</R20><R21>-0.2419</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.081</X><Y>0.081</Y><Z>0.081</Z></Vector3><Color3uint8 name="Color3uint8">4292258894</Color3uint8><token name="Material">1088</token><token name="shape">0</token><float name="Reflectance">0.2</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX12"><Properties><string name="Name">Rivet</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.1715</X><Y>0.3226</Y><Z>-0.4631</Z><R00>-0.0337</R00><R01>0.9703</R01><R02>-0.2396</R02><R10>0.9903</R10><R11>0</R11><R12>-0.1392</R12><R20>-0.135</R20><R21>-0.2419</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.081</X><Y>0.081</Y><Z>0.081</Z></Vector3><Color3uint8 name="Color3uint8">4292258894</Color3uint8><token name="Material">1088</token><token name="shape">0</token><float name="Reflectance">0.2</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX13"><Properties><string name="Name">Soie</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.3903</X><Y>0.1825</Y><Z>-0.4787</Z><R00>-0.0337</R00><R01>0.9703</R01><R02>-0.2396</R02><R10>0.9903</R10><R11>0</R11><R12>-0.1392</R12><R20>-0.135</R20><R21>-0.2419</R21><R22>-0.9609</R22></CoordinateFrame><Vector3 name="size"><X>0.063</X><Y>0.216</Y><Z>0.117</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX14"><Properties><string name="Name">Talon</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.5599</X><Y>0.2074</Y><Z>-0.3381</Z><R00>-0.0337</R00><R01>0.5296</R01><R02>0.8476</R02><R10>0.9903</R10><R11>0.1323</R11><R12>-0.0433</R12><R20>-0.135</R20><R21>0.8379</R21><R22>-0.5289</R22></CoordinateFrame><Vector3 name="size"><X>0.054</X><Y>0.485</Y><Z>0.18</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX15"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.6983</X><Y>0.2399</Y><Z>-0.1345</Z><R00>-0.0337</R00><R01>-0.8705</R01><R02>0.491</R02><R10>0.9903</R10><R11>0.0373</R11><R12>0.1341</R12><R20>-0.135</R20><R21>0.4907</R21><R22>0.8608</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.2075</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX16"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.8121</X><Y>0.235</Y><Z>-0.1987</Z><R00>-0.0337</R00><R01>-0.8705</R01><R02>0.491</R02><R10>0.9903</R10><R11>0.0373</R11><R12>0.1341</R12><R20>-0.135</R20><R21>0.4907</R21><R22>0.8608</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX17"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.6198</X><Y>0.2433</Y><Z>-0.0903</Z><R00>-0.0337</R00><R01>-0.8705</R01><R02>0.491</R02><R10>0.9903</R10><R11>0.0373</R11><R12>0.1341</R12><R20>-0.135</R20><R21>0.4907</R21><R22>0.8608</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX18"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.7616</X><Y>0.2552</Y><Z>-0.0382</Z><R00>-0.0337</R00><R01>-0.7596</R01><R02>0.6496</R02><R10>0.9903</R10><R11>0.0625</R11><R12>0.1244</R12><R20>-0.135</R20><R21>0.6474</R21><R22>0.7501</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1994</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX19"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.8578</X><Y>0.2473</Y><Z>-0.1202</Z><R00>-0.0337</R00><R01>-0.7596</R01><R02>0.6496</R02><R10>0.9903</R10><R11>0.0625</R11><R12>0.1244</R12><R20>-0.135</R20><R21>0.6474</R21><R22>0.7501</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX20"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.6961</X><Y>0.2606</Y><Z>0.0176</Z><R00>-0.0337</R00><R01>-0.7596</R01><R02>0.6496</R02><R10>0.9903</R10><R11>0.0625</R11><R12>0.1244</R12><R20>-0.135</R20><R21>0.6474</R21><R22>0.7501</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX21"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.843</X><Y>0.2693</Y><Z>0.0448</Z><R00>-0.0337</R00><R01>-0.6202</R01><R02>0.7838</R02><R10>0.9903</R10><R11>0.0853</R11><R12>0.11</R12><R20>-0.135</R20><R21>0.7798</R21><R22>0.6112</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1912</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX22"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.9191</X><Y>0.2588</Y><Z>-0.0509</Z><R00>-0.0337</R00><R01>-0.6202</R01><R02>0.7838</R02><R10>0.9903</R10><R11>0.0853</R11><R12>0.11</R12><R20>-0.135</R20><R21>0.7798</R21><R22>0.6112</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX23"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.7921</X><Y>0.2763</Y><Z>0.1088</Z><R00>-0.0337</R00><R01>-0.6202</R01><R02>0.7838</R02><R10>0.9903</R10><R11>0.0853</R11><R12>0.11</R12><R20>-0.135</R20><R21>0.7798</R21><R22>0.6112</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX24"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.9398</X><Y>0.2816</Y><Z>0.111</Z><R00>-0.0337</R00><R01>-0.4575</R01><R02>0.8886</R02><R10>0.9903</R10><R11>0.1049</R11><R12>0.0915</R12><R20>-0.135</R20><R21>0.883</R21><R22>0.4495</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1829</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX25"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.994</X><Y>0.2692</Y><Z>0.0064</Z><R00>-0.0337</R00><R01>-0.4575</R01><R02>0.8886</R02><R10>0.9903</R10><R11>0.1049</R11><R12>0.0915</R12><R20>-0.135</R20><R21>0.883</R21><R22>0.4495</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX26"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>0.9041</X><Y>0.2898</Y><Z>0.1798</Z><R00>-0.0337</R00><R01>-0.4575</R01><R02>0.8886</R02><R10>0.9903</R10><R11>0.1049</R11><R12>0.0915</R12><R20>-0.135</R20><R21>0.883</R21><R22>0.4495</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX27"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.0484</X><Y>0.2917</Y><Z>0.1578</Z><R00>-0.0337</R00><R01>-0.2777</R01><R02>0.9601</R02><R10>0.9903</R10><R11>0.1205</R11><R12>0.0696</R12><R20>-0.135</R20><R21>0.9531</R21><R22>0.2709</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1745</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX28"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.0801</X><Y>0.2779</Y><Z>0.0489</Z><R00>-0.0337</R00><R01>-0.2777</R01><R02>0.9601</R02><R10>0.9903</R10><R11>0.1205</R11><R12>0.0696</R12><R20>-0.135</R20><R21>0.9531</R21><R22>0.2709</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX29"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.0279</X><Y>0.3006</Y><Z>0.2281</Z><R00>-0.0337</R00><R01>-0.2777</R01><R02>0.9601</R02><R10>0.9903</R10><R11>0.1205</R11><R12>0.0696</R12><R20>-0.135</R20><R21>0.9531</R21><R22>0.2709</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX30"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.165</X><Y>0.2991</Y><Z>0.1831</Z><R00>-0.0337</R00><R01>-0.0875</R01><R02>0.9956</R02><R10>0.9903</R10><R11>0.1317</R11><R12>0.0451</R12><R20>-0.135</R20><R21>0.9874</R21><R22>0.0822</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.166</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX31"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.1746</X><Y>0.2846</Y><Z>0.0745</Z><R00>-0.0337</R00><R01>-0.0875</R01><R02>0.9956</R02><R10>0.9903</R10><R11>0.1317</R11><R12>0.0451</R12><R20>-0.135</R20><R21>0.9874</R21><R22>0.0822</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX32"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.1589</X><Y>0.3082</Y><Z>0.2517</Z><R00>-0.0337</R00><R01>-0.0875</R01><R02>0.9956</R02><R10>0.9903</R10><R11>0.1317</R11><R12>0.0451</R12><R20>-0.135</R20><R21>0.9874</R21><R22>0.0822</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX33"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.2852</X><Y>0.3035</Y><Z>0.1857</Z><R00>-0.0337</R00><R01>0.1061</R01><R02>0.9938</R02><R10>0.9903</R10><R11>0.1379</R11><R12>0.0188</R12><R20>-0.135</R20><R21>0.9848</R21><R22>-0.1097</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1573</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX34"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.274</X><Y>0.289</Y><Z>0.0817</Z><R00>-0.0337</R00><R01>0.1061</R01><R02>0.9938</R02><R10>0.9903</R10><R11>0.1379</R11><R12>0.0188</R12><R20>-0.135</R20><R21>0.9848</R21><R22>-0.1097</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX35"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.2921</X><Y>0.3125</Y><Z>0.2499</Z><R00>-0.0337</R00><R01>0.1061</R01><R02>0.9938</R02><R10>0.9903</R10><R11>0.1379</R11><R12>0.0188</R12><R20>-0.135</R20><R21>0.9848</R21><R22>-0.1097</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX36"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.4047</X><Y>0.3048</Y><Z>0.1652</Z><R00>-0.0337</R00><R01>0.2956</R01><R02>0.9547</R02><R10>0.9903</R10><R11>0.1389</R11><R12>-0.0081</R12><R20>-0.135</R20><R21>0.9452</R21><R22>-0.2974</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1485</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX37"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.3747</X><Y>0.2907</Y><Z>0.0695</Z><R00>-0.0337</R00><R01>0.2956</R01><R02>0.9547</R02><R10>0.9903</R10><R11>0.1389</R11><R12>-0.0081</R12><R20>-0.135</R20><R21>0.9452</R21><R22>-0.2974</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX38"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.4226</X><Y>0.3132</Y><Z>0.2226</Z><R00>-0.0337</R00><R01>0.2956</R01><R02>0.9547</R02><R10>0.9903</R10><R11>0.1389</R11><R12>-0.0081</R12><R20>-0.135</R20><R21>0.9452</R21><R22>-0.2974</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX39"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.5188</X><Y>0.3028</Y><Z>0.122</Z><R00>-0.0337</R00><R01>0.474</R01><R02>0.8799</R02><R10>0.9903</R10><R11>0.1348</R11><R12>-0.0347</R12><R20>-0.135</R20><R21>0.8701</R21><R22>-0.474</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1395</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX40"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.473</X><Y>0.2898</Y><Z>0.0379</Z><R00>-0.0337</R00><R01>0.474</R01><R02>0.8799</R02><R10>0.9903</R10><R11>0.1348</R11><R12>-0.0347</R12><R20>-0.135</R20><R21>0.8701</R21><R22>-0.474</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX41"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.5455</X><Y>0.3104</Y><Z>0.171</Z><R00>-0.0337</R00><R01>0.474</R01><R02>0.8799</R02><R10>0.9903</R10><R11>0.1348</R11><R12>-0.0347</R12><R20>-0.135</R20><R21>0.8701</R21><R22>-0.474</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX42"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.6233</X><Y>0.2975</Y><Z>0.0575</Z><R00>-0.0337</R00><R01>0.6347</R01><R02>0.772</R02><R10>0.9903</R10><R11>0.1256</R11><R12>-0.06</R12><R20>-0.135</R20><R21>0.7625</R21><R22>-0.6328</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1303</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX43"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.5648</X><Y>0.286</Y><Z>-0.0128</Z><R00>-0.0337</R00><R01>0.6347</R01><R02>0.772</R02><R10>0.9903</R10><R11>0.1256</R11><R12>-0.06</R12><R20>-0.135</R20><R21>0.7625</R21><R22>-0.6328</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX44"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.6561</X><Y>0.304</Y><Z>0.0968</Z><R00>-0.0337</R00><R01>0.6347</R01><R02>0.772</R02><R10>0.9903</R10><R11>0.1256</R11><R12>-0.06</R12><R20>-0.135</R20><R21>0.7625</R21><R22>-0.6328</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX45"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.7141</X><Y>0.2892</Y><Z>-0.0263</Z><R00>-0.0337</R00><R01>0.7716</R01><R02>0.6352</R02><R10>0.9903</R10><R11>0.1116</R11><R12>-0.0831</R12><R20>-0.135</R20><R21>0.6263</R21><R22>-0.7678</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1209</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX46"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.6467</X><Y>0.2794</Y><Z>-0.0811</Z><R00>-0.0337</R00><R01>0.7716</R01><R02>0.6352</R02><R10>0.9903</R10><R11>0.1116</R11><R12>-0.0831</R12><R20>-0.135</R20><R21>0.6263</R21><R22>-0.7678</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX47"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.7503</X><Y>0.2944</Y><Z>0.003</Z><R00>-0.0337</R00><R01>0.7716</R01><R02>0.6352</R02><R10>0.9903</R10><R11>0.1116</R11><R12>-0.0831</R12><R20>-0.135</R20><R21>0.6263</R21><R22>-0.7678</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX48"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.7876</X><Y>0.278</Y><Z>-0.1265</Z><R00>-0.0337</R00><R01>0.8795</R01><R02>0.4746</R02><R10>0.9903</R10><R11>0.0935</R11><R12>-0.1031</R12><R20>-0.135</R20><R21>0.4665</R21><R22>-0.8741</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1112</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX49"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.715</X><Y>0.2703</Y><Z>-0.1651</Z><R00>-0.0337</R00><R01>0.8795</R01><R02>0.4746</R02><R10>0.9903</R10><R11>0.0935</R11><R12>-0.1031</R12><R20>-0.135</R20><R21>0.4665</R21><R22>-0.8741</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX50"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8247</X><Y>0.282</Y><Z>-0.1069</Z><R00>-0.0337</R00><R01>0.8795</R01><R02>0.4746</R02><R10>0.9903</R10><R11>0.0935</R11><R12>-0.1031</R12><R20>-0.135</R20><R21>0.4665</R21><R22>-0.8741</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX51"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8409</X><Y>0.2644</Y><Z>-0.2397</Z><R00>-0.0337</R00><R01>0.9545</R01><R02>0.2962</R02><R10>0.9903</R10><R11>0.0719</R11><R12>-0.1192</R12><R20>-0.135</R20><R21>0.2893</R21><R22>-0.9477</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.1012</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX52"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.7668</X><Y>0.2588</Y><Z>-0.2621</Z><R00>-0.0337</R00><R01>0.9545</R01><R02>0.2962</R02><R10>0.9903</R10><R11>0.0719</R11><R12>-0.1192</R12><R20>-0.135</R20><R21>0.2893</R21><R22>-0.9477</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX53"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8763</X><Y>0.2671</Y><Z>-0.2289</Z><R00>-0.0337</R00><R01>0.9545</R01><R02>0.2962</R02><R10>0.9903</R10><R11>0.0719</R11><R12>-0.1192</R12><R20>-0.135</R20><R21>0.2893</R21><R22>-0.9477</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX54"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8715</X><Y>0.2488</Y><Z>-0.3616</Z><R00>-0.0337</R00><R01>0.9937</R01><R02>0.1067</R02><R10>0.9903</R10><R11>0.0476</R11><R12>-0.1308</R12><R20>-0.135</R20><R21>0.1013</R21><R22>-0.9856</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.0909</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX55"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.7995</X><Y>0.2454</Y><Z>-0.369</Z><R00>-0.0337</R00><R01>0.9937</R01><R02>0.1067</R02><R10>0.9903</R10><R11>0.0476</R11><R12>-0.1308</R12><R20>-0.135</R20><R21>0.1013</R21><R22>-0.9856</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX56"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.9033</X><Y>0.2503</Y><Z>-0.3584</Z><R00>-0.0337</R00><R01>0.9937</R01><R02>0.1067</R02><R10>0.9903</R10><R11>0.0476</R11><R12>-0.1308</R12><R20>-0.135</R20><R21>0.1013</R21><R22>-0.9856</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX57"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8782</X><Y>0.2318</Y><Z>-0.4881</Z><R00>-0.0337</R00><R01>0.9957</R01><R02>-0.0868</R02><R10>0.9903</R10><R11>0.0215</R11><R12>-0.1375</R12><R20>-0.135</R20><R21>-0.0905</R21><R22>-0.9867</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.0801</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX58"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8115</X><Y>0.2304</Y><Z>-0.482</Z><R00>-0.0337</R00><R01>0.9957</R01><R02>-0.0868</R02><R10>0.9903</R10><R11>0.0215</R11><R12>-0.1375</R12><R20>-0.135</R20><R21>-0.0905</R21><R22>-0.9867</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX59"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.9046</X><Y>0.2324</Y><Z>-0.4905</Z><R00>-0.0337</R00><R01>0.9957</R01><R02>-0.0868</R02><R10>0.9903</R10><R11>0.0215</R11><R12>-0.1375</R12><R20>-0.135</R20><R21>-0.0905</R21><R22>-0.9867</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX60"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8603</X><Y>0.214</Y><Z>-0.6144</Z><R00>-0.0337</R00><R01>0.9603</R01><R02>-0.277</R02><R10>0.9903</R10><R11>-0.0054</R11><R12>-0.1391</R12><R20>-0.135</R20><R21>-0.279</R21><R22>-0.9507</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.0686</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX61"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8014</X><Y>0.2143</Y><Z>-0.5973</Z><R00>-0.0337</R00><R01>0.9603</R01><R02>-0.277</R02><R10>0.9903</R10><R11>-0.0054</R11><R12>-0.1391</R12><R20>-0.135</R20><R21>-0.279</R21><R22>-0.9507</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX62"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8802</X><Y>0.2139</Y><Z>-0.6202</Z><R00>-0.0337</R00><R01>0.9603</R01><R02>-0.277</R02><R10>0.9903</R10><R11>-0.0054</R11><R12>-0.1391</R12><R20>-0.135</R20><R21>-0.279</R21><R22>-0.9507</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX63"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8181</X><Y>0.1959</Y><Z>-0.7361</Z><R00>-0.0337</R00><R01>0.8889</R01><R02>-0.4569</R02><R10>0.9903</R10><R11>-0.0321</R11><R12>-0.1354</R12><R20>-0.135</R20><R21>-0.457</R21><R22>-0.8792</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.0562</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX64"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.7692</X><Y>0.1977</Y><Z>-0.7109</Z><R00>-0.0337</R00><R01>0.8889</R01><R02>-0.4569</R02><R10>0.9903</R10><R11>-0.0321</R11><R12>-0.1354</R12><R20>-0.135</R20><R21>-0.457</R21><R22>-0.8792</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX65"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.8311</X><Y>0.1955</Y><Z>-0.7428</Z><R00>-0.0337</R00><R01>0.8889</R01><R02>-0.4569</R02><R10>0.9903</R10><R11>-0.0321</R11><R12>-0.1354</R12><R20>-0.135</R20><R21>-0.457</R21><R22>-0.8792</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX66"><Properties><string name="Name">Lame</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.7532</X><Y>0.1783</Y><Z>-0.849</Z><R00>-0.0337</R00><R01>0.7842</R01><R02>-0.6196</R02><R10>0.9903</R10><R11>-0.0576</R11><R12>-0.1267</R12><R20>-0.135</R20><R21>-0.6178</R21><R22>-0.7746</R22></CoordinateFrame><Vector3 name="size"><X>0.045</X><Y>0.0417</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4289508030</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0.25</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX67"><Properties><string name="Name">Fil</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.7157</X><Y>0.1811</Y><Z>-0.8194</Z><R00>-0.0337</R00><R01>0.7842</R01><R02>-0.6196</R02><R10>0.9903</R10><R11>-0.0576</R11><R12>-0.1267</R12><R20>-0.135</R20><R21>-0.6178</R21><R22>-0.7746</R22></CoordinateFrame><Vector3 name="size"><X>0.027</X><Y>0.063</Y><Z>0.1639</Z></Vector3><Color3uint8 name="Color3uint8">4293718520</Color3uint8><token name="Material">272</token><token name="shape">1</token><float name="Reflectance">0.3</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item><Item class="Part" referent="RBX68"><Properties><string name="Name">Dos</string><bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanTouch">false</bool><bool name="CanQuery">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>1.759</X><Y>0.1779</Y><Z>-0.8535</Z><R00>-0.0337</R00><R01>0.7842</R01><R02>-0.6196</R02><R10>0.9903</R10><R11>-0.0576</R11><R12>-0.1267</R12><R20>-0.135</R20><R21>-0.6178</R21><R22>-0.7746</R22></CoordinateFrame><Vector3 name="size"><X>0.0675</X><Y>0.0315</Y><Z>0.1606</Z></Vector3><Color3uint8 name="Color3uint8">4283322974</Color3uint8><token name="Material">1088</token><token name="shape">1</token><float name="Reflectance">0</float><float name="Transparency">0</float><token name="TopSurface">0</token><token name="BottomSurface">0</token></Properties></Item></Item><Item class="Script" referent="RBX70"><Properties><string name="Name">FaucilleServer</string><ProtectedString name="Source"><![CDATA[-- FaucilleServer (Script dans ServerScriptService)
+-- La faucille est posée sur l'établi (modèle "FaucilleVitrine" sur le tapis vert).
+-- On l'achète avec E (ou en restant appuyé sur le bouton), elle arrive dans la barre d'outils
+-- et coupe plusieurs touffes d'un coup. L'achat est gardé quand le joueur revient.
+if not game:GetService("RunService"):IsServer() then
+	warn("[Faucille] FaucilleServer doit être un Script dans ServerScriptService !")
+	return
+end
+print("[Faucille] FaucilleServer démarré")
+
+local REGLAGES = {
+	PRIX = 7.99,
+	TOUFFES_EN_PLUS = 3, -- touffes voisines coupées en plus à chaque coup (les ciseaux : 0)
+	RAYON = 5.5, -- rayon autour de la touffe visée (studs)
+	TAILLE_EN_MAIN = 0.75, -- taille de la faucille dans la main
+	INCLINAISON = 0, -- degrés : penche la faucille dans la main si besoin (ex : 20 ou -20)
+	EQUIPER_APRES_ACHAT = true, -- la faucille arrive directement dans la main
+	SAUVEGARDER = true, -- garde l'achat quand le joueur revient (DataStore)
+}
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
+local DataStoreService = game:GetService("DataStoreService")
+
+local TAG = "OutilFaucille"
+local okCfg, CFG = pcall(function() return require(ReplicatedStorage:WaitForChild("GrassConfig", 10)) end)
+if not okCfg or type(CFG) ~= "table" then CFG = {} end
+
+-- infos pour l'écran des joueurs (prix, nombre de touffes)
+local achat = ReplicatedStorage:FindFirstChild("FaucilleAchat") or Instance.new("RemoteEvent")
+achat.Name = "FaucilleAchat"
+achat:SetAttribute("Prix", REGLAGES.PRIX)
+achat:SetAttribute("Touffes", 1 + REGLAGES.TOUFFES_EN_PLUS)
+achat.Parent = ReplicatedStorage
+
+---------------------------------------------------------------- Le modèle (le même sur l'établi et dans la main)
+-- nom, forme, taille (x, y, z), position (x, y, z), rotation (9 nombres), couleur (r, g, b), matière, reflet
+-- Repère : le manche monte selon Y (le poing autour de y = 0), la lame est dans le plan Y-Z.
+local PIECES = {
+	{ "Pommeau", "Ball", 0.36, 0.36, 0.36, 0, -0.8, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 98, 60, 34, "Wood", 0 },
+	{ "Manche", "Cylinder", 1.36, 0.26, 0.26, 0, -0.1, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 176, 112, 62, "Wood", 0 },
+	{ "Bague", "Cylinder", 0.08, 0.31, 0.31, 0, -0.62, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 98, 60, 34, "Wood", 0 },
+	{ "Grip", "Cylinder", 0.66, 0.29, 0.29, 0, -0.18, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 204, 42, 48, "Fabric", 0 },
+	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, -0.51, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
+	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, -0.29, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
+	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, -0.07, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
+	{ "GripBande", "Cylinder", 0.05, 0.305, 0.305, 0, 0.15, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 150, 26, 32, "Fabric", 0 },
+	{ "Virole", "Cylinder", 0.3, 0.33, 0.33, 0, 0.66, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 172, 178, 190, "Metal", 0.2 },
+	{ "ViroleBord", "Cylinder", 0.05, 0.36, 0.36, 0, 0.52, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 78, 82, 94, "Metal", 0 },
+	{ "Rivet", "Ball", 0.09, 0.09, 0.09, -0.16, 0.66, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 214, 172, 78, "Metal", 0.2 },
+	{ "Rivet", "Ball", 0.09, 0.09, 0.09, 0.16, 0.66, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 214, 172, 78, "Metal", 0.2 },
+	{ "Soie", "Block", 0.07, 0.24, 0.13, 0, 0.9, -0.02, 1, 0, 0, 0, 1, 0, 0, 0, 1, 78, 82, 94, "Metal", 0 },
+	{ "Talon", "Block", 0.06, 0.5389, 0.2, 0, 1.0452, -0.219, 1, 0, 0, 0, 0.3111, 0.9504, 0, -0.9504, 0.3111, 172, 178, 190, "Metal", 0.25 },
+	{ "Lame", "Block", 0.05, 0.2305, 0.1785, 0, 1.1396, -0.4783, 1, 0, 0, 0, -0.9634, 0.2682, 0, -0.2682, -0.9634, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.2796, -0.4393, 1, 0, 0, 0, -0.9634, 0.2682, 0, -0.2682, -0.9634, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.043, -0.5052, 1, 0, 0, 0, -0.9634, 0.2682, 0, -0.2682, -0.9634, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.2216, 0.1785, 0, 1.182, -0.6003, 1, 0, 0, 0, -0.8936, 0.4488, 0, -0.4488, -0.8936, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.3078, -0.5372, 1, 0, 0, 0, -0.8936, 0.4488, 0, -0.4488, -0.8936, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.0964, -0.6433, 1, 0, 0, 0, -0.8936, 0.4488, 0, -0.4488, -0.8936, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.2125, 0.1785, 0, 1.2475, -0.7128, 1, 0, 0, 0, -0.7904, 0.6126, 0, -0.6126, -0.7904, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.3551, -0.6293, 1, 0, 0, 0, -0.7904, 0.6126, 0, -0.6126, -0.7904, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.1753, -0.7686, 1, 0, 0, 0, -0.7904, 0.6126, 0, -0.6126, -0.7904, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.2032, 0.1785, 0, 1.3339, -0.8111, 1, 0, 0, 0, -0.6575, 0.7534, 0, -0.7534, -0.6575, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.4205, -0.712, 1, 0, 0, 0, -0.6575, 0.7534, 0, -0.7534, -0.6575, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.277, -0.8764, 1, 0, 0, 0, -0.6575, 0.7534, 0, -0.7534, -0.6575, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1939, 0.1785, 0, 1.4385, -0.8915, 1, 0, 0, 0, -0.5, 0.866, 0, -0.866, -0.5, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.5019, -0.7816, 1, 0, 0, 0, -0.5, 0.866, 0, -0.866, -0.5, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.3975, -0.9625, 1, 0, 0, 0, -0.5, 0.866, 0, -0.866, -0.5, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1844, 0.1785, 0, 1.5573, -0.9508, 1, 0, 0, 0, -0.3237, 0.9461, 0, -0.9461, -0.3237, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.5969, -0.8351, 1, 0, 0, 0, -0.3237, 0.9461, 0, -0.9461, -0.3237, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.5323, -1.0238, 1, 0, 0, 0, -0.3237, 0.9461, 0, -0.9461, -0.3237, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1748, 0.1785, 0, 1.6863, -0.9863, 1, 0, 0, 0, -0.1353, 0.9908, 0, -0.9908, -0.1353, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.7022, -0.87, 1, 0, 0, 0, -0.1353, 0.9908, 0, -0.9908, -0.1353, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.6765, -1.058, 1, 0, 0, 0, -0.1353, 0.9908, 0, -0.9908, -0.1353, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1649, 0.1785, 0, 1.8206, -0.9963, 1, 0, 0, 0, 0.0581, 0.9983, 0, -0.9983, 0.0581, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.814, -0.8841, 1, 0, 0, 0, 0.0581, 0.9983, 0, -0.9983, 0.0581, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.8245, -1.0637, 1, 0, 0, 0, 0.0581, 0.9983, 0, -0.9983, 0.0581, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1549, 0.1785, 0, 1.9552, -0.9803, 1, 0, 0, 0, 0.2494, 0.9684, 0, -0.9684, 0.2494, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 1.9284, -0.8762, 1, 0, 0, 0, 0.2494, 0.9684, 0, -0.9684, 0.2494, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 1.9708, -1.0408, 1, 0, 0, 0, 0.2494, 0.9684, 0, -0.9684, 0.2494, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1447, 0.1785, 0, 2.0853, -0.9384, 1, 0, 0, 0, 0.4314, 0.9022, 0, -0.9022, 0.4314, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.0411, -0.846, 1, 0, 0, 0, 0.4314, 0.9022, 0, -0.9022, 0.4314, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.11, -0.9902, 1, 0, 0, 0, 0.4314, 0.9022, 0, -0.9022, 0.4314, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1343, 0.1785, 0, 2.2057, -0.8718, 1, 0, 0, 0, 0.5972, 0.8021, 0, -0.8021, 0.5972, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.1477, -0.7939, 1, 0, 0, 0, 0.5972, 0.8021, 0, -0.8021, 0.5972, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.2368, -0.9136, 1, 0, 0, 0, 0.5972, 0.8021, 0, -0.8021, 0.5972, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1235, 0.1785, 0, 2.3119, -0.7827, 1, 0, 0, 0, 0.7405, 0.672, 0, -0.672, 0.7405, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.2439, -0.721, 1, 0, 0, 0, 0.7405, 0.672, 0, -0.672, 0.7405, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.3465, -0.8141, 1, 0, 0, 0, 0.7405, 0.672, 0, -0.672, 0.7405, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.1125, 0.1785, 0, 2.3997, -0.674, 1, 0, 0, 0, 0.8562, 0.5167, 0, -0.5167, 0.8562, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.3258, -0.6294, 1, 0, 0, 0, 0.8562, 0.5167, 0, -0.5167, 0.8562, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.435, -0.6953, 1, 0, 0, 0, 0.8562, 0.5167, 0, -0.5167, 0.8562, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.101, 0.1785, 0, 2.4655, -0.5495, 1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.3899, -0.522, 1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.4989, -0.5616, 1, 0, 0, 0, 0.9397, 0.342, 0, -0.342, 0.9397, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.089, 0.1785, 0, 2.5067, -0.4137, 1, 0, 0, 0, 0.988, 0.1545, 0, -0.1545, 0.988, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4331, -0.4021, 1, 0, 0, 0, 0.988, 0.1545, 0, -0.1545, 0.988, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.5358, -0.4182, 1, 0, 0, 0, 0.988, 0.1545, 0, -0.1545, 0.988, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.0762, 0.1785, 0, 2.5213, -0.2712, 1, 0, 0, 0, 0.9992, -0.0388, 0, 0.0388, 0.9992, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4533, -0.2739, 1, 0, 0, 0, 0.9992, -0.0388, 0, 0.0388, 0.9992, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.5444, -0.2703, 1, 0, 0, 0, 0.9992, -0.0388, 0, 0.0388, 0.9992, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.0624, 0.1785, 0, 2.5086, -0.1273, 1, 0, 0, 0, 0.973, -0.2306, 0, 0.2306, 0.973, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4491, -0.1414, 1, 0, 0, 0, 0.973, -0.2306, 0, 0.2306, 0.973, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.5244, -0.1236, 1, 0, 0, 0, 0.973, -0.2306, 0, 0.2306, 0.973, 78, 82, 94, "Metal", 0 },
+	{ "Lame", "Block", 0.05, 0.0464, 0.1785, 0, 2.469, 0.0132, 1, 0, 0, 0, 0.9104, -0.4138, 0, 0.4138, 0.9104, 172, 178, 190, "Metal", 0.25 },
+	{ "Fil", "Block", 0.03, 0.07, 0.1821, 0, 2.4206, -0.0088, 1, 0, 0, 0, 0.9104, -0.4138, 0, 0.4138, 0.9104, 236, 241, 248, "SmoothPlastic", 0.3 },
+	{ "Dos", "Block", 0.075, 0.035, 0.1785, 0, 2.4764, 0.0166, 1, 0, 0, 0, 0.9104, -0.4138, 0, 0.4138, 0.9104, 78, 82, 94, "Metal", 0 },
+}
+
+local function construire(parent, origine, echelle, ancre)
+	local parts = {}
+	for _, d in PIECES do
+		local p = Instance.new("Part")
+		p.Name = d[1]
+		p.Shape = Enum.PartType[d[2]]
+		p.Size = Vector3.new(d[3], d[4], d[5]) * echelle
+		p.CFrame = origine * CFrame.new(d[6] * echelle, d[7] * echelle, d[8] * echelle, d[9], d[10], d[11], d[12], d[13], d[14], d[15], d[16], d[17])
+		p.Color = Color3.fromRGB(d[18], d[19], d[20])
+		p.Material = Enum.Material[d[21]]
+		p.Reflectance = d[22]
+		p.Anchored = ancre
+		p.CanCollide, p.CanTouch, p.CanQuery = false, false, false
+		p.Massless = true
+		p.CastShadow = true
+		p.TopSurface, p.BottomSurface = Enum.SurfaceType.Smooth, Enum.SurfaceType.Smooth
+		p.Parent = parent
+		table.insert(parts, p)
+	end
+	return parts
+end
+
+---------------------------------------------------------------- L'outil
+local function construireOutil()
+	local E = REGLAGES.TAILLE_EN_MAIN
+	local outil = Instance.new("Tool")
+	outil.Name = "Faucille"
+	outil.ToolTip = "Coupe " .. (1 + REGLAGES.TOUFFES_EN_PLUS) .. " touffes d'un coup"
+	outil.CanBeDropped = false
+	outil:SetAttribute("CoupeEnPlus", REGLAGES.TOUFFES_EN_PLUS) -- lu par GrassServer
+	outil:SetAttribute("RayonCoupe", REGLAGES.RAYON)
+	CollectionService:AddTag(outil, TAG)
+	local handle = Instance.new("Part")
+	handle.Name = "Handle"
+	handle.Size = Vector3.new(0.3, 0.3, 0.3)
+	handle.Transparency = 1
+	handle.CanCollide, handle.CanTouch, handle.CanQuery = false, false, false
+	handle.Massless = true
+	handle.CFrame = CFrame.identity
+	handle.Parent = outil
+	local modele = Instance.new("Folder")
+	modele.Name = "Modele"
+	modele.Parent = outil
+	for _, p in construire(modele, CFrame.identity, E, false) do
+		local w = Instance.new("Weld")
+		w.Part0, w.Part1 = handle, p
+		w.C0 = p.CFrame
+		w.Parent = p
+	end
+	-- dans la main : le manche vers l'avant, le croissant vers le haut
+	outil.Grip = CFrame.fromMatrix(Vector3.new(0, -0.18 * E, 0), Vector3.new(-1, 0, 0), Vector3.new(0, 0, -1), Vector3.new(0, -1, 0))
+		* CFrame.Angles(math.rad(-REGLAGES.INCLINAISON), 0, 0)
+	-- traînée blanche pendant le coup
+	local a0 = Instance.new("Attachment") a0.Name = "TraineeA" a0.Position = Vector3.new(0, 2.5, -0.3) * E a0.Parent = handle
+	local a1 = Instance.new("Attachment") a1.Name = "TraineeB" a1.Position = Vector3.new(0, 1.8, -1.05) * E a1.Parent = handle
+	local tr = Instance.new("Trail")
+	tr.Name = "Trainee"
+	tr.Attachment0, tr.Attachment1 = a0, a1
+	tr.Lifetime = 0.16
+	tr.Color = ColorSequence.new(Color3.new(1, 1, 1))
+	tr.Transparency = NumberSequence.new(0.35, 1)
+	tr.LightEmission = 0.5
+	tr.Enabled = false
+	tr.Parent = handle
+	local son = Instance.new("Sound")
+	son.Name = "Swoosh"
+	son.SoundId = "rbxasset://sounds/swordslash.wav"
+	son.Volume = 0.45
+	son.Parent = handle
+	return outil
+end
+local modeleOutil = construireOutil()
+
+---------------------------------------------------------------- Le coup de faucille (bras qui balaie l'herbe)
+local function trouverEpaule(perso)
+	local bras = perso:FindFirstChild("RightUpperArm")
+	if bras then return bras:FindFirstChild("RightShoulder") end
+	local torse = perso:FindFirstChild("Torso")
+	return torse and torse:FindFirstChild("Right Shoulder")
+end
+local animations = setmetatable({}, { __mode = "k" })
+local function animerC0(joint, cible, duree)
+	local depart = joint.C0
+	local id = (animations[joint] or 0) + 1
+	animations[joint] = id
+	task.spawn(function()
+		local t0 = os.clock()
+		while animations[joint] == id do
+			local a = math.min((os.clock() - t0) / duree, 1)
+			local ok = pcall(function() joint.C0 = depart:Lerp(cible, 1 - (1 - a) ^ 2) end)
+			if not ok or a >= 1 then return end
+			RunService.Heartbeat:Wait()
+		end
+	end)
+end
+local function bras(epaule, tangage, lacet, duree)
+	if not (epaule and epaule:IsA("Motor6D")) then return end
+	local origine = epaule:GetAttribute("C0Origine")
+	if not origine then
+		origine = epaule.C0
+		epaule:SetAttribute("C0Origine", origine)
+	end
+	animerC0(epaule, CFrame.new(origine.Position) * CFrame.Angles(math.rad(tangage), math.rad(lacet), 0) * origine.Rotation, duree)
+end
+local function delaiCoupe(qui)
+	local dex = qui and qui:GetAttribute("Upg_Dexterite") or 0
+	return math.max(0.2, (CFG.PICK_COOLDOWN or 0.9) * (1 - (CFG.DEX_PAR_NIVEAU or 0.08) * dex))
+end
+
+local derniers = setmetatable({}, { __mode = "k" })
+local occupes = setmetatable({}, { __mode = "k" })
+local function coup(outil)
+	local perso = outil.Parent
+	local joueur = perso and Players:GetPlayerFromCharacter(perso)
+	if not joueur or occupes[outil] then return end
+	-- pas de spam : un coup seulement quand le délai pour couper une herbe est passé
+	if os.clock() - (derniers[outil] or -math.huge) < delaiCoupe(joueur) * 0.85 then return end
+	derniers[outil] = os.clock()
+	occupes[outil] = true
+	local epaule = trouverEpaule(perso)
+	local handle = outil:FindFirstChild("Handle")
+	local tr = handle and handle:FindFirstChild("Trainee")
+	local son = handle and handle:FindFirstChild("Swoosh")
+	bras(epaule, -20, -55, 0.1) -- on arme : bras vers la droite
+	task.wait(0.1)
+	if tr then tr.Enabled = true end
+	if son then son.PlaybackSpeed = 1.1 + math.random() * 0.25 son:Play() end
+	bras(epaule, -45, 50, 0.13) -- on balaie vers la gauche, près du sol
+	task.wait(0.15)
+	if tr then tr.Enabled = false end
+	if outil.Parent == perso then bras(epaule, -12, 0, 0.18) end
+	task.wait(0.05)
+	occupes[outil] = nil
+end
+
+local branches = setmetatable({}, { __mode = "k" })
+local function brancher(outil)
+	if not outil:IsA("Tool") or branches[outil] then return end
+	branches[outil] = true
+	outil.Equipped:Connect(function()
+		bras(trouverEpaule(outil.Parent), -12, 0, 0.2)
+	end)
+	outil.Unequipped:Connect(function()
+		local joueur = outil:FindFirstAncestorOfClass("Player")
+		local perso = joueur and joueur.Character
+		local epaule = perso and trouverEpaule(perso)
+		local origine = epaule and epaule:GetAttribute("C0Origine")
+		if origine then animerC0(epaule, origine, 0.12) end
+	end)
+	outil.Activated:Connect(function() coup(outil) end)
+end
+CollectionService:GetInstanceAddedSignal(TAG):Connect(brancher)
+for _, o in CollectionService:GetTagged(TAG) do brancher(o) end
+
+-- GrassServer prévient quand une touffe est vraiment coupée (aussi en restant appuyé)
+local signal = ServerStorage:WaitForChild("CiseauxCoupe", 5)
+if not signal then
+	signal = Instance.new("BindableEvent")
+	signal.Name = "CiseauxCoupe"
+	signal.Parent = ServerStorage
+end
+signal.Event:Connect(function(joueur)
+	local outil = joueur.Character and joueur.Character:FindFirstChildOfClass("Tool")
+	if outil and CollectionService:HasTag(outil, TAG) then task.spawn(coup, outil) end
+end)
+
+---------------------------------------------------------------- Achat et sauvegarde
+local store
+if REGLAGES.SAUVEGARDER then
+	local ok, s = pcall(function() return DataStoreService:GetDataStore("Faucille_v1") end)
+	if ok then store = s end
+end
+local avertiSauvegarde = false
+local function charger(joueur)
+	if not store then return false end
+	local ok, v = pcall(function() return store:GetAsync("u" .. joueur.UserId) end)
+	if not ok and not avertiSauvegarde then
+		avertiSauvegarde = true
+		warn("[Faucille] Sauvegarde impossible. Dans Studio : Home > Game Settings > Security > Enable Studio Access to API Services")
+	end
+	return ok and v == true
+end
+local function sauver(joueur)
+	if not store then return end
+	task.spawn(function()
+		for _ = 1, 3 do
+			if pcall(function() store:SetAsync("u" .. joueur.UserId, true) end) then return end
+			task.wait(3)
+		end
+	end)
+end
+
+local NOMS_ARGENT = { "Money", "Cash", "Argent", "Coins", "Dollars", "Pieces", "Pièces", "$" }
+local function argent(joueur)
+	local ls = joueur:FindFirstChild("leaderstats")
+	if not ls then return nil end
+	if CFG.MONEY_STAT and CFG.MONEY_STAT ~= "" then return ls:FindFirstChild(CFG.MONEY_STAT) end
+	for _, n in NOMS_ARGENT do
+		local v = ls:FindFirstChild(n)
+		if v and (v:IsA("IntValue") or v:IsA("NumberValue")) then return v end
+	end
+	return nil
+end
+
+local function donner(joueur, equiper)
+	local gear = joueur:FindFirstChild("StarterGear") or joueur:WaitForChild("StarterGear", 5)
+	if gear and not gear:FindFirstChild("Faucille") then modeleOutil:Clone().Parent = gear end -- gardée après la mort
+	local sac = joueur:FindFirstChildOfClass("Backpack") or joueur:WaitForChild("Backpack", 5)
+	local perso = joueur.Character
+	local outil = (sac and sac:FindFirstChild("Faucille")) or (perso and perso:FindFirstChild("Faucille"))
+	if not outil and sac then
+		outil = modeleOutil:Clone()
+		outil.Parent = sac
+	end
+	if equiper and outil and sac and outil.Parent == sac and perso then
+		local h = perso:FindFirstChildOfClass("Humanoid")
+		if h and h.Health > 0 then h:EquipTool(outil) end
+	end
+end
+
+local enCours = {}
+local function acheter(joueur)
+	if enCours[joueur] then return end
+	enCours[joueur] = true
+	if joueur:GetAttribute("Faucille") then
+		donner(joueur, true)
+	else
+		local m = argent(joueur)
+		local v = m and tonumber(m.Value) or 0
+		local prix = REGLAGES.PRIX
+		if m and m:IsA("IntValue") then prix = math.ceil(prix) end
+		if not m or v + 1e-6 < prix then
+			achat:FireClient(joueur, "manque", prix - v)
+		else
+			m.Value = if m:IsA("IntValue") then v - prix else math.floor((v - prix) * 100 + 0.5) / 100
+			joueur:SetAttribute("Faucille", true)
+			sauver(joueur)
+			donner(joueur, REGLAGES.EQUIPER_APRES_ACHAT)
+			achat:FireClient(joueur, "ok")
+			print("[Faucille] " .. joueur.Name .. " a acheté la faucille")
+		end
+	end
+	task.wait(0.3)
+	enCours[joueur] = nil
+end
+
+local function arrivee(joueur)
+	if charger(joueur) then
+		joueur:SetAttribute("Faucille", true)
+		if not joueur.Character then joueur.CharacterAdded:Wait() end
+		task.wait(1)
+		donner(joueur, false)
+	end
+end
+Players.PlayerAdded:Connect(arrivee)
+for _, j in Players:GetPlayers() do task.spawn(arrivee, j) end
+Players.PlayerRemoving:Connect(function(joueur) enCours[joueur] = nil end)
+
+---------------------------------------------------------------- La faucille sur l'établi
+local function vitrine()
+	local v = workspace:FindFirstChild("FaucilleVitrine", true)
+	if v then return v end
+	-- pas de vitrine : on la pose sur le tapis vert de l'établi
+	local meuble = workspace:FindFirstChild("MeubleOutils", true)
+	local tapis = (meuble and meuble:FindFirstChild("Tapis", true)) or workspace:FindFirstChild("Tapis", true)
+	if not (tapis and tapis:IsA("BasePart")) then
+		warn("[Faucille] Pas de 'FaucilleVitrine' ni d'établi 'MeubleOutils' avec un 'Tapis' : la faucille n'est pas en vente")
+		return nil
+	end
+	v = Instance.new("Model")
+	v.Name = "FaucilleVitrine"
+	local dessus = tapis.CFrame * CFrame.new(0, tapis.Size.Y / 2, 0)
+	local base = Instance.new("Part")
+	base.Name = "Base"
+	base.Size = Vector3.new(3.4, 0.1, 2.2)
+	base.CFrame = dessus * CFrame.new(0, 0.05, 0)
+	base.Transparency = 1
+	base.Anchored = true
+	base.CanCollide, base.CanTouch, base.CanQuery = false, false, false
+	base.Parent = v
+	v.PrimaryPart = base
+	-- couchée sur le tapis, le croissant vers le fond
+	local pose = dessus * CFrame.new(-0.4, 0.18, -0.3) * CFrame.Angles(0, math.rad(14), 0)
+		* CFrame.fromMatrix(Vector3.zero, Vector3.new(0, 1, 0), Vector3.new(1, 0, 0), Vector3.new(0, 0, -1))
+		* CFrame.Angles(0, math.rad(-8), 0)
+	construire(v, pose, 0.9, true)
+	v.Parent = meuble or workspace
+	return v
+end
+
+local v = vitrine()
+if v then
+	local base = v.PrimaryPart or v:FindFirstChild("Base")
+	local prompt = base:FindFirstChildOfClass("ProximityPrompt") or Instance.new("ProximityPrompt")
+	prompt.Name = "Acheter"
+	prompt.ActionText = string.format("Acheter  $%.2f", REGLAGES.PRIX)
+	prompt.ObjectText = "Faucille"
+	prompt.HoldDuration = 0.35
+	prompt.MaxActivationDistance = 10
+	prompt.RequiresLineOfSight = false
+	prompt.KeyboardKeyCode = Enum.KeyCode.E
+	prompt.Parent = base
+	prompt.Triggered:Connect(acheter)
+	print("[Faucille] En vente sur l'établi : $" .. REGLAGES.PRIX)
+end
+]]></ProtectedString></Properties></Item><Item class="Script" referent="RBX71"><Properties><string name="Name">GrassServer</string><ProtectedString name="Source"><![CDATA[-- GrassServer (Script dans ServerScriptService)
+-- ANTI-LAG : le serveur ne crée AUCUNE pièce d'herbe. Il garde seulement la liste des touffes
+-- (position, taille, rareté). Chaque joueur affiche lui-même les touffes proches de lui.
+if not game:GetService("RunService"):IsServer() then
+	warn("[Herbe] GrassServer doit être un Script dans ServerScriptService (pas un LocalScript) !")
+	return
+end
+print("[Herbe] GrassServer démarré")
+local CS=game:GetService("CollectionService")
+local Players=game:GetService("Players")
+local RS=game:GetService("ReplicatedStorage")
+local CFG=require(RS:WaitForChild("GrassConfig"))
+local K=require(RS:WaitForChild("GrassKit"))
+
+local remotes=RS:FindFirstChild("GrassRemotes") or Instance.new("Folder")
+remotes.Name="GrassRemotes" remotes.Parent=RS
+local function remote(n,cls)
+	cls=cls or "RemoteEvent"
+	local r=remotes:FindFirstChild(n)
+	if r and r.ClassName~=cls then r:Destroy() r=nil end
+	if not r then r=Instance.new(cls) r.Name=n r.Parent=remotes end
+	return r
+end
+local Picked,BagFull,Deposited,PickRequest=remote("Picked"),remote("BagFull"),remote("Deposited"),remote("PickRequest")
+local GetGrass=remote("GetGrass","RemoteFunction")
+local MONEY_PER_PLACE=CFG.MONEY_PER_PLACE or CFG.MONEY_PER_TUFT or 0
+local SPACING=CFG.SPACING or 3
+
+-- ===== raretés =====
+local RAR,totalChance={},0
+for _,r in CFG.RARITIES do RAR[r.name]=r totalChance+=r.chance end
+local function rollRarity()
+	local x=math.random()*totalChance
+	for _,r in CFG.RARITIES do x-=r.chance if x<=0 then return r.name end end
+	return CFG.RARITIES[1].name
+end
+
+-- ===== tailles très variées (par rapport à la taille de ton modèle Grass2) =====
+local function tuftScale()
+	local r=math.random()
+	if r<.25 then return .7+math.random()*.15       -- 25% petites        (70-85%)
+	elseif r<.6 then return 1.05+math.random()*.15 -- 35% moyennes       (105-120%)
+	elseif r<.85 then return 1.35+math.random()*.15 -- 25% grosses       (135-150%)
+	else return 1.75+math.random()*.15 end         -- 15% très grosses   (175-190%)
+end
+
+-- ===== joueurs =====
+local MONEY_NAMES={"Money","Cash","Argent","Coins","Dollars","Pieces","Pièces","$"}
+local function moneyStat(plr)
+	local ls=plr:FindFirstChild("leaderstats") if not ls then return nil end
+	if CFG.MONEY_STAT~="" then return ls:FindFirstChild(CFG.MONEY_STAT) end
+	for _,n in MONEY_NAMES do
+		local v=ls:FindFirstChild(n)
+		if v and (v:IsA("IntValue") or v:IsA("NumberValue")) then return v end
+	end
+end
+local function initPlayer(p)
+	p:SetAttribute("Bag",0)
+	p:SetAttribute("BagMax",CFG.BAG_CAPACITY)
+	local ls=p:FindFirstChild("leaderstats") or p:WaitForChild("leaderstats",5)
+	if not ls then ls=Instance.new("Folder") ls.Name="leaderstats" ls.Parent=p end
+	if not ls:FindFirstChild("Herbe") then local v=Instance.new("IntValue") v.Name="Herbe" v.Parent=ls end
+	-- argent : créé s'il n'existe pas encore
+	if not moneyStat(p) then local v=Instance.new("NumberValue") v.Name=CFG.MONEY_STAT~="" and CFG.MONEY_STAT or "Money" v.Parent=ls end
+end
+Players.PlayerAdded:Connect(initPlayer)
+for _,p in Players:GetPlayers() do task.spawn(initPlayer,p) end
+local lastPick,lastFull,lastDep={},{},{}
+Players.PlayerRemoving:Connect(function(p) lastPick[p]=nil lastFull[p]=nil lastDep[p]=nil end)
+local function hrpOf(plr) return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") end
+
+-- ===== outils de coupe : on ne peut couper l'herbe qu'avec un outil en main (ciseaux, faucille...) =====
+local SCISSORS_EXTRA=CFG.SCISSORS_EXTRA or 0   -- touffes voisines coupées en plus à chaque coup (0 = une par une)
+local SCISSORS_RADIUS=CFG.SCISSORS_RADIUS or 4 -- rayon autour de la touffe visée (studs)
+-- un outil peut couper plus : attributs "CoupeEnPlus" (touffes en plus) et "RayonCoupe" (studs) sur l'outil
+local function cutterTool(plr)
+	local ch=plr.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	if tool and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil) then return tool end
+	return nil
+end
+
+-- ===== composteur =====
+local composts={}
+local function deposit(plr,c)
+	local bag=plr:GetAttribute("Bag") or 0
+	if bag<=0 then return end
+	local now=os.clock()
+	if lastDep[plr] and now-lastDep[plr]<1.5 then return end
+	local hrp=hrpOf(plr)
+	local cf,size=c:GetBoundingBox()
+	if not hrp or (hrp.Position-cf.Position).Magnitude>math.max(size.X,size.Z)/2+14 then return end
+	lastDep[plr]=now
+	local ls=plr:FindFirstChild("leaderstats")
+	local h=ls and ls:FindFirstChild("Herbe")
+	if h then h.Value+=bag end
+	local gain=0
+	local m=moneyStat(plr)
+	if m and MONEY_PER_PLACE>0 then
+		gain=bag*MONEY_PER_PLACE
+		if m:IsA("IntValue") then gain=math.max(1,math.floor(gain+.5)) m.Value+=gain
+		else m.Value=math.floor((m.Value+gain)*100+.5)/100 end
+	end
+	Deposited:FireAllClients(plr,c,bag,gain)
+	plr:SetAttribute("Bag",0)
+end
+local function setupCompost(c)
+	table.insert(composts,c)
+	if c:FindFirstChild("GrassDepositHitbox") then return end
+	local cf,size=c:GetBoundingBox()
+	local hb=Instance.new("Part") hb.Name="GrassDepositHitbox"
+	hb.Size=size+Vector3.new(1.2,0,1.2) hb.CFrame=cf hb.Transparency=1 hb.Anchored=true
+	hb.CanCollide=false hb.CanTouch=true hb.CanQuery=true hb.CastShadow=false hb.Parent=c
+	local cd=Instance.new("ClickDetector") cd.MaxActivationDistance=30 cd.Parent=hb
+	cd.MouseClick:Connect(function(plr) deposit(plr,c) end)
+	hb.Touched:Connect(function(part)
+		local ch=part:FindFirstAncestorOfClass("Model")
+		local plr=ch and Players:GetPlayerFromCharacter(ch)
+		if plr then deposit(plr,c) end
+	end)
+	CS:AddTag(c,"GrassCompost")
+end
+for _,d in workspace:GetDescendants() do
+	if d:IsA("Model") and d.Name==CFG.COMPOST_NAME then setupCompost(d) end
+end
+if #composts==0 then warn("[Herbe] Aucun modèle '"..CFG.COMPOST_NAME.."' trouvé dans Workspace") end
+
+-- ===== zones de pelouse =====
+local zones={}
+local zf=workspace:FindFirstChild(CFG.ZONES_FOLDER)
+local ZONE_COLOR=Color3.fromRGB(80,255,120)
+for _,z in workspace:GetDescendants() do
+	if z:IsA("BasePart") and ((zf and z:IsDescendantOf(zf)) or (z.Name:sub(1,4)=="Zone" and z.Color==ZONE_COLOR)) then
+		z.Transparency=1 z.CanCollide=false z.CanQuery=false z.CanTouch=false
+		table.insert(zones,z)
+	end
+end
+if #zones==0 then warn("[Herbe] Aucune zone trouvée : pas d'herbe") end
+
+-- ===== liste des touffes (pas de pièces !) =====
+local tufts={}   -- [id] = {id, p=position, yaw, s=taille, r=rareté, seed, size=places}
+local grid={}    -- grille pour vérifier l'espacement très vite
+local function cellOf(x,z) return math.floor(x/SPACING),math.floor(z/SPACING) end
+local function tooClose(p)
+	local gx,gz=cellOf(p.X,p.Z)
+	for dx=-1,1 do for dz=-1,1 do
+		local cell=grid[(gx+dx)..":"..(gz+dz)]
+		if cell then
+			for _,q in cell do
+				local a,b=q.X-p.X,q.Z-p.Z
+				if a*a+b*b<SPACING*SPACING then return true end
+			end
+		end
+	end end
+	return false
+end
+local function addGrid(p)
+	local gx,gz=cellOf(p.X,p.Z)
+	local k=gx..":"..gz
+	grid[k]=grid[k] or {}
+	table.insert(grid[k],p)
+end
+
+local area=0 for _,z in zones do area+=z.Size.X*z.Size.Z end
+local function randomSpot()
+	for _=1,30 do
+		local x,zone=math.random()*area,zones[#zones]
+		for _,z in zones do x-=z.Size.X*z.Size.Z if x<=0 then zone=z break end end
+		local lx,lz=(math.random()-.5)*zone.Size.X,(math.random()-.5)*zone.Size.Z
+		local top=zone.CFrame:PointToWorldSpace(Vector3.new(lx,zone.Size.Y/2,lz))
+		local bottom=zone.CFrame:PointToWorldSpace(Vector3.new(lx,-zone.Size.Y/2,lz))
+		local hit=K.Cast(top+Vector3.new(0,20,0),Vector3.new(0,-(zone.Size.Y+40),0))
+		if hit and hit.Position.Y<=top.Y+.5 and hit.Position.Y>=bottom.Y-.5 and not tooClose(hit.Position) then
+			local ok=true
+			for _,c in composts do
+				local cf,sz=c:GetBoundingBox()
+				local d=Vector3.new(cf.Position.X-hit.Position.X,0,cf.Position.Z-hit.Position.Z).Magnitude
+				if d<math.max(sz.X,sz.Z)/2+1.5 then ok=false break end
+			end
+			if ok then return hit.Position end
+		end
+	end
+end
+
+local nextId,ready,total,doorTotal=0,false,0,0
+local groupTotal={}
+local MIN2=(SPACING*.6)^2
+task.spawn(function()
+	-- remplissage en grille (avec un petit décalage aléatoire) : couvre toutes les zones sans trou
+	local cands={}
+	for _,zone in zones do
+		local nx=math.max(1,math.floor(zone.Size.X/SPACING))
+		local nz=math.max(1,math.floor(zone.Size.Z/SPACING))
+		for ix=0,nx-1 do
+			for iz=0,nz-1 do
+				local lx=-zone.Size.X/2+(ix+.5+(math.random()-.5)*.7)*zone.Size.X/nx
+				local lz=-zone.Size.Z/2+(iz+.5+(math.random()-.5)*.7)*zone.Size.Z/nz
+				table.insert(cands,{zone,lx,lz})
+			end
+		end
+	end
+	for i=#cands,2,-1 do local j=math.random(1,i) cands[i],cands[j]=cands[j],cands[i] end
+	for i,c in cands do
+		if total>=CFG.SPAWN_COUNT then break end
+		local zone,lx,lz=c[1],c[2],c[3]
+		local top=zone.CFrame:PointToWorldSpace(Vector3.new(lx,zone.Size.Y/2,lz))
+		local bottom=zone.CFrame:PointToWorldSpace(Vector3.new(lx,-zone.Size.Y/2,lz))
+		local hit=K.Cast(top+Vector3.new(0,20,0),Vector3.new(0,-(zone.Size.Y+40),0))
+		if hit and hit.Position.Y<=top.Y+.5 and hit.Position.Y>=bottom.Y-.5 then
+			local p=hit.Position
+			local ok=true
+			-- pas collé à une autre touffe (utile si des zones se chevauchent)
+			local gx,gz=cellOf(p.X,p.Z)
+			for dx=-1,1 do for dz=-1,1 do
+				local cell=grid[(gx+dx)..":"..(gz+dz)]
+				if cell then for _,q in cell do local a,b=q.X-p.X,q.Z-p.Z if a*a+b*b<MIN2 then ok=false end end end
+			end end
+			if ok then
+				for _,cp in composts do
+					local cf,sz=cp:GetBoundingBox()
+					if Vector3.new(cf.Position.X-p.X,0,cf.Position.Z-p.Z).Magnitude<math.max(sz.X,sz.Z)/2+1.5 then ok=false break end
+				end
+			end
+			if ok then
+				nextId+=1
+				local rar=rollRarity()
+				local isDoor=zone.Name=="ZonePorte"
+				local group=zone.Name -- Zone, ZonePorte, ZoneLabyrinthe...
+				tufts[nextId]={id=nextId,p=p,yaw=math.random()*math.pi*2,s=tuftScale(),r=rar,
+					seed=math.random(1,1000000000),size=RAR[rar].size,door=isDoor,group=group}
+				if isDoor then doorTotal+=1 end
+				if group then groupTotal[group]=(groupTotal[group] or 0)+1 end
+				addGrid(p)
+				total+=1
+			end
+		end
+		if i%40==0 then task.wait() end
+	end
+	ready=true
+	-- compteur d'herbe (utilisé par la porte à cadenas)
+	remotes:SetAttribute("GrassTotal",total)
+	remotes:SetAttribute("GrassLeft",total)
+	remotes:SetAttribute("DoorTotal",doorTotal)
+	remotes:SetAttribute("DoorLeft",doorTotal)
+	for g,n in groupTotal do remotes:SetAttribute("Total_"..g,n) remotes:SetAttribute("Left_"..g,n) end
+	print("[Herbe] Zones trouvées :",#zones," | Touffes créées :",total)
+end)
+
+-- chaque joueur récupère la liste au démarrage
+GetGrass.OnServerInvoke=function()
+	while not ready do task.wait(.1) end
+	local out={}
+	for _,t in tufts do
+		table.insert(out,{t.id,t.p.X,t.p.Y,t.p.Z,t.yaw,t.s,t.r,t.seed,t.size})
+	end
+	return out
+end
+
+-- ===== arracher une touffe (le joueur envoie juste son numéro) =====
+PickRequest.OnServerEvent:Connect(function(plr,id)
+	if typeof(id)~="number" then return end
+	local t=tufts[id] if not t then return end
+	local tool=cutterTool(plr)
+	if not tool then return end -- plus d'arrachage à la main
+	local hrp=hrpOf(plr)
+	if not hrp or (hrp.Position-t.p).Magnitude>CFG.CLICK_DIST+8 then return end
+	local now=os.clock()
+	local bag,max=plr:GetAttribute("Bag") or 0,plr:GetAttribute("BagMax") or CFG.BAG_CAPACITY
+	if bag+t.size>max then
+		if not lastFull[plr] or now-lastFull[plr]>.4 then lastFull[plr]=now BagFull:FireClient(plr,id,t.size,max-bag) end
+		return
+	end
+	-- Dextérité : chaque niveau réduit le délai de DEX_PAR_NIVEAU (8 % par défaut)
+	local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*(plr:GetAttribute("Upg_Dexterite") or 0)))
+	if lastPick[plr] and now-lastPick[plr]<cd then return end
+	lastPick[plr]=now
+	local function take(tid,tt)
+		tufts[tid]=nil -- ramassée pour de bon : elle ne repousse pas
+		remotes:SetAttribute("GrassLeft",math.max(0,(remotes:GetAttribute("GrassLeft") or 1)-1))
+		if tt.door then remotes:SetAttribute("DoorLeft",math.max(0,(remotes:GetAttribute("DoorLeft") or 1)-1)) end
+		if tt.group then local k="Left_"..tt.group remotes:SetAttribute(k,math.max(0,(remotes:GetAttribute(k) or 1)-1)) end
+		Picked:FireAllClients(tid,plr,tt.size,tt.r)
+		plr:SetAttribute("Bag",(plr:GetAttribute("Bag") or 0)+tt.size)
+	end
+	take(id,t)
+	-- animation de coupe des ciseaux (script CiseauxServer)
+	local anim=game:GetService("ServerStorage"):FindFirstChild("CiseauxCoupe")
+	if anim then anim:Fire(plr) end
+	-- outil + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
+	local extra=SCISSORS_EXTRA+(plr:GetAttribute("Upg_Saisir") or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	local radius=math.max(SCISSORS_RADIUS,tonumber(tool:GetAttribute("RayonCoupe")) or 0)
+	if extra>0 then
+		local near={}
+		for id2,t2 in tufts do
+			local d=(t2.p-t.p).Magnitude
+			if d<=radius then table.insert(near,{id2,t2,d}) end
+		end
+		table.sort(near,function(a,b) return a[3]<b[3] end)
+		local got=0
+		for _,e in near do
+			if got>=extra then break end
+			if tufts[e[1]] and (plr:GetAttribute("Bag") or 0)+e[2].size<=max then take(e[1],e[2]) got+=1 end
+		end
+	end
+end)
+
+-- ===== AMÉLIORATIONS (menu TAB) =====
+-- Les prix et niveaux max d'ici sont envoyés au menu InventoryUI (ce sont eux qui comptent).
+local UPGRADES={
+-- prices = prix de chaque niveau (niveau 1, niveau 2, ...)
+	Maintenir={prices={1.10},max=1},                      -- rester appuyé = coupe en continu avec les ciseaux
+	Dexterite={prices={0.60,0.90,1.35,2.00,3.00},max=5},  -- les ciseaux coupent plus vite
+	Saisir={prices={0.85,1.90},max=2},                    -- +1 touffe voisine coupée en même temps par niveau
+}
+local GROWTH=1.5 -- seulement si un niveau n'a pas de prix dans la liste
+local function cost(u,lvl)
+	if u.prices[lvl+1] then return u.prices[lvl+1] end
+	return math.floor(u.prices[#u.prices]*GROWTH^(lvl+1-#u.prices)*100+.5)/100
+end
+local function applyUpgrades(plr)
+	plr:SetAttribute("BagMax",CFG.BAG_CAPACITY)
+end
+Players.PlayerAdded:Connect(function(p) task.wait(1) applyUpgrades(p) end)
+for _,p in Players:GetPlayers() do task.spawn(applyUpgrades,p) end
+local BuyUpgrade=RS:FindFirstChild("BuyUpgrade") or Instance.new("RemoteEvent")
+BuyUpgrade.Name="BuyUpgrade" BuyUpgrade.Parent=RS
+for uid,u in UPGRADES do
+	BuyUpgrade:SetAttribute("Price_"..uid,cost(u,0)) BuyUpgrade:SetAttribute("Max_"..uid,u.max)
+	for lvl=0,u.max-1 do BuyUpgrade:SetAttribute("Price_"..uid.."_"..(lvl+1),cost(u,lvl)) end -- prix de chaque niveau pour le menu
+end
+BuyUpgrade:SetAttribute("Growth",GROWTH)
+local lastBuy={}
+BuyUpgrade.OnServerEvent:Connect(function(plr,uid)
+	local u=typeof(uid)=="string" and UPGRADES[uid] if not u then return end
+	local now=os.clock() if lastBuy[plr] and now-lastBuy[plr]<.3 then return end lastBuy[plr]=now
+	local lvl=plr:GetAttribute("Upg_"..uid) or 0
+	if lvl>=u.max then return end
+	local c=cost(u,lvl)
+	local m=moneyStat(plr) if not m or (tonumber(m.Value) or 0)<c then return end
+	m.Value=math.floor(((tonumber(m.Value) or 0)-c)*100+.5)/100
+	plr:SetAttribute("Upg_"..uid,lvl+1)
+	applyUpgrades(plr)
+end)
+]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX72"><Properties><string name="Name">FaucilleClient</string><ProtectedString name="Source"><![CDATA[-- FaucilleClient (LocalScript dans StarterPlayer > StarterPlayerScripts)
+-- Panneau de prix au-dessus de la faucille sur l'établi (pièce + prix), et petite fête quand on l'achète.
+if not game:GetService("RunService"):IsClient() then
+	warn("[Faucille] FaucilleClient doit être un LocalScript dans StarterPlayer > StarterPlayerScripts !")
+	return
+end
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+
+local COIN = "rbxassetid://103593634628600" -- l'icône des pièces
+local lp = Players.LocalPlayer
+local pgui = lp:WaitForChild("PlayerGui")
+local cam = workspace.CurrentCamera
+local achat = ReplicatedStorage:WaitForChild("FaucilleAchat", 30)
+if not achat then return end
+
+local BLANC, ENCRE = Color3.new(1, 1, 1), Color3.fromRGB(26, 22, 28)
+local OR, VERT, ROUGE = Color3.fromRGB(255, 215, 70), Color3.fromRGB(150, 245, 90), Color3.fromRGB(255, 96, 80)
+local BOIS_A, BOIS_B, BOIS_BORD = Color3.fromRGB(170, 114, 64), Color3.fromRGB(122, 78, 42), Color3.fromRGB(72, 44, 22)
+
+local function prix() return achat:GetAttribute("Prix") or 7.99 end
+local function argentTexte(v) return string.format("$%.2f", v) end
+
+local function coin(o, r) local c = Instance.new("UICorner") c.CornerRadius = r or UDim.new(1, 0) c.Parent = o end
+local function contour(o, e, c, bord)
+	local s = Instance.new("UIStroke")
+	s.Thickness = e
+	s.Color = c
+	s.LineJoinMode = Enum.LineJoinMode.Round
+	if bord then s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end
+	s.Parent = o
+	return s
+end
+local function texte(parent, t, police, pos, taille, couleur)
+	local l = Instance.new("TextLabel")
+	l.BackgroundTransparency = 1
+	l.Text = t
+	l.Font = police
+	l.TextScaled = true
+	l.TextColor3 = couleur or BLANC
+	l.AnchorPoint = Vector2.new(0.5, 0)
+	l.Position = pos
+	l.Size = taille
+	l.Parent = parent
+	contour(l, 3, ENCRE)
+	return l
+end
+
+-- argent du joueur (même recherche que le reste du jeu)
+local okCfg, CFG = pcall(function() return require(ReplicatedStorage:WaitForChild("GrassConfig", 10)) end)
+if not okCfg or type(CFG) ~= "table" then CFG = {} end
+local function argent()
+	local ls = lp:FindFirstChild("leaderstats")
+	if not ls then return 0 end
+	local v
+	if CFG.MONEY_STAT and CFG.MONEY_STAT ~= "" then v = ls:FindFirstChild(CFG.MONEY_STAT) end
+	if not v then
+		for _, n in { "Money", "Cash", "Argent", "Coins", "Dollars", "Pieces", "Pièces", "$" } do
+			v = ls:FindFirstChild(n)
+			if v then break end
+		end
+	end
+	return v and tonumber(v.Value) or 0
+end
+
+---------------------------------------------------------------- Panneau au-dessus de la faucille
+local panneau
+local function creerPanneau(vitrine)
+	local base = vitrine.PrimaryPart or vitrine:WaitForChild("Base", 10)
+	if not base then return end
+	local g = Instance.new("BillboardGui")
+	g.Name = "FaucillePrix"
+	g.Adornee = base
+	-- taille fixe dans le monde (en studs) : il ne grossit pas quand on s'éloigne
+	g.Size = UDim2.fromScale(4.2, 2)
+	g.SizeOffset = Vector2.new(0, 0.5)
+	g.StudsOffsetWorldSpace = Vector3.new(0, 1.3, 0)
+	g.AlwaysOnTop = true
+	g.LightInfluence = 0
+	g.MaxDistance = 70
+	g.ResetOnSpawn = false
+	local root = Instance.new("Frame")
+	root.AnchorPoint = Vector2.new(0.5, 0.5)
+	root.Position = UDim2.fromScale(0.5, 0.5)
+	root.Size = UDim2.fromOffset(420, 200)
+	root.BackgroundColor3 = BLANC
+	root.Parent = g
+	coin(root, UDim.new(0, 26))
+	local grad = Instance.new("UIGradient")
+	grad.Rotation = 90
+	grad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(206, 150, 94)),
+		ColorSequenceKeypoint.new(0.12, BOIS_A),
+		ColorSequenceKeypoint.new(1, BOIS_B),
+	})
+	grad.Parent = root
+	local bord = contour(root, 6, BOIS_BORD, true)
+	local echelle = Instance.new("UIScale")
+	echelle.Parent = root
+	local pop = Instance.new("UIScale")
+	-- clous aux 4 coins
+	for _, c in { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } } do
+		local n = Instance.new("Frame")
+		n.AnchorPoint = Vector2.new(0.5, 0.5)
+		n.Size = UDim2.fromOffset(12, 12)
+		n.Position = UDim2.new(c[1], c[1] == 0 and 18 or -18, c[2], c[2] == 0 and 18 or -18)
+		n.BackgroundColor3 = Color3.fromRGB(64, 62, 66)
+		n.Parent = root
+		coin(n)
+	end
+	texte(root, "FAUCILLE", Enum.Font.FredokaOne, UDim2.new(0.5, 0, 0, 12), UDim2.fromOffset(300, 52))
+	-- ligne du prix : [pièce] $7.99
+	local ligne = Instance.new("Frame")
+	ligne.BackgroundTransparency = 1
+	ligne.AnchorPoint = Vector2.new(0.5, 0)
+	ligne.Position = UDim2.new(0.5, 0, 0, 66)
+	ligne.Size = UDim2.fromOffset(380, 76)
+	ligne.Parent = root
+	pop.Parent = ligne
+	local liste = Instance.new("UIListLayout")
+	liste.FillDirection = Enum.FillDirection.Horizontal
+	liste.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	liste.VerticalAlignment = Enum.VerticalAlignment.Center
+	liste.Padding = UDim.new(0, 8)
+	liste.Parent = ligne
+	local piece = Instance.new("ImageLabel")
+	piece.BackgroundTransparency = 1
+	piece.Image = COIN
+	piece.ScaleType = Enum.ScaleType.Fit
+	piece.Size = UDim2.fromOffset(68, 68)
+	piece.LayoutOrder = 1
+	piece.Parent = ligne
+	local valeur = Instance.new("TextLabel")
+	valeur.BackgroundTransparency = 1
+	valeur.Font = Enum.Font.LuckiestGuy
+	valeur.TextSize = 60
+	valeur.Size = UDim2.fromOffset(0, 70)
+	valeur.AutomaticSize = Enum.AutomaticSize.X
+	valeur.TextColor3 = BLANC
+	valeur.Text = argentTexte(prix())
+	valeur.LayoutOrder = 2
+	valeur.Parent = ligne
+	contour(valeur, 4, ENCRE)
+	local vg = Instance.new("UIGradient")
+	vg.Rotation = 90
+	vg.Color = ColorSequence.new(BLANC, Color3.fromRGB(255, 228, 140))
+	vg.Parent = valeur
+	local info = texte(root, "Coupe " .. (achat:GetAttribute("Touffes") or 4) .. " touffes d'un coup !", Enum.Font.FredokaOne,
+		UDim2.new(0.5, 0, 0, 148), UDim2.fromOffset(360, 36), Color3.fromRGB(255, 240, 205))
+	g.Parent = pgui
+	panneau = { g = g, root = root, echelle = echelle, pop = pop, bord = bord, piece = piece, valeur = valeur, vg = vg, info = info, base = base }
+end
+
+local function majPanneau(t)
+	if not panneau or not panneau.g.Parent then return end
+	local p = panneau
+	p.echelle.Scale = p.g.AbsoluteSize.X / 420
+	if lp:GetAttribute("Faucille") then
+		p.piece.Visible = false
+		p.vg.Enabled = false
+		p.valeur.Text = "✓ ACHETÉE"
+		p.valeur.TextColor3 = VERT
+		p.info.Text = "Elle est dans ta barre d'outils"
+		p.bord.Color = BOIS_BORD
+		p.pop.Scale = 1
+	else
+		local assez = argent() + 1e-6 >= prix()
+		p.piece.Visible = true
+		p.vg.Enabled = true
+		p.valeur.Text = argentTexte(prix())
+		p.valeur.TextColor3 = BLANC
+		-- tu as assez d'argent : le panneau brille doucement
+		p.bord.Color = assez and OR or BOIS_BORD
+		p.pop.Scale = assez and 1 + 0.05 * math.abs(math.sin(t * 3)) or 1
+	end
+end
+
+-- on cache le bouton "Acheter" si on l'a déjà
+local function majBouton()
+	if not panneau then return end
+	local prompt = panneau.base:FindFirstChildOfClass("ProximityPrompt")
+	if prompt then prompt.Enabled = not lp:GetAttribute("Faucille") end
+end
+
+task.spawn(function()
+	local vitrine = workspace:FindFirstChild("FaucilleVitrine", true)
+	for _ = 1, 30 do
+		if vitrine then break end
+		task.wait(1)
+		vitrine = workspace:FindFirstChild("FaucilleVitrine", true)
+	end
+	if not vitrine then return end
+	creerPanneau(vitrine)
+	majBouton()
+	if panneau then panneau.base.ChildAdded:Connect(majBouton) end
+end)
+lp:GetAttributeChangedSignal("Faucille"):Connect(majBouton)
+
+RunService.RenderStepped:Connect(function()
+	if not panneau then return end
+	local proche = (cam.CFrame.Position - panneau.base.Position).Magnitude < 80
+	panneau.g.Enabled = proche and not lp:GetAttribute("IntroEnCours")
+	if panneau.g.Enabled then majPanneau(os.clock()) end
+end)
+
+---------------------------------------------------------------- Réponse du serveur
+local ecran = Instance.new("ScreenGui")
+ecran.Name = "FaucilleMessages"
+ecran.ResetOnSpawn = false
+ecran.DisplayOrder = 20
+ecran.Parent = pgui
+
+local function son(id, vol)
+	local s = Instance.new("Sound")
+	s.SoundId = id
+	s.Volume = vol or 0.6
+	s.Parent = ecran
+	s:Play()
+	game:GetService("Debris"):AddItem(s, 4)
+end
+
+local function message(t, couleur, duree)
+	local l = Instance.new("TextLabel")
+	l.BackgroundTransparency = 1
+	l.AnchorPoint = Vector2.new(0.5, 0.5)
+	l.Position = UDim2.fromScale(0.5, 0.3)
+	l.Size = UDim2.fromScale(0.7, 0.1)
+	l.Font = Enum.Font.LuckiestGuy
+	l.TextScaled = true
+	l.Text = t
+	l.TextColor3 = couleur
+	l.Parent = ecran
+	local st = contour(l, 5, ENCRE)
+	local sc = Instance.new("UIScale")
+	sc.Scale = 0
+	sc.Parent = l
+	TweenService:Create(sc, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+	task.delay(duree, function()
+		TweenService:Create(l, TweenInfo.new(0.3), { TextTransparency = 1, Position = UDim2.fromScale(0.5, 0.25) }):Play()
+		TweenService:Create(st, TweenInfo.new(0.3), { Transparency = 1 }):Play()
+		task.wait(0.35)
+		l:Destroy()
+	end)
+end
+
+achat.OnClientEvent:Connect(function(quoi, manque)
+	if quoi == "ok" then
+		son("rbxassetid://129348077985519", 0.7)
+		message("✨ FAUCILLE ACHETÉE ! ✨", OR, 2.2)
+	elseif quoi == "manque" then
+		message("Il te manque " .. argentTexte(math.max(0, tonumber(manque) or 0)), ROUGE, 1.6)
+		-- le prix tremble en rouge
+		if panneau then
+			local p = panneau
+			task.spawn(function()
+				for i = 1, 8 do
+					p.valeur.TextColor3 = ROUGE
+					p.root.Rotation = (i % 2 == 0 and 3 or -3)
+					task.wait(0.04)
+				end
+				p.root.Rotation = 0
+				p.valeur.TextColor3 = BLANC
+			end)
+		end
+	end
+end)
+]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX73"><Properties><string name="Name">GrassClient</string><ProtectedString name="Source"><![CDATA[-- GrassClient (LocalScript dans StarterPlayerScripts)
+-- ANTI-LAG : n'affiche que les touffes proches du joueur, construites petit à petit.
+if not game:GetService("RunService"):IsClient() then
+	warn("[Herbe] GrassClient doit être un LocalScript dans StarterPlayer > StarterPlayerScripts (pas un Script) !")
+	return
+end
+print("[Herbe] GrassClient démarré")
+local Players=game:GetService("Players")
+local RS=game:GetService("ReplicatedStorage")
+local Run=game:GetService("RunService")
+local CS=game:GetService("CollectionService")
+local UIS=game:GetService("UserInputService")
+local lp=Players.LocalPlayer
+local CFG=require(RS:WaitForChild("GrassConfig"))
+local K=require(RS:WaitForChild("GrassKit"))
+local remotes=RS:WaitForChild("GrassRemotes")
+local cam=workspace.CurrentCamera
+local pgui=lp:WaitForChild("PlayerGui")
+
+-- ===== plateformes =====
+-- TOUCH = téléphone / tablette (pas de clavier) ; manette = PlayStation / Xbox (ou manette sur PC)
+local TOUCH=UIS.TouchEnabled and not UIS.KeyboardEnabled
+local PADS={[Enum.UserInputType.Gamepad1]=true,[Enum.UserInputType.Gamepad2]=true,[Enum.UserInputType.Gamepad3]=true,[Enum.UserInputType.Gamepad4]=true}
+local function usingGamepad() return PADS[UIS:GetLastInputType()]==true end
+local function screenCenter() local v=cam.ViewportSize return Vector2.new(v.X/2,v.Y/2) end
+local BB=TOUCH and .7 or 1 -- taille des bulles dans le monde (plus petites sur téléphone)
+local function safeInsets(g) pcall(function() g.ScreenInsets=Enum.ScreenInsets.CoreUISafeInsets end) end
+
+local BAG_IMAGE="rbxassetid://124953051791395"
+local RENDER=CFG.RENDER_DIST or 120
+local WHITE,RED=Color3.new(1,1,1),Color3.fromRGB(255,90,75)
+local GREEN,GOLD=Color3.fromRGB(150,245,90),Color3.fromRGB(255,215,70)
+local RARITY_TEXT={Or="✨ HERBE EN OR !",Diamant="💎 HERBE DIAMANT !",ArcEnCiel="🌈 HERBE ARC-EN-CIEL !"}
+local fx=Instance.new("Folder") fx.Name="GrassFX" fx.Parent=workspace
+local vis=Instance.new("Folder") vis.Name="GrassVisuals" vis.Parent=workspace
+local hitF=Instance.new("Folder") hitF.Name="GrassHit" hitF.Parent=workspace
+
+-- ===== outils =====
+local function tween(d,f)
+	local t0=os.clock()
+	while true do
+		local a=math.min((os.clock()-t0)/d,1)
+		f(a)
+		if a>=1 then return end
+		Run.RenderStepped:Wait()
+	end
+end
+local function outQuad(a) return 1-(1-a)^2 end
+local function bez(a,b,c,t) return (1-t)^2*a+2*(1-t)*t*b+t*t*c end
+local function stroke(o,th,col,border)
+	local s=Instance.new("UIStroke") s.Thickness=th s.Color=col
+	if border then s.ApplyStrokeMode=Enum.ApplyStrokeMode.Border end
+	s.Parent=o return s
+end
+local function corner(o,r) local c=Instance.new("UICorner") c.CornerRadius=r or UDim.new(1,0) c.Parent=o end
+local function fxPart(cls,shape)
+	local p=Instance.new(cls) if shape then p.Shape=shape end
+	p.Material=Enum.Material.SmoothPlastic p.Anchored=true
+	p.CanCollide=false p.CanQuery=false p.CanTouch=false p.CastShadow=false
+	return p
+end
+local function sound(id,pos,vol)
+	if not id or id=="" then return end
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local s=Instance.new("Sound") s.SoundId=id s.Volume=vol or .6 s.Parent=at
+	s:Play() game:GetService("Debris"):AddItem(at,4)
+end
+local function fmt(g) if g==math.floor(g) then return tostring(g) end return string.format("%.2f",g) end
+
+-- ===== interface du sac (en bas à gauche, sans animation) =====
+local gui=Instance.new("ScreenGui") gui.Name="GrassBagGui" gui.ResetOnSpawn=false safeInsets(gui)
+gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling gui.Parent=pgui
+
+local root=Instance.new("Frame") root.Name="Sac" root.AnchorPoint=Vector2.new(0,1)
+root.Position=UDim2.new(0,16,1,-16)
+root.Size=UDim2.fromOffset(150,172) root.BackgroundTransparency=1 root.Parent=gui
+local uiScale=Instance.new("UIScale") uiScale.Parent=root
+-- plus petit, et encore réduit sur téléphone / tablette
+local function rescale()
+	local s=math.clamp(cam.ViewportSize.Y/950,.4,1)
+	if TOUCH then s=math.max(s*.8,.45) end
+	uiScale.Scale=s
+end
+rescale() cam:GetPropertyChangedSignal("ViewportSize"):Connect(rescale)
+
+local function bagImage(parent,color,transp)
+	local i=Instance.new("ImageLabel") i.BackgroundTransparency=1 i.Image=BAG_IMAGE i.ScaleType=Enum.ScaleType.Fit
+	i.Size=UDim2.fromOffset(140,140) i.ImageColor3=color or WHITE i.ImageTransparency=transp or 0 i.Parent=parent
+	return i
+end
+local icon=Instance.new("Frame") icon.Name="Image" icon.AnchorPoint=Vector2.new(.5,0) icon.Position=UDim2.new(.5,0,0,0)
+icon.Size=UDim2.fromOffset(140,140) icon.BackgroundTransparency=1 icon.Parent=root
+local shadow=bagImage(icon,Color3.new(0,0,0),.6) shadow.Position=UDim2.fromOffset(4,6)
+bagImage(icon,Color3.fromRGB(110,110,110),0)
+local clip=Instance.new("Frame") clip.AnchorPoint=Vector2.new(0,1) clip.Position=UDim2.fromScale(0,1)
+clip.Size=UDim2.fromScale(1,0) clip.BackgroundTransparency=1 clip.ClipsDescendants=true clip.Parent=icon
+local full=bagImage(clip) full.AnchorPoint=Vector2.new(0,1) full.Position=UDim2.fromScale(0,1)
+
+local count=Instance.new("TextLabel") count.Name="Compteur" count.AnchorPoint=Vector2.new(.5,.5) count.Position=UDim2.new(.5,0,0,92)
+count.Size=UDim2.fromOffset(120,44) count.BackgroundTransparency=1 count.Font=Enum.Font.FredokaOne count.TextScaled=true
+count.TextColor3=WHITE count.Text="0/"..CFG.BAG_CAPACITY count.ZIndex=3 count.Parent=root
+local cs=stroke(count,4,Color3.fromRGB(15,15,15)) cs.LineJoinMode=Enum.LineJoinMode.Round
+
+local toast=Instance.new("TextLabel") toast.AnchorPoint=Vector2.new(.5,1) toast.Position=UDim2.new(.5,0,1,-150)
+toast.Size=UDim2.fromOffset(520,46) toast.BackgroundColor3=Color3.fromRGB(44,22,18) toast.BackgroundTransparency=.1
+toast.Font=Enum.Font.FredokaOne toast.TextScaled=true toast.TextColor3=WHITE toast.Visible=false toast.Parent=gui
+corner(toast,UDim.new(0,14)) stroke(toast,2.5,RED,true)
+local pad=Instance.new("UIPadding") pad.PaddingLeft=UDim.new(0,16) pad.PaddingRight=UDim.new(0,16)
+pad.PaddingTop=UDim.new(0,7) pad.PaddingBottom=UDim.new(0,7) pad.Parent=toast
+local toastId=0
+local function showToast(text)
+	toastId+=1 local id=toastId
+	toast.Text=text toast.Visible=true
+	task.delay(2,function() if toastId==id then toast.Visible=false end end)
+end
+
+-- ===== texte de mutation (or / diamant / arc-en-ciel) =====
+local STY={
+	Or={a=Color3.fromRGB(255,248,170),b=Color3.fromRGB(255,165,30),st=Color3.fromRGB(95,50,0)},
+	Diamant={a=Color3.fromRGB(240,255,255),b=Color3.fromRGB(80,190,255),st=Color3.fromRGB(10,45,95)},
+	ArcEnCiel={st=Color3.fromRGB(45,20,70)},
+}
+local RAINBOW=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(255,90,90)),ColorSequenceKeypoint.new(.2,Color3.fromRGB(255,190,60)),
+	ColorSequenceKeypoint.new(.4,Color3.fromRGB(250,250,90)),ColorSequenceKeypoint.new(.6,Color3.fromRGB(90,240,120)),
+	ColorSequenceKeypoint.new(.8,Color3.fromRGB(90,170,255)),ColorSequenceKeypoint.new(1,Color3.fromRGB(210,110,255))})
+local banner=Instance.new("Frame") banner.AnchorPoint=Vector2.new(.5,.5) banner.Position=UDim2.new(.5,0,0,120)
+banner.Size=UDim2.fromOffset(620,110) banner.BackgroundTransparency=1 banner.Visible=false banner.Parent=gui
+local bScale=Instance.new("UIScale") bScale.Parent=banner
+local bTitle=Instance.new("TextLabel") bTitle.BackgroundTransparency=1 bTitle.Size=UDim2.fromScale(1,.66)
+bTitle.Font=Enum.Font.FredokaOne bTitle.TextScaled=true bTitle.TextColor3=WHITE bTitle.Parent=banner
+local bStroke=stroke(bTitle,5,Color3.new(0,0,0)) bStroke.LineJoinMode=Enum.LineJoinMode.Round
+local bGrad=Instance.new("UIGradient") bGrad.Rotation=90 bGrad.Parent=bTitle
+local bSub=Instance.new("TextLabel") bSub.BackgroundTransparency=1 bSub.Position=UDim2.fromScale(0,.64) bSub.Size=UDim2.fromScale(1,.34)
+bSub.Font=Enum.Font.FredokaOne bSub.TextScaled=true bSub.TextColor3=WHITE bSub.Parent=banner
+local sStroke=stroke(bSub,3.5,Color3.new(0,0,0)) sStroke.LineJoinMode=Enum.LineJoinMode.Round
+local fitScale=1
+local function fit() fitScale=math.clamp(cam.ViewportSize.X/1400,.4,1) end
+fit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(fit)
+do local sc=Instance.new("UIScale") sc.Parent=toast
+	local function f2() sc.Scale=math.clamp(cam.ViewportSize.X/1400,.4,1) end f2() cam:GetPropertyChangedSignal("ViewportSize"):Connect(f2) end
+local bannerId=0
+local function showBanner(rarity,size)
+	bannerId+=1 local id=bannerId
+	local s=STY[rarity] or STY.Or
+	bTitle.Text=RARITY_TEXT[rarity] or rarity
+	bSub.Text="+"..size.." 🎒"
+	bStroke.Color=s.st sStroke.Color=s.st
+	bGrad.Rotation=rarity=="ArcEnCiel" and 0 or 90
+	bGrad.Color=rarity=="ArcEnCiel" and RAINBOW or ColorSequence.new(s.a,s.b)
+	for _,o in {bTitle,bSub} do o.TextTransparency=0 end bStroke.Transparency=0 sStroke.Transparency=0
+	banner.Visible=true
+	task.spawn(function()
+		-- apparition "pop"
+		tween(.28,function(a)
+			if bannerId~=id then return end
+			local e=a<.6 and (a/.6)*1.18 or 1.18-.18*((a-.6)/.4)
+			bScale.Scale=fitScale*e
+		end)
+		-- l'arc-en-ciel défile, les autres brillent un peu
+		local t0=os.clock()
+		while bannerId==id and os.clock()-t0<1.5 do
+			if rarity=="ArcEnCiel" then bGrad.Offset=Vector2.new(math.sin((os.clock()-t0)*3)*.3,0)
+			else bScale.Scale=fitScale*(1+math.sin((os.clock()-t0)*6)*.02) end
+			Run.RenderStepped:Wait()
+		end
+		-- disparition en fondu
+		tween(.3,function(a)
+			if bannerId~=id then return end
+			bTitle.TextTransparency=a bSub.TextTransparency=a bStroke.Transparency=a sStroke.Transparency=a
+			bScale.Scale=fitScale*(1-.15*a)
+		end)
+		if bannerId==id then banner.Visible=false end
+	end)
+end
+
+local shown,pendingPicks,depositing=0,0,false
+local function maxBag() return lp:GetAttribute("BagMax") or CFG.BAG_CAPACITY end
+local function realBag() return lp:GetAttribute("Bag") or 0 end
+local function refresh()
+	local m=maxBag()
+	shown=math.clamp(shown,0,m)
+	count.Text=shown.."/"..m
+	clip.Size=UDim2.fromScale(1,m>0 and shown/m or 0)
+	count.TextColor3=shown>=m and RED or WHITE
+end
+local function sync() if pendingPicks==0 and not depositing then shown=realBag() refresh() end end
+lp:GetAttributeChangedSignal("Bag"):Connect(sync)
+lp:GetAttributeChangedSignal("BagMax"):Connect(refresh)
+shown=realBag() refresh()
+
+-- ===== argent (en bas à droite) =====
+local COIN="rbxassetid://103593634628600"
+-- (placé juste au-dessus du sac, en bas à gauche)
+local mRoot=Instance.new("Frame") mRoot.Name="Argent" mRoot.AnchorPoint=Vector2.new(0,1)
+mRoot.Size=UDim2.fromOffset(230,70) mRoot.BackgroundTransparency=1 mRoot.Parent=gui
+local mScale=Instance.new("UIScale") mScale.Parent=mRoot
+local function mFit()
+	local s=math.clamp(cam.ViewportSize.Y/950,.45,1) if TOUCH then s=math.clamp(s,.45,.6) end mScale.Scale=s
+	if TOUCH then
+		-- téléphone / tablette : en haut à gauche (le joystick est en bas à gauche)
+		mRoot.AnchorPoint=Vector2.new(0,0) mRoot.Position=UDim2.fromOffset(10,6)
+		root.AnchorPoint=Vector2.new(0,0) root.Position=UDim2.fromOffset(10,6+70*s+2)
+	else
+		root.AnchorPoint=Vector2.new(0,1) root.Position=UDim2.new(0,16,1,-16)
+		mRoot.AnchorPoint=Vector2.new(0,1) mRoot.Position=UDim2.new(0,16,1,-(16+172*uiScale.Scale+4))
+	end
+end
+mFit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(mFit) uiScale:GetPropertyChangedSignal("Scale"):Connect(mFit)
+local mIcon=Instance.new("ImageLabel") mIcon.BackgroundTransparency=1 mIcon.Image=COIN mIcon.ScaleType=Enum.ScaleType.Fit
+mIcon.AnchorPoint=Vector2.new(0,.5) mIcon.Position=UDim2.fromScale(0,.5) mIcon.Size=UDim2.fromOffset(70,70) mIcon.ZIndex=3 mIcon.Parent=mRoot
+local mPop=Instance.new("UIScale") mPop.Parent=mIcon
+local mText=Instance.new("TextLabel") mText.BackgroundTransparency=1 mText.AnchorPoint=Vector2.new(0,.5)
+mText.Position=UDim2.new(0,76,.5,0) mText.Size=UDim2.fromOffset(160,54) mText.Font=Enum.Font.LuckiestGuy
+mText.TextScaled=true mText.TextXAlignment=Enum.TextXAlignment.Left mText.Text="$0.00" mText.TextColor3=WHITE mText.ZIndex=3 mText.Parent=mRoot
+local mst=stroke(mText,4,Color3.fromRGB(26,22,28)) mst.LineJoinMode=Enum.LineJoinMode.Round
+local mg=Instance.new("UIGradient") mg.Rotation=90 mg.Color=ColorSequence.new(WHITE,Color3.fromRGB(255,228,140)) mg.Parent=mText
+local mTextPop=Instance.new("UIScale") mTextPop.Parent=mText
+task.spawn(function()
+	local ls=lp:WaitForChild("leaderstats",20) if not ls then return end
+	local mv
+	for _=1,40 do
+		if CFG.MONEY_STAT and CFG.MONEY_STAT~="" then mv=ls:FindFirstChild(CFG.MONEY_STAT) end
+		if not mv then for _,n in {"Money","Cash","Argent","Coins","Dollars","$"} do mv=ls:FindFirstChild(n) if mv then break end end end
+		if mv then break end task.wait(.25)
+	end
+	if not mv then return end
+	local last=tonumber(mv.Value) or 0
+	mText.Text=string.format("$%.2f",last)
+	mv.Changed:Connect(function()
+		local v=tonumber(mv.Value) or 0
+		mText.Text=string.format("$%.2f",v)
+		if v>last then
+			mPop.Scale=1.35 game:GetService("TweenService"):Create(mPop,TweenInfo.new(.35,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Scale=1}):Play()
+			mTextPop.Scale=1.2 game:GetService("TweenService"):Create(mTextPop,TweenInfo.new(.3,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Scale=1}):Play()
+		end
+		last=v
+	end)
+end)
+
+-- ===== touffes affichées seulement près du joueur =====
+local data={}      -- toutes les touffes de la partie (juste des infos)
+local visible={}   -- [id] = {bl=modèle, hb=zone de clic, cf=position}
+local queued={}
+local queue={}
+local gone={}      -- touffes déjà ramassées avant d'avoir reçu la liste
+local rainbow={}
+
+local function spawnVisual(e)
+	local cf=CFrame.new(e.p)*CFrame.Angles(0,e.yaw,0)
+	local bl=K.Build(cf,e.s,e.seed,true,e.r)
+	bl.Name="Touffe" bl.Parent=vis
+	local _,sz=bl:GetBoundingBox()
+	local hb=Instance.new("Part") hb.Name="Hit" hb.Size=Vector3.new(sz.X+.4,math.max(sz.Y,1),sz.Z+.4)
+	hb.CFrame=cf*CFrame.new(0,hb.Size.Y/2,0) hb.Transparency=1 hb.Anchored=true
+	hb.CanCollide=false hb.CanTouch=false hb.CanQuery=true hb.CastShadow=false
+	hb:SetAttribute("Id",e.id) hb.Parent=hitF
+	local st=K.STYLE[e.r]
+	if st and st.spark then
+		local pe=Instance.new("ParticleEmitter")
+		pe.Color=ColorSequence.new(st.spark)
+		pe.Size=NumberSequence.new({NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(.2,.35*e.s),NumberSequenceKeypoint.new(1,0)})
+		pe.Lifetime=NumberRange.new(.8,1.2) pe.Rate=st.rate pe.Speed=NumberRange.new(.3,1)
+		pe.SpreadAngle=Vector2.new(180,180) pe.LightEmission=1 pe.LightInfluence=0 pe.Parent=hb
+	end
+	if e.r=="ArcEnCiel" then rainbow[bl]=bl end
+	visible[e.id]={bl=bl,hb=hb,cf=cf}
+end
+local function despawnVisual(id)
+	local v=visible[id]
+	if v then v.bl:Destroy() v.hb:Destroy() visible[id]=nil end
+end
+
+-- récupère la liste des touffes au démarrage
+task.spawn(function()
+	local list=remotes:WaitForChild("GetGrass"):InvokeServer()
+	for _,a in list do
+		local id=a[1]
+		if not gone[id] then
+			data[id]={id=id,p=Vector3.new(a[2],a[3],a[4]),yaw=a[5],s=a[6],r=a[7],seed=a[8],size=a[9]}
+		end
+	end
+end)
+
+-- toutes les 0.3 s : on affiche ce qui est proche, on retire ce qui est loin
+task.spawn(function()
+	while true do
+		local ch=lp.Character
+		local hrp=ch and ch:FindFirstChild("HumanoidRootPart")
+		local c=hrp and hrp.Position or cam.CFrame.Position
+		for id,e in data do
+			local d=(e.p-c).Magnitude
+			if d<RENDER then
+				if not visible[id] and not queued[id] then queued[id]=true table.insert(queue,id) end
+			elseif d>RENDER+20 and visible[id] then
+				despawnVisual(id)
+			end
+		end
+		task.wait(.3)
+	end
+end)
+-- on construit max 8 touffes par image (pas de freeze)
+Run.Heartbeat:Connect(function()
+	local n=0
+	while #queue>0 and n<8 do
+		local id=table.remove(queue)
+		queued[id]=nil
+		local e=data[id]
+		if e and not visible[id] then spawnVisual(e) n+=1 end
+	end
+end)
+
+-- couleurs arc-en-ciel qui défilent
+local acc=0
+Run.Heartbeat:Connect(function(dt)
+	acc+=dt if acc<1/20 then return end acc=0
+	local tt=os.clock()*.25
+	for key,bl in rainbow do
+		if not key.Parent then rainbow[key]=nil else
+			for _,p in bl:GetChildren() do
+				local h=p:GetAttribute("Hue")
+				if h then p.Color=K.RainbowColor((h+tt)%1,p:GetAttribute("Tone")) end
+			end
+		end
+	end
+end)
+
+-- ===== survol + clic (sans ClickDetector) =====
+local hl=Instance.new("Highlight")
+hl.FillColor=WHITE hl.OutlineColor=WHITE hl.FillTransparency=.88 hl.OutlineTransparency=0
+hl.DepthMode=Enum.HighlightDepthMode.Occluded hl.Enabled=false hl.Parent=fx
+local hovered
+local rp=RaycastParams.new() rp.FilterType=Enum.RaycastFilterType.Exclude
+local function idFromRay(ray)
+	local ex={fx,vis}
+	if lp.Character then table.insert(ex,lp.Character) end
+	rp.FilterDescendantsInstances=ex
+	local hit=workspace:Raycast(ray.Origin,ray.Direction*250,rp)
+	if hit and hit.Instance.Parent==hitF then return hit.Instance:GetAttribute("Id") end
+end
+-- on ne coupe l'herbe qu'avec les ciseaux en main (et pas pendant que le menu des améliorations est ouvert)
+local function holdingScissors()
+	if lp:GetAttribute("MenuOuvert") then return false end
+	local ch=lp.Character
+	local tool=ch and ch:FindFirstChildOfClass("Tool")
+	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil)
+end
+local function setHover(id)
+	hovered=id
+	local v=id and visible[id]
+	local e=id and data[id]
+	if not (v and e) then hl.Enabled=false hl.Adornee=nil return end
+	local col=(realBag()+e.size>maxBag()) and RED or (K.OUTLINE[e.r] or WHITE)
+	hl.OutlineColor=col hl.FillColor=col hl.Adornee=v.bl hl.Enabled=true
+end
+-- ===== curseur en forme de ciseaux (quand on les tient) =====
+local curGui=Instance.new("ScreenGui") curGui.Name="CurseurCiseaux" curGui.ResetOnSpawn=false
+curGui.IgnoreGuiInset=true curGui.DisplayOrder=100 curGui.Parent=pgui
+local cursor=Instance.new("Frame") cursor.Name="Ciseaux" cursor.AnchorPoint=Vector2.new(.5,.5)
+cursor.Size=UDim2.fromOffset(44,44) cursor.BackgroundTransparency=1 cursor.Visible=false cursor.Parent=curGui
+local TAILLE_CURSEUR=0.7  -- taille du curseur ciseaux (0.8 = plus petit, 1.2 = plus grand)
+local cScale=Instance.new("UIScale") cScale.Scale=TAILLE_CURSEUR cScale.Parent=cursor
+local OPEN=27           -- ouverture des lames (degrés)
+local branches,tinted={},{}
+local snipT=-math.huge
+local function drawScissors(col,offset,transp)
+	local layer=Instance.new("Frame") layer.BackgroundTransparency=1 layer.Size=UDim2.fromScale(1,1)
+	layer.Position=UDim2.fromOffset(offset,offset) layer.Parent=cursor
+	for _,s in {1,-1} do
+		-- une branche = une lame en haut + un anneau en bas, qui tourne autour de la vis
+		local h=Instance.new("Frame") h.BackgroundTransparency=1 h.AnchorPoint=Vector2.new(.5,.5)
+		h.Position=UDim2.fromScale(.5,.5) h.Size=UDim2.fromOffset(16,50) h.Rotation=s*OPEN h.Parent=layer
+		local blade=Instance.new("Frame") blade.BorderSizePixel=0 blade.BackgroundColor3=col blade.BackgroundTransparency=transp
+		blade.AnchorPoint=Vector2.new(.5,1) blade.Position=UDim2.new(.5,0,.5,0) blade.Size=UDim2.fromOffset(5,22) blade.Parent=h
+		corner(blade)
+		local shank=Instance.new("Frame") shank.BorderSizePixel=0 shank.BackgroundColor3=col shank.BackgroundTransparency=transp
+		shank.AnchorPoint=Vector2.new(.5,0) shank.Position=UDim2.new(.5,0,.5,-1) shank.Size=UDim2.fromOffset(3,12) shank.Parent=h
+		local ring=Instance.new("Frame") ring.BackgroundTransparency=1 ring.AnchorPoint=Vector2.new(.5,1)
+		ring.Position=UDim2.fromScale(.5,1) ring.Size=UDim2.fromOffset(12,12) ring.Parent=h
+		corner(ring)
+		local rs=stroke(ring,3,col) rs.Transparency=transp
+		table.insert(branches,{h=h,s=s})
+		if offset==0 then table.insert(tinted,blade) table.insert(tinted,shank) table.insert(tinted,rs) end
+	end
+end
+drawScissors(Color3.new(0,0,0),2,.55) -- ombre douce
+drawScissors(WHITE,0,0)
+local cursorShown,savedMouseIcon=false,true
+local function updateCursor(m,pad)
+	-- visible seulement quand on vise de l'herbe (et un court instant après la coupe pour le clic-clac)
+	local e=hovered and visible[hovered] and data[hovered]
+	local show=(UIS.MouseEnabled or pad) and holdingScissors() and (e~=nil or os.clock()-snipT<.2)
+	if show~=cursorShown then
+		cursorShown=show cursor.Visible=show
+		if show then savedMouseIcon=UIS.MouseIconEnabled UIS.MouseIconEnabled=false
+		else UIS.MouseIconEnabled=savedMouseIcon end
+	end
+	if not show then return end
+	cursor.Position=UDim2.fromOffset(m.X,m.Y)
+	-- toujours blanc (rouge seulement si le sac est trop plein pour cette touffe)
+	local col=(e and realBag()+e.size>maxBag()) and RED or WHITE
+	for _,o in tinted do if o:IsA("UIStroke") then o.Color=col else o.BackgroundColor3=col end end
+	-- clic-clac des lames
+	local t=(os.clock()-snipT)/.16
+	local ang=(t>=0 and t<1) and OPEN*(1-.85*math.sin(t*math.pi)) or OPEN
+	for _,b in branches do b.h.Rotation=b.s*ang end
+end
+Run.RenderStepped:Connect(function()
+	-- manette : on vise au centre de l'écran ; souris : là où est la souris
+	local pad=usingGamepad()
+	local m=pad and screenCenter() or UIS:GetMouseLocation()
+	if UIS.MouseEnabled or pad then
+		local id=holdingScissors() and idFromRay(cam:ViewportPointToRay(m.X,m.Y)) or nil
+		if id~=hovered then setHover(id) end
+	elseif hovered then setHover(nil) end
+	updateCursor(m,pad)
+end)
+-- clic avec les ciseaux = coupe l'herbe visée ; amélioration "Maintenir" = rester appuyé coupe en continu là où tu vises
+local holding,holdInput=false,nil
+local lastHint=0
+local lastCut=-math.huge
+UIS.InputBegan:Connect(function(input,gp)
+	local t=input.UserInputType
+	local pad=input.KeyCode==Enum.KeyCode.ButtonR2 -- gâchette droite (PlayStation R2 / Xbox RT)
+	if (gp and not pad) or UIS:GetFocusedTextBox() or lp:GetAttribute("MenuOuvert") then return end
+	if t==Enum.UserInputType.MouseButton1 or t==Enum.UserInputType.Touch or pad then
+		holding=true holdInput=input
+		local ray
+		if pad then local c=screenCenter() ray=cam:ViewportPointToRay(c.X,c.Y)
+		else ray=cam:ScreenPointToRay(input.Position.X,input.Position.Y) end
+		local id=idFromRay(ray)
+		if id then
+			if holdingScissors() then
+				-- pas de spam : on ne peut recouper qu'une fois le délai passé (même délai que le serveur)
+				local dex=lp:GetAttribute("Upg_Dexterite") or 0
+				local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
+				if os.clock()-lastCut>=cd then lastCut=os.clock() snipT=os.clock() remotes.PickRequest:FireServer(id) end
+			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
+		end
+	end
+end)
+UIS.InputEnded:Connect(function(input)
+	if input==holdInput or input.UserInputType==Enum.UserInputType.MouseButton1 or input.KeyCode==Enum.KeyCode.ButtonR2 then holding=false holdInput=nil end
+end)
+task.spawn(function()
+	while true do
+		local dex=lp:GetAttribute("Upg_Dexterite") or 0
+		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
+		task.wait(cd+.05)
+		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingScissors() then
+			local hi,ray=holdInput,nil
+			if hi and hi.KeyCode==Enum.KeyCode.ButtonR2 then local c=screenCenter() ray=cam:ViewportPointToRay(c.X,c.Y)
+			elseif hi and hi.UserInputType==Enum.UserInputType.Touch then ray=cam:ScreenPointToRay(hi.Position.X,hi.Position.Y)
+			else local m=UIS:GetMouseLocation() ray=cam:ViewportPointToRay(m.X,m.Y) end
+			local id=idFromRay(ray)
+			if id then lastCut=os.clock() remotes.PickRequest:FireServer(id) end
+		end
+	end
+end)
+
+-- ===== effets dans le monde =====
+local DIRT={Color3.fromRGB(104,74,46),Color3.fromRGB(86,60,36),Color3.fromRGB(122,90,58)}
+local function burst(pos,nDirt,nGrass,power,col)
+	local bits={}
+	for i=1,nDirt+nGrass do
+		local g=i>nDirt
+		local p=fxPart(g and "WedgePart" or "Part")
+		local sz=math.random(10,20)/100
+		p.Size=g and Vector3.new(.05,.35,.14) or Vector3.new(sz,sz,sz)
+		if g then
+			if col=="rainbow" then p.Color=Color3.fromHSV(math.random(),.7,1)
+			elseif col then p.Color=col
+			else p.Color=Color3.fromRGB(110+math.random(0,40),185+math.random(0,40),45) end
+		else p.Color=DIRT[math.random(1,3)] end
+		p.CFrame=CFrame.new(pos) p.Parent=fx
+		local a=math.random()*math.pi*2
+		local s=math.random(20,60)/10*power
+		bits[i]={p=p,v=Vector3.new(math.cos(a)*s,math.random(60,110)/10*power,math.sin(a)*s),
+			r=Vector3.new(math.random(-15,15),math.random(-15,15),math.random(-15,15)),s=p.Size}
+	end
+	task.spawn(function()
+		tween(.65,function(a)
+			local t=a*.65
+			for _,b in bits do
+				b.p.CFrame=CFrame.new(pos+b.v*t+Vector3.new(0,-26*t*t,0))*CFrame.Angles(b.r.X*t,b.r.Y*t,b.r.Z*t)
+				if a>.55 then b.p.Size=b.s*math.max(1-(a-.55)/.45,.01) end
+			end
+		end)
+		for _,b in bits do b.p:Destroy() end
+	end)
+end
+
+local function puffs(pos)
+	for i=1,6 do
+		local a=i/6*math.pi*2+math.random()*.5
+		local p=fxPart("Part",Enum.PartType.Ball)
+		p.Size=Vector3.new(.4,.4,.4) p.Color=Color3.fromRGB(196,170,130) p.Transparency=.3
+		p.CFrame=CFrame.new(pos) p.Parent=fx
+		local dir=Vector3.new(math.cos(a),.35,math.sin(a))
+		task.spawn(function()
+			tween(.55,function(t)
+				local e=outQuad(t)
+				p.CFrame=CFrame.new(pos+dir*1.4*e+Vector3.new(0,.2,0))
+				local s=.4+1.1*e p.Size=Vector3.new(s,s,s) p.Transparency=.3+.7*t
+			end)
+			p:Destroy()
+		end)
+	end
+end
+
+local function popupAt(pos,text,color)
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(180*BB,90*BB) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
+	local t=Instance.new("TextLabel") t.Size=UDim2.fromScale(1,1) t.BackgroundTransparency=1
+	t.Text=text t.Font=Enum.Font.FredokaOne t.TextScaled=true t.TextColor3=color t.Parent=g
+	local st=stroke(t,3,Color3.fromRGB(20,40,12))
+	g.Parent=pgui
+	task.spawn(function()
+		tween(1,function(a)
+			g.StudsOffset=Vector3.new(0,a*2.4,0)
+			local f=math.clamp((a-.55)/.45,0,1) t.TextTransparency=f st.Transparency=f
+		end)
+		g:Destroy() at:Destroy()
+	end)
+end
+
+-- ===== bras du joueur (lancer dans le composteur) =====
+local armOrig=setmetatable({},{__mode="k"})
+local armId=0
+local function armAnim(steps)
+	local ch=lp.Character if not ch then return end
+	local m,r15
+	local ua=ch:FindFirstChild("RightUpperArm")
+	if ua and ua:FindFirstChild("RightShoulder") then m=ua.RightShoulder r15=true
+	elseif ch:FindFirstChild("Torso") and ch.Torso:FindFirstChild("Right Shoulder") then m=ch.Torso["Right Shoulder"] end
+	if not m or not m:IsA("Motor6D") then return end
+	armOrig[m]=armOrig[m] or m.C0
+	local c0=armOrig[m]
+	armId+=1 local id=armId
+	local cur=0
+	local function set(x)
+		if armId~=id then return end
+		cur=x
+		pcall(function() m.C0=c0*(r15 and CFrame.Angles(x,0,0) or CFrame.Angles(0,0,x)) end)
+	end
+	for _,s in steps do
+		local from=cur
+		tween(s[1],function(a) set(from+(s[2]-from)*outQuad(a)) end)
+	end
+	if armId==id then pcall(function() m.C0=c0 end) end
+end
+
+-- ===== coupe aux ciseaux : effets =====
+local SNIP_SOUND="rbxassetid://135446324303740" -- son de l'herbe coupée (remplacé par PICK_SOUND si tu en mets un)
+local function snipSound(pos)
+	local id=(CFG.PICK_SOUND and CFG.PICK_SOUND~="") and CFG.PICK_SOUND or SNIP_SOUND
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local s=Instance.new("Sound") s.SoundId=id s.Volume=.6 s.PlaybackSpeed=.95+math.random()*.1 s.RollOffMaxDistance=60 s.Parent=at
+	s:Play() game:GetService("Debris"):AddItem(at,3)
+end
+local function leafColor(m)
+	for _,p in m:GetDescendants() do if p:IsA("BasePart") then return p.Color end end
+	return Color3.fromRGB(110,190,50)
+end
+-- deux lames blanches qui se referment sur la touffe
+local function slash(center,w)
+	local right=Vector3.new(cam.CFrame.RightVector.X,0,cam.CFrame.RightVector.Z)
+	if right.Magnitude<.01 then right=Vector3.new(1,0,0) end
+	right=right.Unit
+	local len=math.max(w,.8)*1.25
+	local pivot=center-right*len/2
+	local look=CFrame.lookAt(pivot,pivot+right)
+	local blades={}
+	for s=-1,1,2 do
+		local b=fxPart("Part") b.Material=Enum.Material.Neon b.Color=Color3.new(1,1,1) b.Transparency=.05
+		b.Size=Vector3.new(.06,.06,len) b.Parent=fx
+		table.insert(blades,{p=b,s=s})
+	end
+	task.spawn(function()
+		tween(.08,function(a)
+			for _,bd in blades do
+				bd.p.CFrame=look*CFrame.Angles(bd.s*math.rad(30)*(1-outQuad(a)),0,0)*CFrame.new(0,0,-len/2)
+			end
+		end)
+		tween(.2,function(a)
+			for _,bd in blades do
+				local t=.06*(1-a)+.01
+				bd.p.Size=Vector3.new(t,t,len*(1+.15*a)) bd.p.Transparency=.05+.95*a
+				bd.p.CFrame=look*CFrame.new(0,0,-len/2)
+			end
+		end)
+		for _,bd in blades do bd.p:Destroy() end
+	end)
+end
+-- petit chaume coupé qui reste au sol quelques secondes
+local function stubble(cf,w,h,col)
+	local m=Instance.new("Model") m.Name="Chaume"
+	local parts={}
+	for i=1,7 do
+		local a=i/7*math.pi*2+math.random()*.6
+		local r=math.random()*math.max(w,.4)*.3
+		local hh=h*(.75+math.random()*.25)
+		local stem=fxPart("Part") stem.Size=Vector3.new(.08,hh,.08) stem.Color=col:Lerp(Color3.new(0,0,0),.15)
+		stem.CFrame=cf*CFrame.new(math.cos(a)*r,hh/2,math.sin(a)*r)*CFrame.Angles(math.random()*.24-.12,math.random()*6.28,math.random()*.24-.12)
+		stem.Parent=m
+		local tip=fxPart("Part") tip.Size=Vector3.new(.085,.02,.085) tip.Color=col:Lerp(Color3.fromRGB(255,255,210),.5) -- tranche nette
+		tip.CFrame=stem.CFrame*CFrame.new(0,hh/2,0) tip.Parent=m
+		table.insert(parts,stem) table.insert(parts,tip)
+	end
+	m.Parent=fx
+	task.delay(4,function()
+		local p0=m:GetPivot()
+		tween(.6,function(a)
+			m:PivotTo(p0*CFrame.new(0,-h*a,0))
+			for _,p in parts do p.Transparency=a end
+		end)
+		m:Destroy()
+	end)
+end
+
+-- "+1" / "+5"... en blanc qui vient vers le joueur
+local function gainPopup(pos,n)
+	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
+	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(90*BB,44*BB) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
+	local t=Instance.new("TextLabel") t.Size=UDim2.fromScale(1,1) t.BackgroundTransparency=1 t.Text="+"..n
+	t.Font=Enum.Font.FredokaOne t.TextScaled=true t.TextColor3=WHITE t.Parent=g
+	local st=stroke(t,2,Color3.fromRGB(20,24,20)) st.Transparency=.3
+	local sc=Instance.new("UIScale") sc.Parent=t
+	g.Parent=pgui
+	task.spawn(function()
+		tween(.15,function(a) sc.Scale=.4+.8*outQuad(a) end) -- petit "pop"
+		local p0=at.WorldPosition
+		tween(.55,function(a)
+			local ch=lp.Character local hrp=ch and ch:FindFirstChild("HumanoidRootPart")
+			local tgt=hrp and hrp.Position+Vector3.new(0,1.5,0) or p0+Vector3.new(0,2,0)
+			at.WorldPosition=p0:Lerp(tgt,a*a)
+			sc.Scale=1.2-.5*a
+			local f=math.clamp((a-.6)/.4,0,1) t.TextTransparency=f st.Transparency=.3+.7*f
+		end)
+		g:Destroy() at:Destroy()
+	end)
+end
+
+-- ===== coupe d'une touffe =====
+remotes:WaitForChild("Picked").OnClientEvent:Connect(function(id,picker,size,rarity)
+	size=size or 1
+	rarity=rarity or "Normal"
+	local mine=picker==lp
+	if not data[id] then gone[id]=true end
+	data[id]=nil queued[id]=nil
+	local v=visible[id] visible[id]=nil
+	if hovered==id then setHover(nil) end
+	if mine then
+		snipT=os.clock() -- le curseur fait clic-clac
+		pendingPicks+=1
+	end
+	local function arrived()
+		if not mine then return end
+		pendingPicks=math.max(0,pendingPicks-1)
+		shown+=size refresh()
+		if pendingPicks==0 and not depositing and shown~=realBag() then shown=realBag() refresh() end
+	end
+	if not v then arrived() return end
+	v.hb:Destroy()
+	local fake,P=v.bl,v.cf
+	fake.Parent=fx
+	local base=fake:GetScale()
+	local _,sz=fake:GetBoundingBox()
+	local h=math.max(sz.Y,.5)
+	local cutH=math.clamp(h*.18,.12,.4)          -- hauteur de la coupe
+	local cutPos=P.Position+Vector3.new(0,cutH,0)
+	local col=leafColor(fake)
+	if mine then gainPopup(cutPos+Vector3.new(0,.8,0),size) end
+	-- 1) les lames se referment : "snip"
+	snipSound(cutPos)
+	slash(cutPos,math.max(sz.X,sz.Z))
+	-- 2) il reste un petit chaume coupé au sol
+	stubble(P,math.min(sz.X,sz.Z),cutH,col)
+	-- 3) des petits brins coupés volent (pas de terre : on ne l'arrache pas)
+	if rarity=="ArcEnCiel" then burst(cutPos,0,12,.45,"rainbow")
+	elseif rarity~="Normal" then burst(cutPos,0,9,.4,K.OUTLINE[rarity])
+	else burst(cutPos,0,6,.35,col) end
+	-- 4) le haut de la touffe bascule et tombe, puis file dans le sac
+	local hrp0=picker and picker.Character and picker.Character:FindFirstChild("HumanoidRootPart")
+	local away=hrp0 and Vector3.new(P.Position.X-hrp0.Position.X,0,P.Position.Z-hrp0.Position.Z) or Vector3.zero
+	if away.Magnitude<.1 then local a=math.random()*math.pi*2 away=Vector3.new(math.cos(a),0,math.sin(a)) end
+	away=away.Unit
+	local axis=Vector3.new(0,1,0):Cross(away).Unit
+	local top=P*CFrame.new(0,cutH,0)
+	fake:PivotTo(top)
+	task.spawn(function()
+		tween(.36,function(a)
+			local e=a*a -- accélère comme une vraie chute
+			fake:PivotTo(CFrame.new(top.Position+away*.4*e-Vector3.new(0,cutH*e,0))*CFrame.fromAxisAngle(axis,math.rad(84)*e)*top.Rotation)
+		end)
+		task.wait(.12)
+		local p0=fake:GetPivot()
+		tween(.32,function(a)
+			local hrp=picker and picker.Character and picker.Character:FindFirstChild("HumanoidRootPart")
+			local tgt=hrp and hrp.Position or p0.Position+Vector3.new(0,3,0)
+			local e=a*a
+			fake:PivotTo(CFrame.new(p0.Position:Lerp(tgt,e))*p0.Rotation)
+			fake:ScaleTo(base*math.max(1-e,.05))
+		end)
+		fake:Destroy()
+		arrived()
+	end)
+end)
+
+-- ===== pas assez de place =====
+remotes:WaitForChild("BagFull").OnClientEvent:Connect(function(id,size,free)
+	if free and free>0 then
+		showToast("🎒 Il te faut "..tostring(size).." places (il t'en reste "..free..") : va au composteur ♻️")
+	else
+		showToast("🎒 Sac plein ! Va le vider au composteur ♻️")
+	end
+end)
+
+-- ===== composteur : panneau "1 herbe = $" + vidage =====
+-- Au-dessus du composteur : image d'herbe = pièce + prix d'une herbe.
+-- Quand le sac n'est pas vide : 2e petit panneau "sac 12 → +$0.12" et une flèche qui rebondit.
+local MPP=CFG.MONEY_PER_PLACE or 0
+local HERB_IMAGE="rbxassetid://90182525256912"
+local INK=Color3.fromRGB(26,22,28)
+local WOOD_A,WOOD_B,WOOD_DARK=Color3.fromRGB(170,114,64),Color3.fromRGB(122,78,42),Color3.fromRGB(72,44,22)
+local function money(v) if v>=1 and v==math.floor(v) then return "$"..v end return string.format("$%.2f",v) end
+local function px(n) return math.floor(n*BB+.5) end
+local function board(parent,h,y)
+	local f=Instance.new("Frame") f.AnchorPoint=Vector2.new(.5,0) f.Position=UDim2.new(.5,0,0,px(y))
+	f.Size=UDim2.fromOffset(0,px(h)) f.AutomaticSize=Enum.AutomaticSize.X f.BackgroundColor3=WHITE f.BorderSizePixel=0 f.Parent=parent
+	corner(f,UDim.new(0,px(14)))
+	local gr=Instance.new("UIGradient") gr.Rotation=90 gr.Parent=f -- reflet clair en haut, plus foncé en bas
+	gr.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,Color3.fromRGB(206,150,94)),ColorSequenceKeypoint.new(.14,WOOD_A),ColorSequenceKeypoint.new(1,WOOD_B)})
+	local st=stroke(f,px(4),WOOD_DARK,true)
+	local pad=Instance.new("UIPadding") pad.PaddingLeft=UDim.new(0,px(9)) pad.PaddingRight=UDim.new(0,px(9)) pad.Parent=f
+	local l=Instance.new("UIListLayout") l.FillDirection=Enum.FillDirection.Horizontal l.VerticalAlignment=Enum.VerticalAlignment.Center
+	l.HorizontalAlignment=Enum.HorizontalAlignment.Center l.SortOrder=Enum.SortOrder.LayoutOrder l.Padding=UDim.new(0,px(6)) l.Parent=f
+	-- 2 clous aux bouts (comme une planche clouée)
+	for _,o in {0,99} do
+		local n=Instance.new("Frame") n.Size=UDim2.fromOffset(px(7),px(7)) n.LayoutOrder=o
+		n.BackgroundColor3=Color3.fromRGB(64,62,66) n.BorderSizePixel=0 n.Parent=f corner(n)
+	end
+	return f,st
+end
+local function word(parent,txt,size,order,color)
+	local t=Instance.new("TextLabel") t.BackgroundTransparency=1 t.Font=Enum.Font.LuckiestGuy t.Text=txt t.TextSize=px(size)
+	t.Size=UDim2.fromOffset(0,px(size+6)) t.AutomaticSize=Enum.AutomaticSize.X t.TextColor3=color or WHITE t.LayoutOrder=order t.Parent=parent
+	local s=stroke(t,px(3.5),INK) s.LineJoinMode=Enum.LineJoinMode.Round
+	return t
+end
+local function iconImg(parent,img,size,order)
+	local i=Instance.new("ImageLabel") i.BackgroundTransparency=1 i.Image=img i.ScaleType=Enum.ScaleType.Fit
+	i.Size=UDim2.fromOffset(px(size),px(size)) i.LayoutOrder=order i.Parent=parent
+	return i
+end
+-- flèche (chevron) dessinée avec 2 barres
+local function chevron(parent)
+	local f=Instance.new("Frame") f.AnchorPoint=Vector2.new(.5,1) f.BackgroundTransparency=1 f.Size=UDim2.fromOffset(px(40),px(30)) f.Parent=parent
+	for _,s in {-1,1} do
+		local b=Instance.new("Frame") b.AnchorPoint=Vector2.new(.5,.5) b.Size=UDim2.fromOffset(px(28),px(10)) b.Rotation=45*-s
+		b.Position=UDim2.new(.5,s*px(8.5),.5,0) b.BackgroundColor3=WHITE b.BorderSizePixel=0 b.Parent=f
+		corner(b) stroke(b,px(3),INK,true)
+	end
+	return f
+end
+
+local hints={}
+-- position du panneau : au-dessus du tas "Compost" (sinon au-dessus du modèle)
+local function hintPos(c)
+	local top=c:FindFirstChild("Compost",true)
+	if top and top:IsA("BasePart") then return top.Position+Vector3.new(0,top.Size.Y/2+2.2,0) end
+	local ok,cf,size=pcall(c.GetBoundingBox,c)
+	if ok and cf and size.Magnitude>.1 then return cf.Position+Vector3.new(0,size.Y/2+.4,0) end
+	return nil
+end
+local function makeHint(c)
+	-- le panneau est accroché à un point invisible (marche même si le modèle charge en retard)
+	local at=Instance.new("Attachment") at.Name="CompostHintPoint" at.Parent=workspace.Terrain
+	local g=Instance.new("BillboardGui") g.Name="CompostHint" g.Adornee=at
+	-- taille fixe dans le monde (en studs) : comme un vrai panneau, il ne grossit pas quand on s'éloigne
+	g.Size=UDim2.fromScale(9,4.9) g.SizeOffset=Vector2.new(0,.5) -- le bas du panneau (la flèche) pointe sur le composteur
+	g.AlwaysOnTop=true g.MaxDistance=120 g.LightInfluence=0 g.ResetOnSpawn=false g.Enabled=false
+	local root=Instance.new("Frame") root.BackgroundTransparency=1 root.AnchorPoint=Vector2.new(.5,.5) root.Position=UDim2.fromScale(.5,.5)
+	root.Size=UDim2.fromOffset(px(360),px(196)) root.Parent=g
+	local rs=Instance.new("UIScale") rs.Parent=root
+	-- panneau principal : [herbe] = [pièce] $0.01
+	local main=board(root,72,0)
+	iconImg(main,HERB_IMAGE,66,1)
+	word(main,"=",40,2)
+	iconImg(main,COIN,50,3)
+	local val=word(main,MPP>0 and money(MPP) or "+1",42,4)
+	local vg=Instance.new("UIGradient") vg.Rotation=90 vg.Color=ColorSequence.new(WHITE,Color3.fromRGB(255,228,140)) vg.Parent=val
+	-- ce que contient ton sac : [sac] 12 → +$0.12
+	local gain,gst=board(root,50,84)
+	local gScale=Instance.new("UIScale") gScale.Parent=gain
+	iconImg(gain,BAG_IMAGE,36,1)
+	local nTx=word(gain,"0",28,2)
+	word(gain,"→",28,3)
+	local gTx=word(gain,"+$0",28,4,GOLD)
+	local arrow=chevron(root) arrow.Position=UDim2.new(.5,0,1,0)
+	g.Parent=pgui
+	table.insert(hints,{c=c,at=at,g=g,rs=rs,gain=gain,gst=gst,gScale=gScale,nTx=nTx,gTx=gTx,arrow=arrow})
+	print("[Herbe] Panneau du composteur créé :",c:GetFullName())
+end
+local function addHint(c)
+	if not c:IsA("Model") then return end
+	for _,h in hints do if h.c==c then return end end
+	local ok,err=pcall(makeHint,c)
+	if not ok then warn("[Herbe] Panneau du composteur : erreur ->",err) end
+end
+-- le serveur marque les composteurs (tag) ; on les cherche aussi nous-mêmes par leur nom
+for _,c in CS:GetTagged("GrassCompost") do addHint(c) end
+CS:GetInstanceAddedSignal("GrassCompost"):Connect(addHint)
+local COMPOST_NAME=CFG.COMPOST_NAME or "Composteur"
+for _,d in workspace:GetDescendants() do if d.Name==COMPOST_NAME then addHint(d) end end
+workspace.DescendantAdded:Connect(function(d) if d.Name==COMPOST_NAME then addHint(d) end end)
+task.delay(20,function() if #hints==0 then warn("[Herbe] Aucun composteur trouvé : le modèle doit s'appeler '"..COMPOST_NAME.."' dans Workspace") end end)
+
+local hintAcc=0
+Run.RenderStepped:Connect(function(dt)
+	hintAcc+=dt
+	local slow=hintAcc>=.2 if slow then hintAcc=0 end
+	local t=os.clock()
+	local m=maxBag()
+	local isFull=shown>=m
+	local hasBag=shown>0 and not depositing
+	local hide=lp:GetAttribute("IntroEnCours")==true
+	for _,h in hints do
+		if slow then
+			local pos=h.c.Parent and hintPos(h.c)
+			if pos then h.at.WorldPosition=pos end
+			h.g.Enabled=not hide and pos~=nil
+			h.gain.Visible=hasBag h.arrow.Visible=hasBag
+			if hasBag then
+				h.nTx.Text=tostring(shown)
+				h.gTx.Text=MPP>0 and "+"..money(shown*MPP) or "+"..shown.." 🌿"
+				h.gst.Color=isFull and GOLD or WOOD_DARK
+				h.nTx.TextColor3=isFull and GOLD or WHITE
+			end
+		end
+		if h.g.Enabled then h.rs.Scale=h.g.AbsoluteSize.X/px(360) end
+		-- animations seulement si le panneau est proche (pas de calcul pour rien)
+		if hasBag and h.g.Enabled and (cam.CFrame.Position-h.at.WorldPosition).Magnitude<125 then
+			h.arrow.Position=UDim2.new(.5,0,1,-px(math.abs(math.sin(t*4.5))*9))
+			h.gScale.Scale=isFull and 1+.06*math.abs(math.sin(t*5)) or 1
+		end
+	end
+end)
+
+local function compostTarget(c)
+	local s=c:FindFirstChild("Compost",true)
+	if s and s:IsA("BasePart") then return s.Position+Vector3.new(0,s.Size.Y/2+.9,0) end
+	local cf,size=c:GetBoundingBox()
+	return cf.Position+Vector3.new(0,size.Y*.15,0)
+end
+
+remotes:WaitForChild("Deposited").OnClientEvent:Connect(function(plr,c,n,gain)
+	local mine=plr==lp
+	if not c or not c.Parent then if mine then depositing=false sync() end return end
+	local target=compostTarget(c)
+	local ch=plr.Character
+	local hrp=ch and ch:FindFirstChild("HumanoidRootPart")
+	local k=math.clamp(n,1,6)
+	if mine then depositing=true shown=math.max(shown,n) task.spawn(armAnim,{{.1,2.5},{.14,.9},{.2,0}}) end
+	local remaining=n
+	for i=1,k do
+		local dec=(i==k) and remaining or math.floor(n/k)
+		remaining-=dec
+		task.delay((i-1)*.1,function()
+			local from=(hrp and hrp.Parent) and (hrp.CFrame*CFrame.new(.9,1.3,-.8)).Position or target+Vector3.new(0,6,0)
+			local m=K.Build(CFrame.new(from),.38,math.random(1,1000000),true)
+			m.Parent=fx
+			local base=m:GetScale()
+			local mid=(from+target)/2+Vector3.new(0,math.max(0,target.Y-from.Y)+3.5,0)
+			local sp=math.random()*6.28
+			tween(.5,function(a)
+				m:PivotTo(CFrame.new(bez(from,mid,target,a))*CFrame.Angles(a*5,sp+a*7,a*2))
+				if a>.75 then m:ScaleTo(base*math.max((1-a)/.25,.05)) end
+			end)
+			m:Destroy()
+			burst(target,1,4,.55)
+			if mine then shown=math.max(0,shown-dec) refresh() end
+			if i==k then
+				burst(target,4,8,1.1) puffs(target-Vector3.new(0,.5,0))
+				sound(CFG.DEPOSIT_SOUND,target,.7)
+				if mine then
+					if gain and gain>0 then popupAt(target+Vector3.new(0,2.5,0),"+"..fmt(gain).."$",GOLD)
+					else popupAt(target+Vector3.new(0,2.5,0),"+"..n.." 🌿",GREEN) end
+					depositing=false sync()
+				end
+			end
+		end)
+	end
+end)
+]]></ProtectedString></Properties></Item><Item class="LocalScript" referent="RBX74"><Properties><string name="Name">Tutoriel</string><ProtectedString name="Source"><![CDATA[-- Tutoriel (LocalScript dans StarterPlayer > StarterPlayerScripts)
+-- Tutoriel sans texte : des icônes et des flèches montrent quoi faire.
+-- 1) couper l'herbe  2) vendre au composteur  3) acheter une amélioration dans BOOSTS.
+-- Il s'arrête après le premier achat.
+if not game:GetService("RunService"):IsClient() then
+	warn("[Tutoriel] Tutoriel doit être un LocalScript dans StarterPlayer > StarterPlayerScripts !")
+	return
+end
+
+local Players=game:GetService("Players")
+local Run=game:GetService("RunService")
+local TS=game:GetService("TweenService")
+local CS=game:GetService("CollectionService")
+local UIS=game:GetService("UserInputService")
+local lp=Players.LocalPlayer
+local cam=workspace.CurrentCamera
+local pgui=lp:WaitForChild("PlayerGui")
+
+-- images du jeu
+local IMG={
+	ciseaux="rbxassetid://98821470151953",
+	sac="rbxassetid://124953051791395",
+	piece="rbxassetid://103593634628600",
+	boost="rbxassetid://113918337226531",
+}
+local SEUIL_VENTE=.8 -- on montre le composteur quand le sac est rempli à 80 %
+
+local WHITE=Color3.new(1,1,1)
+local INK=Color3.fromRGB(20,26,22)
+local GREEN=Color3.fromRGB(70,200,90)
+local TOUCH=UIS.TouchEnabled and not UIS.KeyboardEnabled
+local K=TOUCH and .75 or 1 -- tout un peu plus petit sur téléphone
+
+-- ===== le tutoriel est-il déjà fini ? =====
+local UPGRADES={"Maintenir","Dexterite","Saisir"}
+local function fini()
+	for _,id in UPGRADES do if (lp:GetAttribute("Upg_"..id) or 0)>0 then return true end end
+	return false
+end
+if fini() then return end
+
+-- ===== petits outils de dessin =====
+local function new(cls,props,parent)
+	local o=Instance.new(cls)
+	for k,v in props do o[k]=v end
+	if parent then o.Parent=parent end
+	return o
+end
+local function round(o) new("UICorner",{CornerRadius=UDim.new(1,0)},o) end
+
+-- flèche épaisse vers le bas (contour foncé + blanc), dans un cadre w × 1.2w
+local function drawArrow(parent,w,color)
+	local box=new("Frame",{BackgroundTransparency=1,Size=UDim2.fromOffset(w,w*1.2)},parent)
+	local inner=new("Frame",{BackgroundTransparency=1,Size=UDim2.fromScale(1,1)},box)
+	local H=w*1.2
+	for layer=1,2 do
+		local col=layer==1 and INK or (color or WHITE)
+		local t=layer==1 and w*.3 or w*.19 -- épaisseur
+		local grow=layer==1 and w*.06 or 0
+		local stem=new("Frame",{BorderSizePixel=0,BackgroundColor3=col,AnchorPoint=Vector2.new(.5,0),
+			Position=UDim2.fromOffset(w/2,-grow),Size=UDim2.fromOffset(t,H*.82+grow*2),ZIndex=layer},inner)
+		round(stem)
+		local L=w*.62+grow*2
+		for s=-1,1,2 do
+			local bar=new("Frame",{BorderSizePixel=0,BackgroundColor3=col,AnchorPoint=Vector2.new(.5,.5),
+				Position=UDim2.fromOffset(w/2+s*w*.2,H-w*.22),Size=UDim2.fromOffset(t,L),Rotation=s*45,ZIndex=layer},inner)
+			round(bar)
+		end
+	end
+	return box,inner
+end
+
+-- disque blanc avec une (ou deux) image(s)
+local function iconDisc(parent,size,image,extra)
+	local d=new("Frame",{BackgroundColor3=WHITE,Size=UDim2.fromOffset(size,size),ZIndex=3},parent)
+	round(d)
+	new("UIStroke",{Thickness=4,Color=INK},d)
+	new("ImageLabel",{BackgroundTransparency=1,Image=image,ScaleType=Enum.ScaleType.Fit,AnchorPoint=Vector2.new(.5,.5),
+		Position=UDim2.fromScale(.5,.5),Size=UDim2.fromScale(.82,.82),ZIndex=4},d)
+	if extra then -- petite image en bas à droite (ex : pièce sur le sac)
+		new("ImageLabel",{BackgroundTransparency=1,Image=extra,ScaleType=Enum.ScaleType.Fit,AnchorPoint=Vector2.new(.5,.5),
+			Position=UDim2.fromScale(.86,.84),Size=UDim2.fromScale(.5,.5),ZIndex=5},d)
+	end
+	return d
+end
+
+-- onde qui s'agrandit autour d'un bouton
+local function ripple(parent,rond)
+	local r=new("Frame",{BackgroundTransparency=1,AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,rond and .45 or .5),
+		Size=UDim2.fromScale(1,1),ZIndex=60},parent)
+	if rond then new("UIAspectRatioConstraint",{AspectRatio=1},r) round(r)
+	else new("UICorner",{CornerRadius=UDim.new(.35,0)},r) end
+	local st=new("UIStroke",{Thickness=5,Color=WHITE},r)
+	local grand=rond and UDim2.fromScale(1.6,1.6) or UDim2.fromScale(1.18,1.5)
+	task.spawn(function()
+		while r.Parent do
+			r.Size=UDim2.fromScale(1,1) st.Transparency=0
+			TS:Create(r,TweenInfo.new(.9,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{Size=grand}):Play()
+			local t=TS:Create(st,TweenInfo.new(.9),{Transparency=1}) t:Play() t.Completed:Wait()
+		end
+	end)
+	return r
+end
+
+-- ===== écran du tutoriel =====
+local gui=new("ScreenGui",{Name="Tutoriel",ResetOnSpawn=false,IgnoreGuiInset=true,DisplayOrder=30,ZIndexBehavior=Enum.ZIndexBehavior.Sibling},pgui)
+
+-- repère dans le monde : icône + flèche qui rebondit au-dessus de la cible
+local anchor=new("Attachment",{},workspace.Terrain)
+local marker=new("BillboardGui",{Adornee=anchor,Size=UDim2.fromOffset(90*K,150*K),AlwaysOnTop=true,LightInfluence=0,
+	StudsOffsetWorldSpace=Vector3.new(0,2.2,0),Enabled=false,ResetOnSpawn=false},pgui)
+local markerIcon=nil
+local markerArrowBox,markerArrow=drawArrow(marker,46*K)
+markerArrowBox.AnchorPoint=Vector2.new(.5,1) markerArrowBox.Position=UDim2.fromScale(.5,1)
+
+-- flèche au bord de l'écran quand la cible est hors de vue
+local edge=new("Frame",{BackgroundTransparency=1,AnchorPoint=Vector2.new(.5,.5),Size=UDim2.fromOffset(70*K,70*K),Visible=false},gui)
+local edgeIcon=nil
+local edgeRot=new("Frame",{BackgroundTransparency=1,AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromOffset(0,0)},edge)
+local edgeArrowBox=drawArrow(edgeRot,34*K)
+edgeArrowBox.AnchorPoint=Vector2.new(.5,0) edgeArrowBox.Position=UDim2.fromOffset(0,40*K)
+
+local function setIcons(image,extra)
+	if markerIcon then markerIcon:Destroy() end
+	if edgeIcon then edgeIcon:Destroy() end
+	markerIcon=iconDisc(marker,66*K,image,extra)
+	markerIcon.AnchorPoint=Vector2.new(.5,0) markerIcon.Position=UDim2.fromScale(.5,0)
+	edgeIcon=iconDisc(edge,64*K,image,extra)
+	edgeIcon.AnchorPoint=Vector2.new(.5,.5) edgeIcon.Position=UDim2.fromScale(.5,.5)
+end
+
+-- flèches + ondes accrochées à un bouton de l'interface (barre d'outils, BOOSTS, prix)
+local attached,bouncing={},{}
+local function clearAttached()
+	for _,o in attached do o:Destroy() end
+	table.clear(attached) table.clear(bouncing)
+end
+local function attachTo(target,side,size,rond)
+	-- side = "haut" (flèche au-dessus, vers le bas) ou "gauche" (flèche à gauche, vers la droite)
+	local holder=new("Frame",{BackgroundTransparency=1,Size=UDim2.fromOffset(0,0),ZIndex=30},target)
+	if side=="gauche" then
+		holder.Position=UDim2.new(0,-8,.45,0) holder.Rotation=-90
+	else
+		holder.Position=UDim2.new(.5,0,0,-6) holder.Rotation=0
+	end
+	local box,inner=drawArrow(holder,size*K)
+	box.AnchorPoint=Vector2.new(.5,1) box.Position=UDim2.fromOffset(0,-8)
+	for _,d in box:GetDescendants() do if d:IsA("GuiObject") then d.ZIndex+=40 end end
+	table.insert(attached,holder)
+	table.insert(attached,ripple(target,rond))
+	table.insert(bouncing,inner)
+	return box
+end
+
+-- ===== cibles =====
+local function character() return lp.Character end
+local function hrp() local c=character() return c and c:FindFirstChild("HumanoidRootPart") end
+local function holdingScissors()
+	local c=character()
+	local t=c and c:FindFirstChildOfClass("Tool")
+	return t~=nil and (CS:HasTag(t,"OutilCiseaux") or CS:HasTag(t,"OutilFaucille") or t.Name=="Ciseaux" or t:GetAttribute("CoupeEnPlus")~=nil)
+end
+local function nearestTuft()
+	local folder=workspace:FindFirstChild("GrassHit")
+	local r=hrp()
+	if not folder or not r then return nil end
+	local best,bd=nil,math.huge
+	for _,p in folder:GetChildren() do
+		if p:IsA("BasePart") then
+			local d=(p.Position-r.Position).Magnitude
+			if d<bd then best,bd=p,d end
+		end
+	end
+	return best and best.Position+Vector3.new(0,best.Size.Y/2,0)
+end
+local function nearestCompost()
+	local r=hrp()
+	if not r then return nil end
+	local best,bd=nil,math.huge
+	for _,c in CS:GetTagged("GrassCompost") do
+		if c:IsA("Model") then
+			local cf,size=c:GetBoundingBox()
+			local d=(cf.Position-r.Position).Magnitude
+			if d<bd then best,bd=cf.Position+Vector3.new(0,size.Y/2,0),d end
+		end
+	end
+	return best
+end
+-- cherche un écran (ScreenGui) par son nom : le script InventoryUI porte le même nom que son menu !
+local function findScreen(name)
+	for _,g in pgui:GetChildren() do
+		if g:IsA("ScreenGui") and g.Name==name then return g end
+	end
+	return nil
+end
+local buttonsCache={}
+local function buyButtons()
+	if #buttonsCache>0 and buttonsCache[1].Parent then return buttonsCache end
+	table.clear(buttonsCache)
+	local inv=findScreen("InventoryUI")
+	if inv then
+		for _,d in inv:GetDescendants() do
+			if d:IsA("GuiButton") and d:GetAttribute("UpgradeId") then table.insert(buttonsCache,d) end
+		end
+	end
+	return buttonsCache
+end
+local function shown(o)
+	while o and o:IsA("GuiObject") do
+		if not o.Visible then return false end
+		o=o.Parent
+	end
+	return true
+end
+local function anyAffordable()
+	for _,b in buyButtons() do if b:GetAttribute("Achetable") then return true end end
+	return false
+end
+local function affordableVisibleButton()
+	for _,b in buyButtons() do if b:GetAttribute("Achetable") and shown(b) then return b end end
+	return nil
+end
+
+-- ===== intro : ✂ ➜ 🎒 ➜ 🪙 ➜ ⬆ =====
+local function intro()
+	local strip=new("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.3),Size=UDim2.fromOffset(0,110*K),
+		AutomaticSize=Enum.AutomaticSize.X,BackgroundColor3=Color3.fromRGB(14,24,16),BackgroundTransparency=.35},gui)
+	new("UICorner",{CornerRadius=UDim.new(0,28)},strip)
+	new("UIPadding",{PaddingLeft=UDim.new(0,18*K),PaddingRight=UDim.new(0,18*K)},strip)
+	new("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,VerticalAlignment=Enum.VerticalAlignment.Center,
+		HorizontalAlignment=Enum.HorizontalAlignment.Center,Padding=UDim.new(0,10*K),SortOrder=Enum.SortOrder.LayoutOrder},strip)
+	local stripScale=new("UIScale",{},strip)
+	local items={}
+	local steps={{IMG.ciseaux},{IMG.sac},{IMG.sac,IMG.piece},{IMG.boost}}
+	for i,st in steps do
+		local slot=new("Frame",{BackgroundTransparency=1,Size=UDim2.fromOffset(84*K,84*K),LayoutOrder=i*2},strip)
+		local d=iconDisc(slot,84*K,st[1],st[2])
+		local sc=new("UIScale",{Scale=0},d)
+		table.insert(items,sc)
+		if i<#steps then
+			local aslot=new("Frame",{BackgroundTransparency=1,Size=UDim2.fromOffset(40*K,84*K),LayoutOrder=i*2+1},strip)
+			local rot=new("Frame",{BackgroundTransparency=1,AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),
+				Size=UDim2.fromOffset(0,0),Rotation=-90},aslot)
+			local box=drawArrow(rot,30*K)
+			box.AnchorPoint=Vector2.new(.5,.5) box.Position=UDim2.fromOffset(0,0)
+			local asc=new("UIScale",{Scale=0},box)
+			table.insert(items,asc)
+		end
+	end
+	for _,sc in items do
+		TS:Create(sc,TweenInfo.new(.35,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Scale=1}):Play()
+		task.wait(.22)
+	end
+	task.wait(2.6)
+	local t=TS:Create(stripScale,TweenInfo.new(.3,Enum.EasingStyle.Back,Enum.EasingDirection.In),{Scale=0})
+	t:Play() t.Completed:Wait()
+	strip:Destroy()
+end
+
+-- ===== bravo : grand ✓ vert =====
+local function bravo()
+	local d=new("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.4),Size=UDim2.fromOffset(130*K,130*K),BackgroundColor3=GREEN},gui)
+	round(d)
+	new("UIStroke",{Thickness=6,Color=INK},d)
+	local w=130*K
+	for layer=1,2 do
+		local col=layer==1 and INK or WHITE
+		local t=layer==1 and w*.16 or w*.1
+		local short=new("Frame",{BorderSizePixel=0,BackgroundColor3=col,AnchorPoint=Vector2.new(.5,.5),
+			Position=UDim2.fromOffset(w*.36,w*.56),Size=UDim2.fromOffset(t,w*.3),Rotation=-45,ZIndex=layer+1},d)
+		round(short)
+		local long=new("Frame",{BorderSizePixel=0,BackgroundColor3=col,AnchorPoint=Vector2.new(.5,.5),
+			Position=UDim2.fromOffset(w*.56,w*.46),Size=UDim2.fromOffset(t,w*.56),Rotation=40,ZIndex=layer+1},d)
+		round(long)
+	end
+	local sc=new("UIScale",{Scale=0},d)
+	TS:Create(sc,TweenInfo.new(.45,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Scale=1}):Play()
+	task.wait(1.4)
+	local t=TS:Create(sc,TweenInfo.new(.3,Enum.EasingStyle.Back,Enum.EasingDirection.In),{Scale=0})
+	t:Play() t.Completed:Wait()
+end
+
+-- ===== première vente =====
+-- après la première vente, on laisse le joueur couper tranquille ;
+-- on revient seulement quand il peut acheter sa première amélioration.
+local aVendu=false
+task.spawn(function()
+	local remotes=game:GetService("ReplicatedStorage"):WaitForChild("GrassRemotes",30)
+	local dep=remotes and remotes:WaitForChild("Deposited",30)
+	if dep then dep.OnClientEvent:Connect(function(plr) if plr==lp then aVendu=true end end) end
+end)
+
+-- ===== boucle du tutoriel =====
+local step,target=nil,nil
+local function decide()
+	if fini() then return "fin" end
+	if lp:GetAttribute("IntroEnCours") then return "rien" end -- on attend la fin de l'intro du chiot
+	if lp:GetAttribute("MenuOuvert") then return "menu" end
+	if anyAffordable() then return "acheter" end
+	if aVendu then return "rien" end
+	local bag,max=lp:GetAttribute("Bag") or 0,lp:GetAttribute("BagMax") or 25
+	if bag>0 and bag>=max*SEUIL_VENTE then return "vendre" end
+	if not holdingScissors() then return "outil" end
+	return "couper"
+end
+
+local function enterStep(s)
+	step=s
+	clearAttached()
+	marker.Enabled=false edge.Visible=false
+	if s=="couper" then setIcons(IMG.ciseaux)
+	elseif s=="vendre" then setIcons(IMG.sac,IMG.piece)
+	elseif s=="outil" then
+		-- montre la bulle des ciseaux dans la barre d'outils
+		local barre=findScreen("BarreOutils")
+		local slot=barre and barre:FindFirstChild("Ciseaux",true)
+		if slot then attachTo(slot,"haut",40,true) end
+	elseif s=="acheter" then
+		-- montre le bouton BOOSTS
+		local b=findScreen("BoostsBouton")
+		local holder=b and b:FindFirstChild("BoostsHolder")
+		if holder then attachTo(holder,"gauche",36,true) end -- petite flèche vers BOOSTS
+	end
+end
+
+local menuButton=nil
+local acc=0
+local conn
+conn=Run.RenderStepped:Connect(function(dt)
+	acc+=dt
+	if acc>=.25 then
+		acc=0
+		local s=decide()
+		if s=="fin" then
+			conn:Disconnect()
+			clearAttached()
+			marker.Enabled=false edge.Visible=false
+			task.spawn(function() bravo() gui:Destroy() marker:Destroy() anchor:Destroy() end)
+			return
+		end
+		if s~=step then enterStep(s) menuButton=nil end
+		-- dans le menu : flèche sur le bouton de prix à acheter
+		if s=="menu" then
+			local b=affordableVisibleButton()
+			if b~=menuButton then
+				clearAttached()
+				menuButton=b
+				if b then attachTo(b,"haut",36,false) end
+			end
+		end
+		target=(s=="couper" and nearestTuft()) or (s=="vendre" and nearestCompost()) or nil
+	end
+	local bounce=math.abs(math.sin(os.clock()*5))*8*K
+	for _,inner in bouncing do inner.Position=UDim2.fromOffset(0,bounce) end
+	-- repère dans le monde ou au bord de l'écran
+	if not target then marker.Enabled=false edge.Visible=false return end
+	anchor.WorldPosition=target
+	local p,onScreen=cam:WorldToViewportPoint(target+Vector3.new(0,2.2,0))
+	if onScreen and p.Z>0 then
+		-- le composteur a déjà son panneau (herbe = $) avec une flèche : pas de 2e repère par-dessus
+		local panneau=step=="vendre" and pgui:FindFirstChild("CompostHint")
+		marker.Enabled=not (panneau and panneau.Enabled) edge.Visible=false
+		markerArrow.Position=UDim2.fromOffset(0,bounce) -- rebond
+	else
+		marker.Enabled=false edge.Visible=true
+		local v=cam.ViewportSize
+		local c=Vector2.new(v.X/2,v.Y/2)
+		local d=Vector2.new(p.X,p.Y)-c
+		if p.Z<0 then d=-d end
+		if d.Magnitude<1 then d=Vector2.new(0,1) end
+		local m=80*K
+		local sx=(v.X/2-m)/math.max(math.abs(d.X),1e-3)
+		local sy=(v.Y/2-m)/math.max(math.abs(d.Y),1e-3)
+		local pos=c+d*math.min(sx,sy)
+		edge.Position=UDim2.fromOffset(pos.X,pos.Y)
+		edgeRot.Rotation=math.deg(math.atan2(d.Y,d.X))-90
+	end
+end)
+
+-- l'intro au tout début
+task.spawn(function()
+	if not lp.Character then lp.CharacterAdded:Wait() end
+	task.wait(1.5)
+	while lp:GetAttribute("IntroEnCours") do task.wait(0.25) end -- après l'intro du chiot
+	if not fini() then intro() end
+end)
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX75"><Properties><string name="Name">Installer</string><ProtectedString name="Source"><![CDATA[-- Installe la faucille (vitrine sur l'établi + scripts), lancé depuis la barre de commande.
+-- Les anciennes versions sont rangées (désactivées) dans ServerStorage > AnciensScripts, rien n'est supprimé.
+return function()
+	local f = workspace:FindFirstChild("InstallationFaucille")
+	assert(f, "Insère d'abord le fichier InstallationFaucille.rbxmx (Workspace > Insert from File)")
+	local b = game.ServerStorage:FindFirstChild("AnciensScripts") or Instance.new("Folder")
+	b.Name = "AnciensScripts"
+	b.Parent = game.ServerStorage
+
+	-- 1) la faucille sur le tapis vert de l'établi
+	local vitrine = f.FaucilleVitrine
+	local ancienne = workspace:FindFirstChild("FaucilleVitrine", true)
+	if ancienne and not ancienne:IsDescendantOf(f) then
+		ancienne.Name = "FaucilleVitrine_ANCIENNE"
+		ancienne.Parent = b
+	end
+	local meuble = workspace:FindFirstChild("MeubleOutils", true)
+	local tapis = (meuble and meuble:FindFirstChild("Tapis", true)) or workspace:FindFirstChild("Tapis", true)
+	local ok = tapis and tapis:IsA("BasePart")
+	if ok then
+		vitrine:PivotTo(tapis.CFrame * CFrame.new(0, tapis.Size.Y / 2 + 0.05, 0))
+		vitrine.Parent = meuble or tapis.Parent
+	else
+		local c = workspace.CurrentCamera.CFrame
+		local p = c.Position + Vector3.new(c.LookVector.X, 0, c.LookVector.Z).Unit * 10
+		local hit = workspace:Raycast(p + Vector3.new(0, 50, 0), Vector3.new(0, -200, 0))
+		vitrine:PivotTo(CFrame.new(hit and hit.Position or p) * CFrame.new(0, 0.05, 0))
+		vitrine.Parent = workspace
+	end
+
+	-- 2) les scripts
+	local sss, sps = game.ServerScriptService, game.StarterPlayer.StarterPlayerScripts
+	for n, parent in { FaucilleServer = sss, GrassServer = sss, FaucilleClient = sps, GrassClient = sps, Tutoriel = sps } do
+		local v = parent:FindFirstChild(n)
+		while v do
+			v.Enabled = false
+			v.Name = n .. "_ANCIEN"
+			v.Parent = b
+			v = parent:FindFirstChild(n)
+		end
+		f[n].Parent = parent
+	end
+	f:Destroy()
+	pcall(function() game:GetService("Selection"):Set({ vitrine }) end)
+	print(ok and "Faucille installée sur l'établi !" or "Établi introuvable : la faucille est posée devant ta caméra (déplace-la où tu veux)")
+end
+]]></ProtectedString></Properties></Item></Item></roblox>

@@ -69,13 +69,15 @@ local lastPick,lastFull,lastDep={},{},{}
 Players.PlayerRemoving:Connect(function(p) lastPick[p]=nil lastFull[p]=nil lastDep[p]=nil end)
 local function hrpOf(plr) return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") end
 
--- ===== ciseaux : on ne peut couper l'herbe qu'avec les ciseaux en main =====
+-- ===== outils de coupe : on ne peut couper l'herbe qu'avec un outil en main (ciseaux, faucille...) =====
 local SCISSORS_EXTRA=CFG.SCISSORS_EXTRA or 0   -- touffes voisines coupées en plus à chaque coup (0 = une par une)
 local SCISSORS_RADIUS=CFG.SCISSORS_RADIUS or 4 -- rayon autour de la touffe visée (studs)
-local function holdsScissors(plr)
+-- un outil peut couper plus : attributs "CoupeEnPlus" (touffes en plus) et "RayonCoupe" (studs) sur l'outil
+local function cutterTool(plr)
 	local ch=plr.Character
 	local tool=ch and ch:FindFirstChildOfClass("Tool")
-	return tool~=nil and (CS:HasTag(tool,"OutilCiseaux") or tool.Name=="Ciseaux")
+	if tool and (CS:HasTag(tool,"OutilCiseaux") or CS:HasTag(tool,"OutilFaucille") or tool.Name=="Ciseaux" or tool:GetAttribute("CoupeEnPlus")~=nil) then return tool end
+	return nil
 end
 
 -- ===== composteur =====
@@ -258,7 +260,8 @@ end
 PickRequest.OnServerEvent:Connect(function(plr,id)
 	if typeof(id)~="number" then return end
 	local t=tufts[id] if not t then return end
-	if not holdsScissors(plr) then return end -- plus d'arrachage à la main
+	local tool=cutterTool(plr)
+	if not tool then return end -- plus d'arrachage à la main
 	local hrp=hrpOf(plr)
 	if not hrp or (hrp.Position-t.p).Magnitude>CFG.CLICK_DIST+8 then return end
 	local now=os.clock()
@@ -283,13 +286,14 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 	-- animation de coupe des ciseaux (script CiseauxServer)
 	local anim=game:GetService("ServerStorage"):FindFirstChild("CiseauxCoupe")
 	if anim then anim:Fire(plr) end
-	-- Ciseaux + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
-	local extra=SCISSORS_EXTRA+(plr:GetAttribute("Upg_Saisir") or 0)
+	-- outil + Saisir : coupe aussi les touffes voisines (les plus proches d'abord)
+	local extra=SCISSORS_EXTRA+(plr:GetAttribute("Upg_Saisir") or 0)+(tonumber(tool:GetAttribute("CoupeEnPlus")) or 0)
+	local radius=math.max(SCISSORS_RADIUS,tonumber(tool:GetAttribute("RayonCoupe")) or 0)
 	if extra>0 then
 		local near={}
 		for id2,t2 in tufts do
 			local d=(t2.p-t.p).Magnitude
-			if d<=SCISSORS_RADIUS then table.insert(near,{id2,t2,d}) end
+			if d<=radius then table.insert(near,{id2,t2,d}) end
 		end
 		table.sort(near,function(a,b) return a[3]<b[3] end)
 		local got=0
