@@ -1,6 +1,8 @@
 <roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Item class="LocalScript" referent="RBX0"><Properties><string name="Name">IntroChien</string><ProtectedString name="Source"><![CDATA[-- IntroChien (LocalScript dans StarterPlayer > StarterPlayerScripts)
 -- Cinématique d'intro : le chiot projette sa balle beaucoup trop loin... jusqu'à la dernière zone !
 -- Ensuite il suit le joueur, et une colonne de lumière montre où est tombée la balle.
+-- FIN : quand toute l'herbe est coupée, "Va chercher la balle !" -> on la ramasse -> cinématique
+-- avec le chiot (il attrape la balle en plein vol) -> "BRAVO !" -> écran des statistiques.
 if not game:GetService("RunService"):IsClient() then
 	warn("[Intro] IntroChien doit être un LocalScript dans StarterPlayer > StarterPlayerScripts !")
 	return
@@ -20,6 +22,7 @@ local REGLAGES = {
 		atterrir = "rbxasset://sounds/action_jump_land.mp3",
 		pop = "rbxassetid://129348077985519", -- le "?" et le titre
 		aboiement = "", -- mets un son d'aboiement ici si tu en as un : "rbxassetid://..."
+		victoire = "", -- musique / son de victoire pour la fin (optionnel) : "rbxassetid://..."
 	},
 }
 
@@ -1054,9 +1057,818 @@ local function suivre(dt)
 	majChien(dt)
 end
 
+
+---------------------------------------------------------------- LA FIN DU JEU
+-- Quand toute l'herbe est coupée (le stade était la dernière zone) : "Va chercher la balle !"
+-- On ramasse la balle -> cinématique de fin avec le chiot -> écran des statistiques.
+local finEnCours = false -- pendant la fin, c'est la cinématique qui bouge le chiot (pas "suivre")
+task.spawn(function()
+	local ok, err = pcall(function()
+		local remotes = RS:WaitForChild("GrassRemotes", 60)
+		if not remotes then return end
+		-- le temps de jeu commence à la fin de l'intro (si le chrono n'a pas donné son temps)
+		while lp:GetAttribute("IntroEnCours") do task.wait(0.2) end
+		local debutPartie = os.clock()
+		local function tempsJeu() return os.clock() - debutPartie end
+		-- on attend que toute l'herbe soit coupée
+		while true do
+			local total, reste = remotes:GetAttribute("GrassTotal"), remotes:GetAttribute("GrassLeft")
+			if total and total > 0 and reste and reste <= 0 and not lp:GetAttribute("IntroEnCours") then break end
+			task.wait(0.5)
+		end
+		task.wait(1)
+
+		---------------------------------------------------------------- interface de la fin
+		local fg = Instance.new("ScreenGui")
+		fg.Name = "FinChien"
+		fg.IgnoreGuiInset = true
+		fg.ResetOnSpawn = false
+		fg.DisplayOrder = 60
+		fg.Parent = pgui
+		local function nouveau(classe, props, parent)
+			local o = Instance.new(classe)
+			for k, v in props do o[k] = v end
+			o.Parent = parent
+			return o
+		end
+		local function coin(o, r) return nouveau("UICorner", { CornerRadius = r or UDim.new(1, 0) }, o) end
+		local function trait(o, e, c, bord)
+			local s = nouveau("UIStroke", { Thickness = e, Color = c or INK, LineJoinMode = Enum.LineJoinMode.Round }, o)
+			if bord then s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border end
+			return s
+		end
+		local function degrade(o, couleurs, rot)
+			local k = {}
+			for i, c in couleurs do table.insert(k, ColorSequenceKeypoint.new((i - 1) / (#couleurs - 1), c)) end
+			return nouveau("UIGradient", { Rotation = rot or 90, Color = ColorSequence.new(k) }, o)
+		end
+		local OR = Color3.fromRGB(255, 214, 90)
+		local echelles = {}
+		local function echelle(o) table.insert(echelles, nouveau("UIScale", {}, o)) return o end
+		local function adapter()
+			local s = math.clamp(cam.ViewportSize.Y / 1080, 0.42, 1.2)
+			for _, u in echelles do u.Scale = s end
+		end
+		cam:GetPropertyChangedSignal("ViewportSize"):Connect(adapter)
+
+		-- grand titre qui pop (comme dans l'intro)
+		local function grandTitre(texte, sous, duree, y)
+			local titre = nouveau("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, y or 0.24), Size = UDim2.fromScale(0.74, 0.17), ZIndex = 5 }, fg)
+			local sc = nouveau("UIScale", { Scale = 0 }, titre)
+			local grand = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 0.68), Text = texte, Font = Enum.Font.LuckiestGuy, TextScaled = true, TextColor3 = WHITE, ZIndex = 5 }, titre)
+			local gs = trait(grand, 5)
+			degrade(grand, { WHITE, OR })
+			local petit = nouveau("TextLabel", { BackgroundTransparency = 1, Position = UDim2.fromScale(0.1, 0.7), Size = UDim2.fromScale(0.8, 0.3), Text = sous or "", Font = Enum.Font.FredokaOne, TextScaled = true, TextColor3 = WHITE, ZIndex = 5 }, titre)
+			local pst = trait(petit, 3)
+			TS:Create(sc, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+			task.delay(duree, function()
+				TS:Create(titre, TweenInfo.new(0.35), { Position = UDim2.fromScale(0.5, (y or 0.24) - 0.06) }):Play()
+				for _, o in { grand, petit } do TS:Create(o, TweenInfo.new(0.35), { TextTransparency = 1 }):Play() end
+				for _, o in { gs, pst } do TS:Create(o, TweenInfo.new(0.35), { Transparency = 1 }):Play() end
+				task.wait(0.4)
+				titre:Destroy()
+			end)
+		end
+
+		---------------------------------------------------------------- 1) "Va chercher la balle !"
+		local posBalle = atterrissage + UP * 0.38
+		sonJouer(REGLAGES.SONS.pop, 0.7, 1)
+		grandTitre("TOUTE L'HERBE EST COUPÉE !", "Va chercher la balle de ton chiot !", 3.2)
+		-- la colonne de lumière s'élargit et brille plus fort
+		rayon.Width0, rayon.Width1 = 3, 1.2
+		eclat.Enabled = true
+		eclat.Rate = 22
+		lumiere.Enabled = true
+		lumiere.Range = 18
+		b1.Position = Vector3.new(0, 90, 0)
+		-- la balle brille (contour blanc) et flotte
+		local brille = nouveau("Highlight", { Adornee = balleModel, FillColor = WHITE, FillTransparency = 0.6, OutlineColor = OR, OutlineTransparency = 0, DepthMode = Enum.HighlightDepthMode.AlwaysOnTop }, balleModel)
+		-- flèche qui rebondit au-dessus de la balle
+		local attFleche = nouveau("Attachment", { WorldPosition = posBalle + UP * 3.2 }, workspace.Terrain)
+		local fleche = nouveau("BillboardGui", { Adornee = attFleche, Size = UDim2.fromOffset(120, 130), AlwaysOnTop = true, LightInfluence = 0, MaxDistance = 400 }, fg)
+		local flecheIn = nouveau("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) }, fleche)
+		local balleTxt = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 44), Text = "BALLE", Font = Enum.Font.LuckiestGuy, TextSize = 34, TextColor3 = WHITE }, flecheIn)
+		trait(balleTxt, 4)
+		for _, s in { -1, 1 } do -- chevron vers le bas
+			local b = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, s * 15, 0, 80), Size = UDim2.fromOffset(46, 16), Rotation = -40 * s, BackgroundColor3 = OR, BorderSizePixel = 0 }, flecheIn)
+			coin(b)
+			trait(b, 3, INK, true)
+		end
+		-- bandeau en haut de l'écran + flèche au bord quand la balle n'est pas à l'écran
+		local bandeau = echelle(nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 70), Size = UDim2.fromOffset(520, 64), BackgroundColor3 = Color3.fromRGB(14, 34, 20), BackgroundTransparency = 0.1 }, fg))
+		coin(bandeau)
+		trait(bandeau, 4, INK, true)
+		local bt = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 3), Text = "🎾 VA CHERCHER LA BALLE !", Font = Enum.Font.LuckiestGuy, TextSize = 34, TextColor3 = WHITE }, bandeau)
+		trait(bt, 4)
+		degrade(bt, { WHITE, OR })
+		local bord = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(76, 76), BackgroundTransparency = 1, Visible = false }, fg)
+		local bordRot = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }, bord)
+		for _, s in { -1, 1 } do
+			local b = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, s * 13, 0.5, 0), Size = UDim2.fromOffset(44, 15), Rotation = -40 * s, BackgroundColor3 = OR, BorderSizePixel = 0 }, bordRot)
+			coin(b)
+			trait(b, 3, INK, true)
+		end
+		adapter()
+
+		local ramassee = false
+		local conn
+		conn = Run.RenderStepped:Connect(function(dt)
+			local t = os.clock()
+			-- la balle flotte et tourne doucement dans sa colonne de lumière
+			balleCF = CFrame.new(posBalle + UP * (0.35 + 0.18 * math.sin(t * 3))) * CFrame.Angles(0, t * 1.5, 0)
+			flecheIn.Position = UDim2.fromOffset(0, -math.abs(math.sin(t * 4)) * 14)
+			rayon.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.1 + 0.15 * math.sin(t * 4) ^ 2), NumberSequenceKeypoint.new(0.7, 0.7), NumberSequenceKeypoint.new(1, 1) })
+			bandeau.Rotation = math.sin(t * 2) * 1.2
+			-- flèche au bord de l'écran si la balle est hors champ
+			local p, vu = cam:WorldToViewportPoint(posBalle + UP)
+			if vu and p.Z > 0 then
+				bord.Visible = false
+			else
+				bord.Visible = true
+				local v = cam.ViewportSize
+				local c = Vector2.new(v.X / 2, v.Y / 2)
+				local d = Vector2.new(p.X, p.Y) - c
+				if p.Z < 0 then d = -d end
+				if d.Magnitude < 1 then d = Vector2.new(0, 1) end
+				local m = 70
+				local k = math.min((v.X / 2 - m) / math.max(math.abs(d.X), 1e-3), (v.Y / 2 - m) / math.max(math.abs(d.Y), 1e-3))
+				local pos = c + d * k
+				bord.Position = UDim2.fromOffset(pos.X, pos.Y)
+				bordRot.Rotation = math.deg(math.atan2(d.Y, d.X)) - 90
+			end
+			-- on ramasse la balle en passant dessus
+			local ch = lp.Character
+			local r = ch and ch:FindFirstChild("HumanoidRootPart")
+			if r and (Vector3.new(r.Position.X, 0, r.Position.Z) - Vector3.new(posBalle.X, 0, posBalle.Z)).Magnitude < 4.5 and math.abs(r.Position.Y - posBalle.Y) < 8 then
+				ramassee = true
+			end
+		end)
+		while not ramassee do task.wait() end
+		conn:Disconnect()
+		bandeau:Destroy()
+		bord:Destroy()
+		fleche:Destroy()
+		attFleche:Destroy()
+		brille:Destroy()
+		-- la colonne de lumière se referme sur la balle (elle cacherait la scène)
+		TS:Create(b1, TweenInfo.new(0.45, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { Position = Vector3.new(0, 0.1, 0) }):Play()
+		TS:Create(lumiere, TweenInfo.new(0.5), { Brightness = 0 }):Play()
+		eclat.Enabled = false
+
+		---------------------------------------------------------------- 2) La cinématique de fin
+		finEnCours = true
+		local ch = lp.Character
+		local r = ch and ch:FindFirstChild("HumanoidRootPart")
+		local hum = ch and ch:FindFirstChildOfClass("Humanoid")
+		if not (r and hum) then finEnCours = false return end
+		exclus[1] = ch
+		majExclus({ chienModel, balleModel })
+		pcall(function() hum:UnequipTools() end)
+		-- on cache l'interface, on fige le personnage
+		local cachees = {}
+		for _, g in pgui:GetChildren() do
+			if g:IsA("ScreenGui") and g ~= fg and g.Enabled then g.Enabled = false table.insert(cachees, g) end
+		end
+		local coreAv = {}
+		for _, ct in { Enum.CoreGuiType.PlayerList, Enum.CoreGuiType.Chat, Enum.CoreGuiType.EmotesMenu, Enum.CoreGuiType.Health, Enum.CoreGuiType.Backpack } do
+			local okc, v = pcall(StarterGui.GetCoreGuiEnabled, StarterGui, ct)
+			coreAv[ct] = okc and v
+			pcall(StarterGui.SetCoreGuiEnabled, StarterGui, ct, false)
+		end
+		lp:SetAttribute("MenuOuvert", true)
+		local vitesse0, saut0 = hum.WalkSpeed, hum.JumpPower
+		hum.WalkSpeed, hum.JumpPower = 0, 0
+		hum.AutoRotate = false
+		r.Anchored = true
+		local fov0 = cam.FieldOfView
+		cam.CameraType = Enum.CameraType.Scriptable
+		local flouFin = nouveau("DepthOfFieldEffect", { Name = "FlouFin", FarIntensity = 0.3, NearIntensity = 0, InFocusRadius = 12, FocusDistance = 10 }, Lighting)
+
+		-- bandes noires de cinéma + bouton passer
+		local haut = nouveau("Frame", { AnchorPoint = Vector2.new(0, 1), Position = UDim2.fromScale(0, 0), Size = UDim2.fromScale(1, 0.11), BackgroundColor3 = Color3.new(0, 0, 0), BorderSizePixel = 0, ZIndex = 3 }, fg)
+		local bas = nouveau("Frame", { Position = UDim2.fromScale(0, 1), Size = UDim2.fromScale(1, 0.11), BackgroundColor3 = Color3.new(0, 0, 0), BorderSizePixel = 0, ZIndex = 3 }, fg)
+		local voileNoir = nouveau("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 1, BorderSizePixel = 0, ZIndex = 20 }, fg)
+		TS:Create(haut, TweenInfo.new(0.45, Enum.EasingStyle.Quad), { Position = UDim2.fromScale(0, 0.11) }):Play()
+		TS:Create(bas, TweenInfo.new(0.45, Enum.EasingStyle.Quad), { Position = UDim2.fromScale(0, 0.89) }):Play()
+		local sauter = false
+		local btnPasser = nouveau("TextButton", {
+			AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -24, 1, -22), Size = UDim2.fromOffset(150, 44), BackgroundColor3 = Color3.fromRGB(20, 24, 22),
+			BackgroundTransparency = 0.25, Text = "PASSER  »", Font = Enum.Font.FredokaOne, TextSize = 22, TextColor3 = WHITE, ZIndex = 30,
+		}, fg)
+		coin(btnPasser)
+		btnPasser.Activated:Connect(function() sauter = true end)
+		local connSauter = UIS.InputBegan:Connect(function(input)
+			if input.KeyCode == Enum.KeyCode.ButtonB or input.KeyCode == Enum.KeyCode.Return then sauter = true end
+		end)
+
+		local lent = 1 -- ralenti (1 = vitesse normale)
+		local function scene(duree, f)
+			local t = 0
+			while not sauter and t < duree do
+				local dt = Run.RenderStepped:Wait()
+				t = math.min(t + dt * lent, duree)
+				f(t / duree, dt * lent, t)
+			end
+		end
+
+		-- le bras droit du personnage (animation faite à la main, marche en R15 et R6)
+		local epaule
+		local brasHaut = ch:FindFirstChild("RightUpperArm")
+		if brasHaut then epaule = brasHaut:FindFirstChild("RightShoulder") else
+			local torse = ch:FindFirstChild("Torso")
+			epaule = torse and torse:FindFirstChild("Right Shoulder")
+		end
+		local c0 = epaule and epaule.C0
+		local function bras(deg)
+			if epaule and c0 then pcall(function() epaule.C0 = CFrame.new(c0.Position) * CFrame.Angles(math.rad(deg), 0, 0) * c0.Rotation end) end
+		end
+		local main = ch:FindFirstChild("RightHand") or ch:FindFirstChild("Right Arm")
+		local function dansLaMain()
+			if not main then return r.CFrame * CFrame.new(1, 0.5, -1) end
+			return main.CFrame * CFrame.new(0, -main.Size.Y / 2 - 0.3, 0)
+		end
+		local function tourner(dir) -- le personnage regarde dans une direction
+			local p = r.Position
+			r.CFrame = CFrame.lookAt(p, p + aPlat(dir))
+		end
+		local function courir(cible, vitesse, dt)
+			local cur = pose.cf.Position
+			local vec = Vector3.new(cible.X - cur.X, 0, cible.Z - cur.Z)
+			local d = vec.Magnitude
+			local dir = pose.cf.LookVector
+			local v = 0
+			if d > 0.05 then
+				v = vitesse
+				cur += vec.Unit * math.min(v * dt, d)
+				dir = dir:Lerp(vec.Unit, math.min(dt * 12, 1))
+			end
+			local g = sol(cur, cur.Y + 3) or cur
+			local y = pose.cf.Position.Y + (g.Y - pose.cf.Position.Y) * math.min(dt * 14, 1)
+			local pos = Vector3.new(cur.X, y, cur.Z)
+			pose.cf = CFrame.lookAt(pos, pos + aPlat(dir))
+			pose.marche += ((v > 0 and 1 or 0) - pose.marche) * math.min(dt * 10, 1)
+			pose.pas += dt * (6 + v * 0.55)
+			return d
+		end
+		local function regarderChien(cible, dt)
+			local cur = pose.cf.Position
+			local dir = pose.cf.LookVector:Lerp(aPlat(cible - cur), math.min(dt * 8, 1))
+			pose.cf = CFrame.lookAt(cur, cur + aPlat(dir))
+		end
+		local function eclatA(pos, couleur, n, vitesseP)
+			local att = nouveau("Attachment", { WorldPosition = pos }, workspace.Terrain)
+			local pe = nouveau("ParticleEmitter", {
+				Color = ColorSequence.new(couleur), LightEmission = 1, Size = NumberSequence.new(0.5, 0), Speed = NumberRange.new(vitesseP or 6, (vitesseP or 6) * 1.6),
+				SpreadAngle = Vector2.new(180, 180), Lifetime = NumberRange.new(0.35, 0.6), Rate = 0,
+			}, att)
+			pe:Emit(n)
+			game:GetService("Debris"):AddItem(att, 1.5)
+		end
+		-- coeurs qui montent au-dessus du chiot
+		local function coeur()
+			local att = nouveau("Attachment", { WorldPosition = teteChien() + UP * 1.2 + Vector3.new(math.random() - 0.5, 0, math.random() - 0.5) }, workspace.Terrain)
+			local g = nouveau("BillboardGui", { Adornee = att, Size = UDim2.fromOffset(46, 46), AlwaysOnTop = true, LightInfluence = 0 }, fg)
+			local l = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Text = "❤", TextScaled = true, Font = Enum.Font.FredokaOne, TextColor3 = Color3.fromRGB(255, 70, 110) }, g)
+			local st = trait(l, 3, WHITE)
+			task.spawn(function()
+				local p0 = att.WorldPosition
+				local t0 = os.clock()
+				while os.clock() - t0 < 1.2 do
+					local a = (os.clock() - t0) / 1.2
+					att.WorldPosition = p0 + UP * (a * 2.4) + Vector3.new(math.sin(a * 9) * 0.3, 0, 0)
+					l.TextTransparency, st.Transparency = math.max(0, a * 1.4 - 0.4), math.max(0, a * 1.4 - 0.4)
+					Run.RenderStepped:Wait()
+				end
+				att:Destroy()
+				g:Destroy()
+			end)
+		end
+		-- bulle "!" au-dessus du chiot
+		local attBulle = nouveau("Attachment", {}, workspace.Terrain)
+		local bulleFin = nouveau("BillboardGui", { Adornee = attBulle, Size = UDim2.fromOffset(74, 74), StudsOffsetWorldSpace = Vector3.new(0, 1.9, 0), AlwaysOnTop = true, LightInfluence = 0, Enabled = false }, fg)
+		local rondB = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(1, 1), BackgroundColor3 = WHITE }, bulleFin)
+		coin(rondB)
+		trait(rondB, 4)
+		local ex = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Text = "!", Font = Enum.Font.LuckiestGuy, TextScaled = true, TextColor3 = Color3.fromRGB(235, 60, 55) }, rondB)
+		nouveau("UIPadding", { PaddingTop = UDim.new(0.16, 0), PaddingBottom = UDim.new(0.04, 0) }, ex)
+		local bulleSc = nouveau("UIScale", { Scale = 0 }, rondB)
+
+		-- placements : le joueur devant la balle, le chiot un peu plus loin, dans un endroit dégagé
+		local dirBalle = aPlat(posBalle - r.Position)
+		local sP = sol(posBalle - dirBalle * 2.2, posBalle.Y + 3) or (posBalle - dirBalle * 2.2)
+		local solSous = sol(r.Position, r.Position.Y + 1)
+		local hauteurHanches = solSous and math.clamp(r.Position.Y - solSous.Y, 1, 6) or (hum.HipHeight + r.Size.Y / 2)
+		r.CFrame = CFrame.lookAt(sP + UP * hauteurHanches, sP + UP * hauteurHanches + dirBalle)
+		local P = sP
+		local placeD
+		for _, dist in { 10, 8, 12, 6.5 } do
+			for _, ang in { 150, -150, 120, -120, 180, 90, -90, 60, -60 } do
+				local d = CFrame.Angles(0, math.rad(ang), 0):VectorToWorldSpace(dirBalle)
+				local q = sol(P + d * dist, P.Y + 3)
+				if q and math.abs(q.Y - P.Y) < 2.5 and placeLibre(q, P + UP * 1.5) then placeD = q break end
+			end
+			if placeD then break end
+		end
+		placeD = placeD or (sol(P - dirBalle * 8, P.Y + 3) or (P - dirBalle * 8))
+		pose = nouvellePose(CFrame.lookAt(placeD, placeD + aPlat(P - placeD)))
+		pose.oreilles, pose.triste, pose.langue = 30, 0.35, 1
+		pose.queueAmp, pose.queueVitesse = 20, 6
+		majChien(0)
+		local droiteJ = dirBalle:Cross(UP).Unit
+
+		local okCine, errCine = pcall(function()
+			---------------- plan 1 : il ramasse la balle et la lève bien haut
+			-- face au joueur, un peu du côté du chiot : on le voit au loin qui dresse les oreilles
+			local coteChien = (placeD - P):Dot(droiteJ) >= 0 and 1 or -1
+			local dirCam1 = (dirBalle + droiteJ * coteChien * 0.45).Unit
+			local C0 = camSure(P + UP * 2.6, P + dirCam1 * 9.2 + UP * 2.1)
+			local C1 = camSure(P + UP * 2.6, P + dirCam1 * 8.1 + UP * 2.4)
+			cam.FieldOfView = 52
+			local sol0 = balleCF.Position
+			local attrapee, brillee = false, false
+			scene(1.9, function(a, dt, t)
+				cam.CFrame = CFrame.lookAt(C0:Lerp(C1, ease(a)), P + UP * (2.8 + 1.1 * ease(math.clamp((t - 0.6) / 0.9, 0, 1))))
+				cam.FieldOfView = 52 - 3 * ease(a)
+				flouFin.FocusDistance = (cam.CFrame.Position - (P + UP * 2.6)).Magnitude
+				-- le bras descend vers la balle, puis la lève
+				if t < 0.35 then bras(70 * ease(t / 0.35))
+				elseif t < 0.8 then bras(70)
+				else bras(70 + 80 * ease(math.min((t - 0.8) / 0.5, 1))) end
+				if t < 0.3 then
+					balleCF = CFrame.new(sol0 + UP * (0.15 * math.sin(t * 12)))
+				else
+					-- la balle saute dans la main
+					local k = math.min((t - 0.3) / 0.45, 1)
+					local m = dansLaMain().Position
+					balleCF = CFrame.new(sol0:Lerp(m, ease(k)) + UP * math.sin(k * math.pi) * 1.2) * CFrame.Angles(k * 8, 0, 0)
+					if not attrapee and k >= 1 then
+						attrapee = true
+						sonJouer(REGLAGES.SONS.pop, 0.7, 1.3)
+						eclatA(m, Color3.fromRGB(255, 240, 180), 16, 5)
+					end
+					if k >= 1 then balleCF = dansLaMain() end
+				end
+				if not brillee and t > 1.25 then
+					brillee = true
+					eclatA(dansLaMain().Position, Color3.fromRGB(255, 214, 90), 30, 9)
+					sonJouer(REGLAGES.SONS.pop, 0.6, 1.6)
+				end
+				-- pendant ce temps, le chiot (hors champ) dresse les oreilles
+				pose.oreilles = 30 - 18 * math.min(t / 1.9, 1)
+				majChien(dt)
+			end)
+
+			---------------- plan 2 : le chiot a vu la balle ! "!"
+			local tete = teteChien()
+			local dirC = meilleurAngle(tete, aPlat(P - placeD), 4.4, 0.5, DEVANT)
+			local D0 = camSure(tete, tete + dirC * 4.6 + UP * 0.6)
+			local D1 = camSure(tete, tete + dirC * 3.5 + UP * 0.35)
+			cam.FieldOfView = 46
+			attBulle.WorldPosition = tete
+			local pop = false
+			scene(1.6, function(a, dt, t)
+				cam.CFrame = CFrame.lookAt(D0:Lerp(D1, ease(a)), tete)
+				flouFin.FocusDistance = (cam.CFrame.Position - tete).Magnitude
+				pose.triste = math.max(0, 0.35 - t)
+				pose.oreilles = 12
+				pose.queueAmp, pose.queueVitesse = 45, 16
+				pose.langue = 1
+				pose.couRoulis = math.sin(t * 5) * 10
+				if t > 0.25 then pose.saut = math.abs(math.sin((t - 0.25) * 9)) * 0.45 end
+				if not pop and t > 0.2 then
+					pop = true
+					bulleFin.Enabled = true
+					sonJouer(REGLAGES.SONS.pop, 0.6, 1.35)
+					TS:Create(bulleSc, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+				end
+				rondB.Rotation = math.sin(t * 10) * 10
+				attBulle.WorldPosition = teteChien()
+				majChien(dt)
+			end)
+			bulleFin.Enabled = false
+
+			---------------- plan 3 : il court vers toi et saute de joie
+			local versChien = aPlat(placeD - P)
+			local arrivee = P + versChien * 2.8
+			arrivee = sol(arrivee, P.Y + 3) or arrivee
+			local cote = versChien:Cross(UP).Unit
+			local milieu = (P + placeD) / 2
+			local dirV = meilleurAngle(milieu + UP * 1.5, cote, 10, 2.2, { 0, 180, 25, -25, 155, -155 })
+			local camPos = camSure(milieu + UP * 1.8, milieu + dirV * 10.5 + UP * 3.2)
+			cam.CFrame = CFrame.lookAt(camPos, (pose.cf.Position + UP * 1.3):Lerp(P + UP * 3, 0.5))
+			cam.FieldOfView = 55
+			local vitesseC = (placeD - arrivee).Magnitude / 1.1
+			pose.saut, pose.couRoulis = 0, 0
+			scene(2.0, function(a, dt, t)
+				tourner(versChien)
+				bras(115 - 25 * ease(math.min(t / 0.5, 1))) -- la balle tendue devant
+				balleCF = dansLaMain()
+				local reste = courir(arrivee, vitesseC, dt)
+				if reste < 0.2 then
+					regarderChien(P, dt)
+					local k = math.clamp((t - 1.15) / 0.6, 0, 1)
+					pose.saut = math.sin(k * math.pi) * 1.3 -- saut de joie !
+					pose.tangage = -25 * math.sin(k * math.pi)
+				else
+					pose.saut = math.abs(math.sin(pose.pas)) * 0.35
+				end
+				pose.queueAmp, pose.queueVitesse = 45, 18
+				local regard = pose.cf.Position + UP * 1.3
+				camPos = camPos:Lerp(camSure(regard, (pose.cf.Position + P) / 2 + dirV * 10 + UP * 3.1), 1 - math.exp(-dt * 3))
+				cam.CFrame = CFrame.lookAt(camPos, regard:Lerp(P + UP * 3, 0.5))
+				flouFin.FocusDistance = (camPos - regard).Magnitude
+				majChien(dt)
+			end)
+			pose.saut, pose.tangage = 0, 0
+
+			---------------- plan 4 : tu lances la balle... il l'attrape en plein vol !
+			-- direction de lancer : un endroit bien dégagé
+			local dirL, L
+			for _, ang in { 0, 30, -30, 60, -60, 90, -90, 135, -135, 180 } do
+				local d = CFrame.Angles(0, math.rad(ang), 0):VectorToWorldSpace(versChien)
+				local q = sol(P + d * 11, P.Y + 4)
+				if q and math.abs(q.Y - P.Y) < 2 and not rayVisible(P + UP * 2, d * 11 + UP * 1) then dirL, L = d, q break end
+			end
+			dirL = dirL or versChien
+			L = L or (P + versChien * 11)
+			local ligneL = dirL:Cross(UP).Unit
+			local depart3 = pose.cf.Position
+			local cote4 = meilleurAngle((P + L) / 2 + UP * 1.5, ligneL, 9, 2.5, { 0, 180, 15, -15, 165, -165 })
+			-- de côté sur le joueur qui arme son bras, puis la caméra file le long du lancer jusqu'au chiot
+			local CA = camSure(P + UP * 2.5, P + cote4 * 7.8 + dirL * 1.2 + UP * 2.4)
+			local CB = camSure(L + UP * 2, L + cote4 * 6.6 - dirL * 2.4 + UP * 2.1)
+			local regardA = P + UP * 2.9 + dirL * 1.6
+			cam.CFrame = CFrame.lookAt(CA, regardA)
+			cam.FieldOfView = 55
+			local p0, envol, attrapeVol = nil, 0, false
+			local VOL = 1.15
+			scene(3.1, function(a, dt, t)
+				tourner(dirL)
+				pose.queueAmp, pose.queueVitesse = 50, 20
+				if not p0 then cam.CFrame = CFrame.lookAt(CA + dirL * (0.4 * t), regardA) end
+				if t < 0.42 then
+					bras(90 - 140 * ease(t / 0.42)) -- on arme le bras en arrière
+					balleCF = dansLaMain()
+					regarderChien(P + dirL * 3, dt)
+					pose.accroupi = ease(t / 0.42) -- le chiot se prépare
+				elseif t < 0.56 then
+					bras(-50 + 180 * ease((t - 0.42) / 0.14)) -- et hop !
+					balleCF = dansLaMain()
+					p0 = balleCF.Position
+				else
+					bras(130 - 60 * ease(math.min((t - 0.56) / 0.6, 1)))
+					if not attrapeVol then
+						envol = math.min(envol + dt / VOL, 1)
+						local u = envol
+						local bp = p0:Lerp(L + UP * 0.4, u) + UP * (4 * 5.5 * u * (1 - u))
+						balleCF = CFrame.new(bp) * CFrame.Angles(u * 20, 0, u * 7)
+						trail.Enabled = true
+						if u < 0.05 then sonJouer(REGLAGES.SONS.lancer, 0.6, 1.2) end
+						-- ralenti juste avant l'attrapé
+						lent = (u > 0.62 and u < 0.9) and 0.35 or 1
+						-- on s'écarte un peu quand la balle est tout en haut, puis on zoome sur l'attrapé
+						local f1 = 55 + 7 * math.sin(math.pi * math.clamp(u / 0.62, 0, 1))
+						cam.FieldOfView = f1 + (44 - f1) * math.clamp((u - 0.55) / 0.3, 0, 1)
+						-- le chiot fonce sous la balle et saute
+						pose.accroupi = math.max(0, pose.accroupi - dt * 6)
+						local sous = L - dirL * 1.2
+						courir(sous, (sous - depart3).Magnitude / (VOL * 0.8), dt)
+						if u > 0.68 then
+							local k = math.clamp((u - 0.68) / 0.3, 0, 1)
+							pose.saut = math.sin(k * math.pi) * 2.1
+							pose.tangage = -30 * math.sin(k * math.pi)
+							pose.couTangage = -25 * math.sin(k * math.pi)
+						end
+						local _, _, cou = calculerChien(rig, pose, horloge)
+						local gueule = (cou * CFrame.new(0, -0.2, -1.45)).Position
+						if u > 0.8 and (gueule - bp).Magnitude < 2.2 or u >= 1 then
+							attrapeVol = true
+							balleCF = nil -- dans la gueule !
+							trail.Enabled = false
+							lent = 1
+							sonJouer(REGLAGES.SONS.rebond, 0.8, 1.2)
+							eclatA(gueule, WHITE, 18, 7)
+						end
+						local regard = bp:Lerp(pose.cf.Position + UP * 1.5, 0.45 + 0.35 * u)
+						local recul = math.sin(math.pi * u)
+						local posC = CA:Lerp(CB, ease(u)) + cote4 * (3 * recul) + UP * recul
+						cam.CFrame = cam.CFrame:Lerp(CFrame.lookAt(posC, regard), 1 - math.exp(-dt * 8))
+					else
+						-- il retombe et s'arrête, tout fier
+						pose.saut = math.max(0, pose.saut - dt * 6)
+						pose.tangage, pose.couTangage = 0, 0
+						courir(pose.cf.Position + pose.cf.LookVector * 0.6, 3, dt)
+						cam.FieldOfView = cam.FieldOfView + (52 - cam.FieldOfView) * math.min(dt * 4, 1)
+						local regard = pose.cf.Position + UP * 1.4
+						cam.CFrame = cam.CFrame:Lerp(CFrame.lookAt(cam.CFrame.Position, regard), 1 - math.exp(-dt * 5))
+					end
+				end
+				flouFin.FocusDistance = (cam.CFrame.Position - pose.cf.Position).Magnitude
+				majChien(dt)
+			end)
+			lent = 1
+			trail.Enabled = false
+			balleCF = nil
+			pose.accroupi, pose.saut, pose.tangage, pose.couTangage = 0, 0, 0, 0
+
+			---------------- plan 5 : il revient, fait des tours de joie autour de toi, puis s'assoit
+			local centreT = P
+			local rayonT = 3.3
+			local angle0 = math.atan2(pose.cf.Position.Z - P.Z, pose.cf.Position.X - P.X)
+			local orbite0 = math.atan2(cam.CFrame.Position.Z - P.Z, cam.CFrame.Position.X - P.X)
+			local devantJ = aPlat(r.CFrame.LookVector)
+			local assis = P + devantJ * 2.6
+			assis = sol(assis, P.Y + 3) or assis
+			local phase, tours = "retour", 0
+			local nextCoeur = 0
+			scene(3.0, function(a, dt, t)
+				bras(70 * (1 - ease(math.min(t / 0.5, 1))))
+				pose.queueAmp, pose.queueVitesse = 50, 20
+				if phase == "retour" then
+					local cible = centreT + Vector3.new(math.cos(angle0), 0, math.sin(angle0)) * rayonT
+					if courir(cible, 16, dt) < 0.5 then phase = "tours" end
+				elseif phase == "tours" then
+					tours += dt * 4.2 -- tours de joie
+					local ang = angle0 + tours
+					local cible = centreT + Vector3.new(math.cos(ang), 0, math.sin(ang)) * rayonT
+					courir(cible, 20, dt)
+					if tours > math.pi * 2 then phase = "assis" end
+				else
+					local reste = courir(assis, 10, dt)
+					if reste < 0.3 then
+						regarderChien(P, dt)
+						pose.tangage = pose.tangage + (-20 - pose.tangage) * math.min(dt * 6, 1) -- assis
+						pose.accroupi = pose.accroupi + (0.45 - pose.accroupi) * math.min(dt * 6, 1)
+						pose.couRoulis = math.sin(t * 3) * 12
+						if t > nextCoeur then nextCoeur = t + 0.28 coeur() end
+					end
+				end
+				if phase ~= "assis" then pose.saut = math.abs(math.sin(pose.pas)) * 0.3 end
+				tourner(aPlat(pose.cf.Position - P):Lerp(devantJ, 0.5))
+				local o = orbite0 + t * 0.35
+				local voulu = camSure(P + UP * 2.4, P + Vector3.new(math.cos(o), 0, math.sin(o)) * 11 + UP * 4.8)
+				cam.CFrame = cam.CFrame:Lerp(CFrame.lookAt(voulu, P + UP * 2.4), 1 - math.exp(-dt * 3))
+				cam.FieldOfView = cam.FieldOfView + (55 - cam.FieldOfView) * math.min(dt * 3, 1)
+				flouFin.FocusDistance = (cam.CFrame.Position - P).Magnitude
+				majChien(dt)
+			end)
+		end)
+		if not okCine then warn("[Fin] " .. tostring(errCine)) end
+		lent = 1
+		trail.Enabled = false
+		balleCF = nil
+		bras(0)
+
+		---------------- plan 6 : BRAVO ! (la caméra s'envole, confettis)
+		local P6 = (lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") or r).Position
+		local centre6 = (P6 + pose.cf.Position) / 2
+		local lat6 = meilleurAngle(centre6 + UP * 2, aPlat(pose.cf.Position - P6):Cross(UP).Unit, 9, 3, { 0, 180, 25, -25, 155, -155 })
+		local ang6 = math.atan2(lat6.Z, lat6.X)
+		-- la caméra tourne du côté où l'on voit ton visage (jamais le chiot caché derrière toi)
+		local versC6 = aPlat(pose.cf.Position - P6)
+		local sgn6 = (-math.sin(ang6) * versC6.X + math.cos(ang6) * versC6.Z) >= 0 and 1 or -1
+		-- confettis : de petits papiers de couleur qui tombent en tournant
+		local COULEURS = { Color3.fromRGB(255, 90, 90), Color3.fromRGB(255, 200, 60), Color3.fromRGB(90, 200, 255), Color3.fromRGB(130, 230, 100), Color3.fromRGB(230, 120, 255), WHITE }
+		local confettis = {}
+		local dossierC = nouveau("Folder", { Name = "Confettis" }, workspace)
+		local function lancerConfettis(n)
+			for _ = 1, n do
+				local p = nouveau("Part", {
+					Anchored = true, CanCollide = false, CanQuery = false, CanTouch = false, CastShadow = false, Material = Enum.Material.SmoothPlastic,
+					Size = Vector3.new(0.28, 0.03, 0.18), Color = COULEURS[math.random(1, #COULEURS)],
+				}, dossierC)
+				local a = math.random() * math.pi * 2
+				local rr = math.random() * 9
+				table.insert(confettis, {
+					p = p, pos = centre6 + Vector3.new(math.cos(a) * rr, 9 + math.random() * 6, math.sin(a) * rr),
+					v = math.random(35, 60) / 10, ph = math.random() * 6.28, rot = Vector3.new(math.random() * 6, math.random() * 6, math.random() * 6), age = 0,
+				})
+			end
+		end
+		local connC = Run.RenderStepped:Connect(function(dt)
+			local parts, cfs = {}, {}
+			for i = #confettis, 1, -1 do
+				local c = confettis[i]
+				c.age += dt
+				c.pos += Vector3.new(math.sin(c.age * 3 + c.ph) * 1.2 * dt, -c.v * dt, math.cos(c.age * 2.5 + c.ph) * 1.2 * dt)
+				if c.age > 5 then
+					c.p:Destroy()
+					table.remove(confettis, i)
+				else
+					table.insert(parts, c.p)
+					table.insert(cfs, CFrame.new(c.pos) * CFrame.Angles(c.rot.X * c.age, c.rot.Y * c.age, c.rot.Z * c.age))
+				end
+			end
+			if #parts > 0 then workspace:BulkMoveTo(parts, cfs, Enum.BulkMoveMode.FireCFrameChanged) end
+		end)
+		if not sauter then
+			local okB, errB = pcall(function()
+				lancerConfettis(90)
+				sonJouer(REGLAGES.SONS.pop, 0.8, 0.9)
+				if REGLAGES.SONS.victoire and REGLAGES.SONS.victoire ~= "" then sonJouer(REGLAGES.SONS.victoire, 0.8, 1) end
+				grandTitre("BRAVO !", "Tu as retrouvé la balle de ton chiot !", 2.6, 0.26)
+				local nextCoeur, relance = 0, false
+				scene(3.2, function(a, dt, t)
+					local o = ang6 + sgn6 * ease(a) * 0.4
+					local distC = 8 + 6 * ease(a)
+					local voulu = camSure(centre6 + UP * 2, centre6 + Vector3.new(math.cos(o), 0, math.sin(o)) * distC + UP * (2.6 + 6 * ease(a)))
+					cam.CFrame = CFrame.lookAt(voulu, centre6 + UP * (2 - 0.5 * a))
+					flouFin.FocusDistance = (voulu - centre6).Magnitude
+					-- le chiot saute de joie autour de sa balle
+					pose.tangage, pose.accroupi = 0, 0
+					pose.saut = math.abs(math.sin(t * 6)) * 0.8
+					pose.couRoulis = math.sin(t * 4) * 12
+					if t > nextCoeur then nextCoeur = t + 0.35 coeur() end
+					if not relance and t > 1.4 then relance = true lancerConfettis(60) end
+					majChien(dt)
+				end)
+			end)
+			if not okB then warn("[Fin] " .. tostring(errB)) end
+		end
+		pose.saut, pose.couRoulis = 0, 0
+		connSauter:Disconnect()
+		btnPasser:Destroy()
+
+		---------------------------------------------------------------- 3) L'écran des statistiques
+		-- la caméra tourne lentement autour de toi et du chiot pendant que tu lis
+		local P7 = r.Position
+		local centre7 = (P7 + pose.cf.Position) / 2
+		local t7 = 0
+		local large = cam.ViewportSize.X / math.max(cam.ViewportSize.Y, 1) > 1.25
+		local connCam = Run.RenderStepped:Connect(function(dt)
+			t7 += dt
+			-- balancement lent autour de vous deux (toujours de trois quarts : on vous voit tous les deux)
+			local ang7 = ang6 + sgn6 * (0.4 - 0.3 * math.sin(t7 * 0.22))
+			local voulu = camSure(centre7 + UP * 2, centre7 + Vector3.new(math.cos(ang7), 0, math.sin(ang7)) * 12 + UP * 5)
+			local vise = centre7 + UP * 1.8
+			if large then vise += aPlat(centre7 - voulu):Cross(UP).Unit * 3.8 end -- vous deux à gauche, la carte à droite
+			cam.CFrame = cam.CFrame:Lerp(CFrame.lookAt(voulu, vise), 1 - math.exp(-dt * 2))
+			pose.saut = math.abs(math.sin(os.clock() * 3)) * 0.1
+			majChien(dt)
+		end)
+		TS:Create(haut, TweenInfo.new(0.4), { Position = UDim2.fromScale(0, 0) }):Play()
+		TS:Create(bas, TweenInfo.new(0.4), { Position = UDim2.fromScale(0, 1) }):Play()
+
+		-- les chiffres
+		local function nb(a) return tonumber(lp:GetAttribute(a)) or 0 end
+		local temps = lp:GetAttribute("TempsFinal") or tempsJeu()
+		local outils = 1 + (lp:GetAttribute("Faucille") and 1 or 0) + (lp:GetAttribute("Debroussailleuse") and 1 or 0)
+		local amelios = 0
+		for nom, v in lp:GetAttributes() do
+			if nom:sub(1, 4) == "Upg_" and type(v) == "number" then amelios += v end
+		end
+		local function formatTemps(t)
+			t = math.floor(t)
+			local h, m, s = math.floor(t / 3600), math.floor(t / 60) % 60, t % 60
+			if h > 0 then return string.format("%d:%02d:%02d", h, m, s) end
+			return string.format("%02d:%02d", m, s)
+		end
+		local function milliers(n)
+			local s = tostring(math.floor(n))
+			local out = s:reverse():gsub("(%d%d%d)", "%1 "):reverse()
+			return (out:gsub("^ ", ""))
+		end
+		local STATS = {
+			{ "⏱", "TEMPS", temps, formatTemps },
+			{ "🌿", "TOUFFES COUPÉES", nb("TouffesCoupees"), milliers },
+			{ "💰", "ARGENT GAGNÉ", nb("ArgentGagne"), function(v) return string.format("$%.2f", v) end },
+			{ "♻️", "SACS VIDÉS", nb("SacsVides"), milliers },
+			{ "✨", "HERBES RARES", nb("HerbesRares"), milliers },
+			{ "🛠️", "OUTILS", outils, function(v) return math.floor(v) .. " / 3" end },
+			{ "⬆️", "AMÉLIORATIONS", amelios, milliers },
+		}
+
+		-- la carte (même style que les menus du jeu)
+		local fond = nouveau("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.fromRGB(6, 14, 8), BackgroundTransparency = 1, BorderSizePixel = 0 }, fg)
+		if large then -- on assombrit surtout derrière la carte
+			nouveau("UIGradient", { Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.85), NumberSequenceKeypoint.new(0.45, 0.6), NumberSequenceKeypoint.new(1, 0) }) }, fond)
+		end
+		TS:Create(fond, TweenInfo.new(0.5), { BackgroundTransparency = large and 0.35 or 0.45 }):Play()
+		local xCarte = large and 0.7 or 0.5
+		local carte = echelle(nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(xCarte, 1.6), Size = UDim2.fromOffset(640, 900) }, fg))
+		coin(carte, UDim.new(0, 34))
+		trait(carte, 5, INK, true)
+		degrade(carte, { Color3.fromRGB(66, 124, 74), Color3.fromRGB(30, 66, 42) })
+		local rim = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.new(1, -16, 1, -16), BackgroundTransparency = 1 }, carte)
+		coin(rim, UDim.new(0, 28))
+		trait(rim, 2, WHITE, true).Transparency = 0.7
+		local reflet = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 9), Size = UDim2.new(1, -24, 0, 120), BackgroundColor3 = WHITE, BorderSizePixel = 0 }, carte)
+		coin(reflet, UDim.new(0, 26))
+		nouveau("UIGradient", { Rotation = 90, Transparency = NumberSequence.new(0.8, 1) }, reflet)
+		local etiq = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0, 2), Size = UDim2.fromOffset(300, 54), Rotation = -2, ZIndex = 3 }, carte)
+		coin(etiq, UDim.new(0, 20))
+		trait(etiq, 4, INK, true)
+		degrade(etiq, { Color3.fromRGB(255, 226, 112), Color3.fromRGB(240, 160, 32) })
+		local et = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 3), Text = "PARTIE TERMINÉE", Font = Enum.Font.LuckiestGuy, TextSize = 30, TextColor3 = WHITE, ZIndex = 4 }, etiq)
+		trait(et, 3)
+		local bravo = nouveau("TextLabel", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, 44), Size = UDim2.new(1, 0, 0, 96), Text = "BRAVO !", Font = Enum.Font.LuckiestGuy, TextSize = 92, TextColor3 = WHITE }, carte)
+		trait(bravo, 6)
+		degrade(bravo, { WHITE, OR })
+		nouveau("TextLabel", {
+			BackgroundTransparency = 1, Position = UDim2.fromOffset(30, 138), Size = UDim2.new(1, -60, 0, 36), Text = lp.DisplayName .. " a retrouvé la balle de son chiot !",
+			Font = Enum.Font.FredokaOne, TextSize = 27, TextColor3 = Color3.fromRGB(226, 242, 216), TextScaled = true,
+		}, carte)
+		local valeurs = {}
+		for i, s in STATS do
+			local l = nouveau("Frame", { Position = UDim2.fromOffset(28, 188 + (i - 1) * 80), Size = UDim2.new(1, -56, 0, 70) }, carte)
+			coin(l, UDim.new(0, 22))
+			trait(l, 4, INK, true)
+			degrade(l, { Color3.fromRGB(252, 249, 240), Color3.fromRGB(236, 230, 212) })
+			local sc = nouveau("UIScale", { Scale = 0 }, l)
+			nouveau("TextLabel", { BackgroundTransparency = 1, Position = UDim2.fromOffset(14, 8), Size = UDim2.fromOffset(54, 54), Text = s[1], TextScaled = true, Font = Enum.Font.FredokaOne }, l)
+			nouveau("TextLabel", { BackgroundTransparency = 1, Position = UDim2.fromOffset(80, 0), Size = UDim2.new(0.6, 0, 1, 0), Text = s[2], Font = Enum.Font.LuckiestGuy, TextSize = 29, TextXAlignment = Enum.TextXAlignment.Left, TextColor3 = Color3.fromRGB(60, 90, 64), TextYAlignment = Enum.TextYAlignment.Center }, l)
+			local v = nouveau("TextLabel", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -18, 0, 4), Size = UDim2.fromOffset(230, 62), Text = "", Font = Enum.Font.LuckiestGuy, TextSize = 44, TextXAlignment = Enum.TextXAlignment.Right, TextColor3 = WHITE }, l)
+			trait(v, 5)
+			valeurs[i] = { sc = sc, v = v }
+		end
+		-- bouton continuer
+		local bouton = nouveau("TextButton", { Text = "", AutoButtonColor = false, BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -28), Size = UDim2.new(1, -120, 0, 104) }, carte)
+		local socle = nouveau("Frame", { Position = UDim2.fromOffset(0, 12), Size = UDim2.new(1, 0, 1, -12) }, bouton)
+		coin(socle, UDim.new(0, 30))
+		trait(socle, 4, INK, true)
+		degrade(socle, { Color3.fromRGB(36, 112, 42), Color3.fromRGB(20, 68, 26) })
+		local face = nouveau("Frame", { Size = UDim2.new(1, 0, 1, -14) }, bouton)
+		coin(face, UDim.new(0, 30))
+		trait(face, 4, INK, true)
+		degrade(face, { Color3.fromRGB(168, 244, 120), Color3.fromRGB(56, 170, 62) })
+		local ct = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 4), Text = "CONTINUER", Font = Enum.Font.LuckiestGuy, TextSize = 52, TextColor3 = WHITE }, face)
+		trait(ct, 5)
+		bouton.MouseButton1Down:Connect(function() face.Position = UDim2.fromOffset(0, 8) end)
+		bouton.MouseButton1Up:Connect(function() face.Position = UDim2.fromOffset(0, 0) end)
+		bouton.MouseLeave:Connect(function() face.Position = UDim2.fromOffset(0, 0) end)
+		nouveau("TextButton", { Text = "", BackgroundTransparency = 1, Size = UDim2.fromOffset(1, 1), Modal = true }, fg) -- souris libre
+		Run:BindToRenderStep("FinSouris", Enum.RenderPriority.Last.Value, function()
+			UIS.MouseBehavior = Enum.MouseBehavior.Default
+			UIS.MouseIconEnabled = true
+		end)
+		adapter()
+		TS:Create(carte, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.fromScale(xCarte, 0.5) }):Play()
+		task.wait(0.5)
+		-- les lignes arrivent une par une, les chiffres montent
+		for i, s in STATS do
+			local x = valeurs[i]
+			TS:Create(x.sc, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+			sonJouer(REGLAGES.SONS.pop, 0.35, 1 + i * 0.08)
+			local t0 = os.clock()
+			while os.clock() - t0 < 0.45 do
+				local k = ease(math.min((os.clock() - t0) / 0.45, 1))
+				x.v.Text = s[4](s[3] * k)
+				Run.RenderStepped:Wait()
+			end
+			x.v.Text = s[4](s[3])
+		end
+		if UIS.GamepadEnabled then game:GetService("GuiService").SelectedObject = bouton end
+
+		-- CONTINUER : on rend la main au joueur, le chiot garde sa balle et te suit
+		local fini = false
+		bouton.Activated:Connect(function() fini = true end)
+		local connK = UIS.InputBegan:Connect(function(input)
+			if input.KeyCode == Enum.KeyCode.ButtonA or input.KeyCode == Enum.KeyCode.Return then fini = true end
+		end)
+		while not fini do task.wait() end
+		connK:Disconnect()
+		TS:Create(voileNoir, TweenInfo.new(0.3), { BackgroundTransparency = 0 }):Play()
+		task.wait(0.32)
+		connCam:Disconnect()
+		connC:Disconnect()
+		dossierC:Destroy()
+		flouFin:Destroy()
+		pcall(function() Run:UnbindFromRenderStep("FinSouris") end)
+		bras(0)
+		r.Anchored = false
+		hum.WalkSpeed, hum.JumpPower = vitesse0, saut0
+		hum.AutoRotate = true
+		cam.FieldOfView = fov0
+		cam.CameraType = Enum.CameraType.Custom
+		cam.CameraSubject = hum
+		for _, g in cachees do if g.Parent then g.Enabled = true end end
+		for ctp, v in coreAv do pcall(StarterGui.SetCoreGuiEnabled, StarterGui, ctp, v) end
+		lp:SetAttribute("MenuOuvert", false)
+		lp:SetAttribute("PartieFinie", true)
+		balise:Destroy() -- plus besoin de la colonne de lumière
+		carte:Destroy()
+		fond:Destroy()
+		finEnCours = false
+		TS:Create(voileNoir, TweenInfo.new(0.4), { BackgroundTransparency = 1 }):Play()
+		task.wait(0.45)
+		fg:Destroy()
+	end)
+	if not ok then
+		warn("[Fin] " .. tostring(err))
+		finEnCours = false
+		pcall(function()
+			local ch = lp.Character
+			local r = ch and ch:FindFirstChild("HumanoidRootPart")
+			if r then r.Anchored = false end
+			cam.CameraType = Enum.CameraType.Custom
+			lp:SetAttribute("MenuOuvert", false)
+		end)
+	end
+end)
+
 local attendre = 0
 Run.RenderStepped:Connect(function(dt)
-	if not chienModel.Parent then return end
+	if not chienModel.Parent or finEnCours then return end
 	attendre += dt
 	if REGLAGES.CHIEN_SUIT_LE_JOUEUR and attendre > 0.8 then suivre(dt) else majChien(dt) end
 end)

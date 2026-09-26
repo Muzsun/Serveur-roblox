@@ -160,6 +160,7 @@ RunService.Heartbeat:Connect(function()
 	if jeuFini() then
 		-- terminé : le chrono s'arrête et passe en doré
 		fini = true
+		lp:SetAttribute("TempsFinal", t) -- pour l'écran des statistiques de fin (IntroChien)
 		texte.TextColor3 = OR
 		anneau.BackgroundColor3 = OR
 		barre.BackgroundColor3 = OR

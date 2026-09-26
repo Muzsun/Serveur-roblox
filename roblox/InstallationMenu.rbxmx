@@ -656,6 +656,9 @@ local function deposit(plr,c)
 	end
 	Deposited:FireAllClients(plr,c,bag,gain)
 	plr:SetAttribute("Bag",0)
+	-- statistiques de fin de partie
+	plr:SetAttribute("SacsVides",(plr:GetAttribute("SacsVides") or 0)+1)
+	plr:SetAttribute("ArgentGagne",math.floor(((plr:GetAttribute("ArgentGagne") or 0)+gain)*100+.5)/100)
 end
 local function setupCompost(c)
 	table.insert(composts,c)
@@ -924,6 +927,12 @@ PickRequest.OnServerEvent:Connect(function(plr,id)
 		if tt.group then local k="Left_"..tt.group remotes:SetAttribute(k,math.max(0,(remotes:GetAttribute(k) or 1)-1)) end
 		Picked:FireAllClients(tid,plr,tt.size,tt.r)
 		plr:SetAttribute("Bag",(plr:GetAttribute("Bag") or 0)+tt.size)
+		-- statistiques de fin de partie
+		plr:SetAttribute("TouffesCoupees",(plr:GetAttribute("TouffesCoupees") or 0)+1)
+		if tt.r and tt.r~="Normal" then
+			plr:SetAttribute("HerbesRares",(plr:GetAttribute("HerbesRares") or 0)+1)
+			plr:SetAttribute("Rare_"..tt.r,(plr:GetAttribute("Rare_"..tt.r) or 0)+1)
+		end
 	end
 	take(id,t)
 	-- animation de coupe des ciseaux (script CiseauxServer)
