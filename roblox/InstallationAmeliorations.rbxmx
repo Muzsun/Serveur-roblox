@@ -368,6 +368,7 @@ local REGLAGES = {
 	TAILLE_EN_MAIN = 0.75, -- taille de la faucille dans la main
 	INCLINAISON = 0, -- degrés : penche la faucille dans la main si besoin (ex : 20 ou -20)
 	EQUIPER_APRES_ACHAT = true, -- la faucille arrive directement dans la main
+	SON = "rbxassetid://96174578707811", -- bruit du coup de faucille
 	SAUVEGARDER = false, -- true = garde l'achat quand le joueur revient (DataStore). false = à racheter à chaque partie
 }
 
@@ -529,7 +530,7 @@ local function construireOutil()
 	tr.Parent = handle
 	local son = Instance.new("Sound")
 	son.Name = "Swoosh"
-	son.SoundId = "rbxasset://sounds/swordslash.wav"
+	son.SoundId = REGLAGES.SON
 	son.Volume = 0.45
 	son.Parent = handle
 	return outil
