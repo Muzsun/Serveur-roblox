@@ -771,9 +771,12 @@ local function makeHint(c)
 	-- le panneau est accroché à un point invisible (marche même si le modèle charge en retard)
 	local at=Instance.new("Attachment") at.Name="CompostHintPoint" at.Parent=workspace.Terrain
 	local g=Instance.new("BillboardGui") g.Name="CompostHint" g.Adornee=at
-	g.Size=UDim2.fromOffset(px(360),px(196)) g.SizeOffset=Vector2.new(0,.5) -- le bas du panneau (la flèche) pointe sur le composteur
+	-- taille fixe dans le monde (en studs) : comme un vrai panneau, il ne grossit pas quand on s'éloigne
+	g.Size=UDim2.fromScale(9,4.9) g.SizeOffset=Vector2.new(0,.5) -- le bas du panneau (la flèche) pointe sur le composteur
 	g.AlwaysOnTop=true g.MaxDistance=120 g.LightInfluence=0 g.ResetOnSpawn=false g.Enabled=false
-	local root=Instance.new("Frame") root.BackgroundTransparency=1 root.Size=UDim2.fromScale(1,1) root.Parent=g
+	local root=Instance.new("Frame") root.BackgroundTransparency=1 root.AnchorPoint=Vector2.new(.5,.5) root.Position=UDim2.fromScale(.5,.5)
+	root.Size=UDim2.fromOffset(px(360),px(196)) root.Parent=g
+	local rs=Instance.new("UIScale") rs.Parent=root
 	-- panneau principal : [herbe] = [pièce] $0.01
 	local main=board(root,72,0)
 	iconImg(main,HERB_IMAGE,66,1)
@@ -790,7 +793,7 @@ local function makeHint(c)
 	local gTx=word(gain,"+$0",28,4,GOLD)
 	local arrow=chevron(root) arrow.Position=UDim2.new(.5,0,1,0)
 	g.Parent=pgui
-	table.insert(hints,{c=c,at=at,g=g,gain=gain,gst=gst,gScale=gScale,nTx=nTx,gTx=gTx,arrow=arrow})
+	table.insert(hints,{c=c,at=at,g=g,rs=rs,gain=gain,gst=gst,gScale=gScale,nTx=nTx,gTx=gTx,arrow=arrow})
 	print("[Herbe] Panneau du composteur créé :",c:GetFullName())
 end
 local function addHint(c)
@@ -829,6 +832,7 @@ Run.RenderStepped:Connect(function(dt)
 				h.nTx.TextColor3=isFull and GOLD or WHITE
 			end
 		end
+		if h.g.Enabled then h.rs.Scale=h.g.AbsoluteSize.X/px(360) end
 		-- animations seulement si le panneau est proche (pas de calcul pour rien)
 		if hasBag and h.g.Enabled and (cam.CFrame.Position-h.at.WorldPosition).Magnitude<125 then
 			h.arrow.Position=UDim2.new(.5,0,1,-px(math.abs(math.sin(t*4.5))*9))
