@@ -17,6 +17,15 @@ local remotes=RS:WaitForChild("GrassRemotes")
 local cam=workspace.CurrentCamera
 local pgui=lp:WaitForChild("PlayerGui")
 
+-- ===== plateformes =====
+-- TOUCH = téléphone / tablette (pas de clavier) ; manette = PlayStation / Xbox (ou manette sur PC)
+local TOUCH=UIS.TouchEnabled and not UIS.KeyboardEnabled
+local PADS={[Enum.UserInputType.Gamepad1]=true,[Enum.UserInputType.Gamepad2]=true,[Enum.UserInputType.Gamepad3]=true,[Enum.UserInputType.Gamepad4]=true}
+local function usingGamepad() return PADS[UIS:GetLastInputType()]==true end
+local function screenCenter() local v=cam.ViewportSize return Vector2.new(v.X/2,v.Y/2) end
+local BB=TOUCH and .7 or 1 -- taille des bulles dans le monde (plus petites sur téléphone)
+local function safeInsets(g) pcall(function() g.ScreenInsets=Enum.ScreenInsets.CoreUISafeInsets end) end
+
 local BAG_IMAGE="rbxassetid://124953051791395"
 local RENDER=CFG.RENDER_DIST or 120
 local WHITE,RED=Color3.new(1,1,1),Color3.fromRGB(255,90,75)
@@ -59,17 +68,17 @@ end
 local function fmt(g) if g==math.floor(g) then return tostring(g) end return string.format("%.2f",g) end
 
 -- ===== interface du sac (en bas à gauche, sans animation) =====
-local gui=Instance.new("ScreenGui") gui.Name="GrassBagGui" gui.ResetOnSpawn=false gui.IgnoreGuiInset=true
+local gui=Instance.new("ScreenGui") gui.Name="GrassBagGui" gui.ResetOnSpawn=false safeInsets(gui)
 gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling gui.Parent=pgui
 
 local root=Instance.new("Frame") root.Name="Sac" root.AnchorPoint=Vector2.new(0,1)
-root.Position=UIS.TouchEnabled and UDim2.new(0,10,1,-10) or UDim2.new(0,16,1,-16)
+root.Position=UDim2.new(0,16,1,-16)
 root.Size=UDim2.fromOffset(150,172) root.BackgroundTransparency=1 root.Parent=gui
 local uiScale=Instance.new("UIScale") uiScale.Parent=root
 -- plus petit, et encore réduit sur téléphone / tablette
 local function rescale()
 	local s=math.clamp(cam.ViewportSize.Y/950,.4,1)
-	if UIS.TouchEnabled then s*=.8 end
+	if TOUCH then s=math.max(s*.8,.45) end
 	uiScale.Scale=s
 end
 rescale() cam:GetPropertyChangedSignal("ViewportSize"):Connect(rescale)
@@ -186,9 +195,15 @@ local mRoot=Instance.new("Frame") mRoot.Name="Argent" mRoot.AnchorPoint=Vector2.
 mRoot.Size=UDim2.fromOffset(230,70) mRoot.BackgroundTransparency=1 mRoot.Parent=gui
 local mScale=Instance.new("UIScale") mScale.Parent=mRoot
 local function mFit()
-	local s=math.clamp(cam.ViewportSize.Y/950,.45,1) if UIS.TouchEnabled then s=math.min(s,.6) end mScale.Scale=s
-	local left=UIS.TouchEnabled and 10 or 16
-	mRoot.Position=UDim2.new(0,left,1,-(left+172*uiScale.Scale+4))
+	local s=math.clamp(cam.ViewportSize.Y/950,.45,1) if TOUCH then s=math.clamp(s,.45,.6) end mScale.Scale=s
+	if TOUCH then
+		-- téléphone / tablette : en haut à gauche (le joystick est en bas à gauche)
+		mRoot.AnchorPoint=Vector2.new(0,0) mRoot.Position=UDim2.fromOffset(10,6)
+		root.AnchorPoint=Vector2.new(0,0) root.Position=UDim2.fromOffset(10,6+70*s+2)
+	else
+		root.AnchorPoint=Vector2.new(0,1) root.Position=UDim2.new(0,16,1,-16)
+		mRoot.AnchorPoint=Vector2.new(0,1) mRoot.Position=UDim2.new(0,16,1,-(16+172*uiScale.Scale+4))
+	end
 end
 mFit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(mFit) uiScale:GetPropertyChangedSignal("Scale"):Connect(mFit)
 local mIcon=Instance.new("ImageLabel") mIcon.BackgroundTransparency=1 mIcon.Image=COIN mIcon.ScaleType=Enum.ScaleType.Fit
@@ -370,10 +385,10 @@ end
 drawScissors(Color3.new(0,0,0),2,.55) -- ombre douce
 drawScissors(WHITE,0,0)
 local cursorShown,savedMouseIcon=false,true
-local function updateCursor(m)
+local function updateCursor(m,pad)
 	-- visible seulement quand on vise de l'herbe (et un court instant après la coupe pour le clic-clac)
 	local e=hovered and visible[hovered] and data[hovered]
-	local show=UIS.MouseEnabled and holdingScissors() and (e~=nil or os.clock()-snipT<.2)
+	local show=(UIS.MouseEnabled or pad) and holdingScissors() and (e~=nil or os.clock()-snipT<.2)
 	if show~=cursorShown then
 		cursorShown=show cursor.Visible=show
 		if show then savedMouseIcon=UIS.MouseIconEnabled UIS.MouseIconEnabled=false
@@ -390,22 +405,28 @@ local function updateCursor(m)
 	for _,b in branches do b.h.Rotation=b.s*ang end
 end
 Run.RenderStepped:Connect(function()
-	local m=UIS:GetMouseLocation()
-	if UIS.MouseEnabled then
+	-- manette : on vise au centre de l'écran ; souris : là où est la souris
+	local pad=usingGamepad()
+	local m=pad and screenCenter() or UIS:GetMouseLocation()
+	if UIS.MouseEnabled or pad then
 		local id=holdingScissors() and idFromRay(cam:ViewportPointToRay(m.X,m.Y)) or nil
 		if id~=hovered then setHover(id) end
-	end
-	updateCursor(m)
+	elseif hovered then setHover(nil) end
+	updateCursor(m,pad)
 end)
 -- clic avec les ciseaux = coupe l'herbe visée ; amélioration "Maintenir" = rester appuyé coupe en continu là où tu vises
 local holding,holdInput=false,nil
 local lastHint=0
 UIS.InputBegan:Connect(function(input,gp)
-	if gp then return end
 	local t=input.UserInputType
-	if t==Enum.UserInputType.MouseButton1 or t==Enum.UserInputType.Touch then
+	local pad=input.KeyCode==Enum.KeyCode.ButtonR2 -- gâchette droite (PlayStation R2 / Xbox RT)
+	if (gp and not pad) or UIS:GetFocusedTextBox() or lp:GetAttribute("MenuOuvert") then return end
+	if t==Enum.UserInputType.MouseButton1 or t==Enum.UserInputType.Touch or pad then
 		holding=true holdInput=input
-		local id=idFromRay(cam:ScreenPointToRay(input.Position.X,input.Position.Y))
+		local ray
+		if pad then local c=screenCenter() ray=cam:ViewportPointToRay(c.X,c.Y)
+		else ray=cam:ScreenPointToRay(input.Position.X,input.Position.Y) end
+		local id=idFromRay(ray)
 		if id then
 			if holdingScissors() then snipT=os.clock() remotes.PickRequest:FireServer(id)
 			elseif os.clock()-lastHint>2 then lastHint=os.clock() showToast("✂️ Prends tes ciseaux pour couper l'herbe !") end
@@ -413,7 +434,7 @@ UIS.InputBegan:Connect(function(input,gp)
 	end
 end)
 UIS.InputEnded:Connect(function(input)
-	if input==holdInput or input.UserInputType==Enum.UserInputType.MouseButton1 then holding=false holdInput=nil end
+	if input==holdInput or input.UserInputType==Enum.UserInputType.MouseButton1 or input.KeyCode==Enum.KeyCode.ButtonR2 then holding=false holdInput=nil end
 end)
 task.spawn(function()
 	while true do
@@ -421,8 +442,10 @@ task.spawn(function()
 		local cd=math.max(.2,(CFG.PICK_COOLDOWN or .9)*(1-(CFG.DEX_PAR_NIVEAU or .08)*dex))
 		task.wait(cd+.05)
 		if holding and (lp:GetAttribute("Upg_Maintenir") or 0)>=1 and holdingScissors() then
-			local pos=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and holdInput.Position or UIS:GetMouseLocation()
-			local ray=holdInput and holdInput.UserInputType==Enum.UserInputType.Touch and cam:ScreenPointToRay(pos.X,pos.Y) or cam:ViewportPointToRay(pos.X,pos.Y)
+			local hi,ray=holdInput,nil
+			if hi and hi.KeyCode==Enum.KeyCode.ButtonR2 then local c=screenCenter() ray=cam:ViewportPointToRay(c.X,c.Y)
+			elseif hi and hi.UserInputType==Enum.UserInputType.Touch then ray=cam:ScreenPointToRay(hi.Position.X,hi.Position.Y)
+			else local m=UIS:GetMouseLocation() ray=cam:ViewportPointToRay(m.X,m.Y) end
 			local id=idFromRay(ray)
 			if id then remotes.PickRequest:FireServer(id) end
 		end
@@ -481,7 +504,7 @@ end
 
 local function popupAt(pos,text,color)
 	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
-	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(180,90) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
+	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(180*BB,90*BB) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
 	local t=Instance.new("TextLabel") t.Size=UDim2.fromScale(1,1) t.BackgroundTransparency=1
 	t.Text=text t.Font=Enum.Font.FredokaOne t.TextScaled=true t.TextColor3=color t.Parent=g
 	local st=stroke(t,3,Color3.fromRGB(20,40,12))
@@ -592,7 +615,7 @@ end
 -- "+1" / "+5"... en blanc qui vient vers le joueur
 local function gainPopup(pos,n)
 	local at=Instance.new("Attachment") at.Parent=workspace.Terrain at.WorldPosition=pos
-	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(90,44) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
+	local g=Instance.new("BillboardGui") g.Adornee=at g.Size=UDim2.fromOffset(90*BB,44*BB) g.AlwaysOnTop=true g.LightInfluence=0 g.ResetOnSpawn=false
 	local t=Instance.new("TextLabel") t.Size=UDim2.fromScale(1,1) t.BackgroundTransparency=1 t.Text="+"..n
 	t.Font=Enum.Font.FredokaOne t.TextScaled=true t.TextColor3=WHITE t.Parent=g
 	local st=stroke(t,2,Color3.fromRGB(20,24,20)) st.Transparency=.3
@@ -691,14 +714,14 @@ end)
 local hints={}
 local function addHint(c)
 	local hb=c:WaitForChild("GrassDepositHitbox",15) if not hb then return end
-	local g=Instance.new("BillboardGui") g.Name="CompostHint" g.Adornee=hb g.Size=UDim2.fromOffset(240,64)
+	local g=Instance.new("BillboardGui") g.Name="CompostHint" g.Adornee=hb g.Size=UDim2.fromOffset(240*BB,64*BB)
 	g.AlwaysOnTop=true g.MaxDistance=90 g.LightInfluence=0 g.ResetOnSpawn=false g.Enabled=false
 	g.StudsOffsetWorldSpace=Vector3.new(0,hb.Size.Y/2+1.6,0)
 	local pill=Instance.new("Frame") pill.Size=UDim2.fromScale(1,1) pill.BackgroundColor3=Color3.fromRGB(34,58,24) pill.BackgroundTransparency=.08 pill.Parent=g
 	corner(pill,UDim.new(0,18)) stroke(pill,3,WHITE,true)
 	local im=Instance.new("ImageLabel") im.BackgroundTransparency=1 im.Image=BAG_IMAGE im.ScaleType=Enum.ScaleType.Fit
-	im.Size=UDim2.fromOffset(48,48) im.Position=UDim2.fromOffset(8,8) im.Parent=pill
-	local tx=Instance.new("TextLabel") tx.BackgroundTransparency=1 tx.Position=UDim2.fromOffset(62,10) tx.Size=UDim2.new(1,-72,1,-20)
+	im.Size=UDim2.fromOffset(48*BB,48*BB) im.Position=UDim2.fromOffset(8*BB,8*BB) im.Parent=pill
+	local tx=Instance.new("TextLabel") tx.BackgroundTransparency=1 tx.Position=UDim2.fromOffset(62*BB,10*BB) tx.Size=UDim2.new(1,-72*BB,1,-20*BB)
 	tx.Font=Enum.Font.FredokaOne tx.TextScaled=true tx.TextColor3=WHITE tx.Text="VIDE TON SAC ICI ⬇" tx.Parent=pill
 	stroke(tx,2,Color3.fromRGB(18,38,10))
 	g.Parent=pgui

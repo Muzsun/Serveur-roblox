@@ -11,8 +11,14 @@ local TS=game:GetService("TweenService")
 local UIS=game:GetService("UserInputService")
 local Lighting=game:GetService("Lighting")
 local StarterGui=game:GetService("StarterGui")
+local GuiService=game:GetService("GuiService")
 local player=Players.LocalPlayer
 local cam=workspace.CurrentCamera
+
+-- plateformes : téléphone / tablette (pas de clavier) et manette (PlayStation / Xbox)
+local TOUCH=UIS.TouchEnabled and not UIS.KeyboardEnabled
+local PADS={[Enum.UserInputType.Gamepad1]=true,[Enum.UserInputType.Gamepad2]=true,[Enum.UserInputType.Gamepad3]=true,[Enum.UserInputType.Gamepad4]=true}
+local function usingGamepad() return PADS[UIS:GetLastInputType()]==true end
 
 -- ================= À COMPLÉTER =================
 local BAG_ICON="rbxassetid://113918337226531"
@@ -106,12 +112,15 @@ local function fmt(v) return string.format("%.2f$",v) end
 
 -- ================= BOUTON BOOSTS (à droite de l'écran) =================
 local SIZE=138
+-- le bouton a son propre écran, dans la zone sûre (encoche des téléphones, bords des télés)
+local boostGui=new("ScreenGui",{Name="BoostsBouton",ResetOnSpawn=false,ZIndexBehavior=Enum.ZIndexBehavior.Sibling,DisplayOrder=9},player:WaitForChild("PlayerGui"))
+pcall(function() boostGui.ScreenInsets=Enum.ScreenInsets.CoreUISafeInsets end)
 local holder=new("Frame",{Name="BoostsHolder",BackgroundTransparency=1,AnchorPoint=Vector2.new(1,.5),
-	Position=UDim2.new(1,-16,.5,0),Size=UDim2.fromOffset(SIZE,SIZE+10)},gui)
+	Position=UDim2.new(1,-16,.5,0),Size=UDim2.fromOffset(SIZE,SIZE+10)},boostGui)
 local fitScale=new("UIScale",{},holder)
 local function fit()
 	local s=math.clamp(cam.ViewportSize.Y/900,.45,1)
-	if UIS.TouchEnabled then s=math.min(s,.6) end
+	if TOUCH then s=math.clamp(s,.45,.6) end
 	fitScale.Scale=s
 end
 fit() cam:GetPropertyChangedSignal("ViewportSize"):Connect(fit)
@@ -125,8 +134,14 @@ corner(discRim,UDim.new(1,0)) stroke(discRim,2,WHITE,.55)
 local icon=new("ImageLabel",{BackgroundTransparency=1,Image=BAG_ICON,ScaleType=Enum.ScaleType.Fit,AnchorPoint=Vector2.new(.5,.5),
 	Position=UDim2.fromScale(.5,.4),Size=UDim2.fromScale(.95,.9),ZIndex=5},button)
 lbl(button,"BOOSTS",UDim2.new(0,-10,1,-34),UDim2.new(1,20,0,34),{font=Enum.Font.LuckiestGuy,align=Enum.TextXAlignment.Center,stroke=4,grad={WHITE,Color3.fromRGB(210,255,190)},z=6})
-new("ImageLabel",{Name="TabKey",BackgroundTransparency=1,Image=TAB_ICON,ScaleType=Enum.ScaleType.Fit,AnchorPoint=Vector2.new(.5,.5),
-	Position=UDim2.fromOffset(8,10),Size=UDim2.fromOffset(60,40),Rotation=-10,ZIndex=8,Visible=not UIS.TouchEnabled},button)
+local tabKey=new("ImageLabel",{Name="TabKey",BackgroundTransparency=1,Image=TAB_ICON,ScaleType=Enum.ScaleType.Fit,AnchorPoint=Vector2.new(.5,.5),
+	Position=UDim2.fromOffset(8,10),Size=UDim2.fromOffset(60,40),Rotation=-10,ZIndex=8,Visible=not TOUCH},button)
+-- manette : icône du bouton Y / Triangle
+local padKey=new("Frame",{Name="PadKey",BackgroundTransparency=1,AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromOffset(12,12),
+	Size=UDim2.fromOffset(44,44),ZIndex=8,Visible=false},button)
+local padImage="" pcall(function() padImage=UIS:GetImageForKeyCode(Enum.KeyCode.ButtonY) end)
+if padImage~="" then new("ImageLabel",{BackgroundTransparency=1,Image=padImage,ScaleType=Enum.ScaleType.Fit,Size=UDim2.fromScale(1,1),ZIndex=8},padKey)
+else lbl(padKey,"Y",UDim2.fromScale(0,0),UDim2.fromScale(1,1),{font=Enum.Font.LuckiestGuy,color=WHITE,stroke=3,align=Enum.TextXAlignment.Center,z=8}) end
 -- pastille "!" quand une amélioration est achetable
 local badge=new("Frame",{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.88,.12),Size=UDim2.fromOffset(36,36),Visible=false,ZIndex=9},button)
 corner(badge,UDim.new(1,0)) stroke(badge,3)
@@ -144,14 +159,14 @@ button.MouseEnter:Connect(function() hovered=true upd() end)
 button.MouseLeave:Connect(function() hovered=false upd() end)
 
 -- ================= FOND =================
-local backdrop=new("TextButton",{Name="Backdrop",Text="",AutoButtonColor=false,Size=UDim2.fromScale(1,1),
+local backdrop=new("TextButton",{Name="Backdrop",Text="",AutoButtonColor=false,Size=UDim2.fromScale(1,1),Selectable=false,
 	BackgroundColor3=Color3.fromRGB(6,14,8),BackgroundTransparency=1,Visible=false,ZIndex=20},gui)
 local blur=new("BlurEffect",{Name="InventoryBlur",Size=0},Lighting)
 
 -- ================= PANNEAU =================
 local panel=new("CanvasGroup",{Name="Panel",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),
 	Size=UDim2.fromScale(.9,.86),BackgroundTransparency=1,GroupTransparency=1,Visible=false,ZIndex=21},gui)
-new("UIAspectRatioConstraint",{AspectRatio=1.7},panel)
+local panelRatio=new("UIAspectRatioConstraint",{AspectRatio=1.7},panel)
 new("UISizeConstraint",{MaxSize=Vector2.new(1180,700)},panel)
 local pScale=new("UIScale",{},panel)
 local card=new("Frame",{Name="Card",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.new(1,-16,1,-16)},panel)
@@ -205,8 +220,9 @@ close.MouseLeave:Connect(function() TS:Create(closeScale,TweenInfo.new(.12),{Sca
 -- titres des colonnes
 lbl(card,"OUTILS",UDim2.fromScale(.03,.165),UDim2.fromScale(.26,.05),{color=WHITE,transp=.15,z=3})
 local pageTitle=lbl(card,"",UDim2.fromScale(.32,.165),UDim2.fromScale(.6,.05),{color=WHITE,transp=.15,z=3})
-lbl(card,"Clique sur un prix pour acheter   •   TAB pour fermer",UDim2.fromScale(.32,.915),UDim2.fromScale(.65,.045),
+local aide=lbl(card,"",UDim2.fromScale(.32,.915),UDim2.fromScale(.65,.045),
 	{color=WHITE,transp=.4,align=Enum.TextXAlignment.Center,z=3})
+local descs={} -- descriptions (cachées sur les petits écrans pour rester lisible)
 
 local tabsFrame=new("Frame",{BackgroundTransparency=1,Position=UDim2.fromScale(.03,.225),Size=UDim2.fromScale(.265,.68)},card)
 new("UIListLayout",{Padding=UDim.new(.04,0),SortOrder=Enum.SortOrder.LayoutOrder},tabsFrame)
@@ -249,7 +265,7 @@ local function makeRow(page,outil,item,i)
 	end
 	-- textes
 	lbl(row,item.locked and "???" or item.name,UDim2.fromScale(.19,.1),UDim2.fromScale(.4,.3),{z=4})
-	lbl(row,item.locked and "Bientôt disponible" or item.desc or "",UDim2.fromScale(.19,.42),UDim2.fromScale(.5,.26),{z=4,color=GRAY_TEXT,wrap=true})
+	table.insert(descs,lbl(row,item.locked and "Bientôt disponible" or item.desc or "",UDim2.fromScale(.19,.42),UDim2.fromScale(.5,.26),{z=4,color=GRAY_TEXT,wrap=true}))
 	-- niveau
 	local pips,lv={},nil
 	if not item.locked then
@@ -285,7 +301,7 @@ local function makeRow(page,outil,item,i)
 	buy.MouseLeave:Connect(function() TS:Create(buyScale,TweenInfo.new(.12),{Scale=1}):Play() face.Position=UDim2.fromScale(0,0) end)
 	buy.MouseButton1Down:Connect(function() face.Position=UDim2.fromScale(0,.1) end)
 	buy.MouseButton1Up:Connect(function() face.Position=UDim2.fromScale(0,0) end)
-	buy.MouseButton1Click:Connect(function()
+	buy.Activated:Connect(function()
 		playClick()
 		if item.locked or level(item)>=maxLevel(item) then return end
 		if money()<price(item) then
@@ -326,7 +342,7 @@ for i,outil in ipairs(OUTILS) do
 	lbl(t,outil.name,UDim2.fromScale(.42,.14),UDim2.fromScale(.54,.4),{z=4,color=WHITE,stroke=2.5})
 	local sub=lbl(t,"",UDim2.fromScale(.42,.58),UDim2.fromScale(.54,.26),{z=4,color=WHITE,transp=.15})
 	tabs[i]={btn=t,stroke=st,grad=grad,scale=sc,sub=sub,outil=outil}
-	t.MouseButton1Click:Connect(function() playClick() selectOutil(i) end)
+	t.Activated:Connect(function() playClick() selectOutil(i) end)
 	t.MouseEnter:Connect(function() if current~=i then TS:Create(sc,TweenInfo.new(.12),{Scale=1.04}):Play() end end)
 	t.MouseLeave:Connect(function() if current~=i then TS:Create(sc,TweenInfo.new(.12),{Scale=1}):Play() end end)
 	-- page des améliorations de cet outil
@@ -430,6 +446,33 @@ end)
 selectOutil(1)
 refresh()
 
+-- ================= ADAPTATION À L'APPAREIL =================
+local function adapter()
+	local pad=usingGamepad()
+	tabKey.Visible=not TOUCH and not pad
+	padKey.Visible=pad
+	aide.Text=pad and "A (Croix) : acheter   •   B (Rond) : fermer"
+		or TOUCH and "Touche un prix pour acheter"
+		or "Clique sur un prix pour acheter   •   TAB pour fermer"
+	-- petit écran (téléphone) : panneau plus grand et sans descriptions
+	local small=cam.ViewportSize.Y<520
+	panel.Size=small and UDim2.fromScale(.98,.96) or UDim2.fromScale(.9,.86)
+	panelRatio.AspectRatio=small and 1.9 or 1.7
+	for _,d in descs do d.Visible=not small end
+end
+adapter()
+UIS.LastInputTypeChanged:Connect(adapter)
+cam:GetPropertyChangedSignal("ViewportSize"):Connect(adapter)
+
+-- manette : sélectionne le premier bouton utile du menu
+local function selectionManette()
+	if not usingGamepad() then return end
+	for _,r in rows do
+		if r.outil==OUTILS[current] and not r.item.locked then GuiService.SelectedObject=r.buy return end
+	end
+	GuiService.SelectedObject=tabs[current].btn
+end
+
 -- ================= OUVERTURE / FERMETURE =================
 local busy=false
 local function setOpen(v)
@@ -453,7 +496,9 @@ local function setOpen(v)
 		TS:Create(rIcon,TweenInfo.new(.6,Enum.EasingStyle.Elastic,Enum.EasingDirection.Out),{Rotation=-12}):Play()
 		local t=TS:Create(pScale,TweenInfo.new(.42,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Scale=1})
 		t:Play() t.Completed:Wait()
+		selectionManette()
 	else
+		if GuiService.SelectedObject and GuiService.SelectedObject:IsDescendantOf(gui) then GuiService.SelectedObject=nil end
 		TS:Create(backdrop,TweenInfo.new(.2),{BackgroundTransparency=1}):Play()
 		TS:Create(blur,TweenInfo.new(.2),{Size=0}):Play()
 		TS:Create(panel,TweenInfo.new(.2),{GroupTransparency=1,Position=UDim2.new(.5,0,.5,40)}):Play()
@@ -465,11 +510,14 @@ local function setOpen(v)
 	busy=false
 end
 
-button.MouseButton1Click:Connect(function() playClick() setOpen(not open) end)
-close.MouseButton1Click:Connect(function() playClick() setOpen(false) end)
+button.Activated:Connect(function() playClick() setOpen(not open) end)
+close.Activated:Connect(function() playClick() setOpen(false) end)
 backdrop.MouseButton1Click:Connect(function() setOpen(false) end)
 -- Tab est aussi utilisé par Roblox (liste des joueurs) : on ne tient pas compte de "gp",
 -- on ignore seulement quand le joueur écrit dans le chat / une zone de texte.
+-- Manette : Y / Triangle ouvre ou ferme, B / Rond ferme.
 UIS.InputBegan:Connect(function(input)
-	if input.KeyCode==Enum.KeyCode.Tab and not UIS:GetFocusedTextBox() then setOpen(not open) end
+	if UIS:GetFocusedTextBox() then return end
+	if input.KeyCode==Enum.KeyCode.Tab or input.KeyCode==Enum.KeyCode.ButtonY then setOpen(not open)
+	elseif input.KeyCode==Enum.KeyCode.ButtonB and open then setOpen(false) end
 end)
