@@ -336,7 +336,7 @@ local curGui=Instance.new("ScreenGui") curGui.Name="CurseurCiseaux" curGui.Reset
 curGui.IgnoreGuiInset=true curGui.DisplayOrder=100 curGui.Parent=pgui
 local cursor=Instance.new("Frame") cursor.Name="Ciseaux" cursor.AnchorPoint=Vector2.new(.5,.5)
 cursor.Size=UDim2.fromOffset(44,44) cursor.BackgroundTransparency=1 cursor.Visible=false cursor.Parent=curGui
-local cScale=Instance.new("UIScale") cScale.Parent=cursor
+local cScale=Instance.new("UIScale") cScale.Scale=1.15 cScale.Parent=cursor
 local OPEN=27           -- ouverture des lames (degrés)
 local branches,tinted={},{}
 local snipT=-math.huge
@@ -374,10 +374,9 @@ local function updateCursor(m)
 	end
 	if not show then return end
 	cursor.Position=UDim2.fromOffset(m.X,m.Y)
-	local col=WHITE
-	if e then col=(realBag()+e.size>maxBag()) and RED or (e.r~="Normal" and K.OUTLINE[e.r] or WHITE) end
+	-- toujours blanc (rouge seulement si le sac est trop plein pour cette touffe)
+	local col=(e and realBag()+e.size>maxBag()) and RED or WHITE
 	for _,o in tinted do if o:IsA("UIStroke") then o.Color=col else o.BackgroundColor3=col end end
-	cScale.Scale+=((e and 1.15 or 1)-cScale.Scale)*.3
 	-- clic-clac des lames
 	local t=(os.clock()-snipT)/.16
 	local ang=(t>=0 and t<1) and OPEN*(1-.85*math.sin(t*math.pi)) or OPEN
