@@ -35,6 +35,7 @@ local achat = ReplicatedStorage:FindFirstChild("FaucilleAchat") or Instance.new(
 achat.Name = "FaucilleAchat"
 achat:SetAttribute("Prix", REGLAGES.PRIX)
 achat:SetAttribute("Touffes", 1 + REGLAGES.TOUFFES_EN_PLUS)
+achat:SetAttribute("Rayon", REGLAGES.RAYON)
 achat.Parent = ReplicatedStorage
 
 ---------------------------------------------------------------- Le modèle (le même sur l'établi et dans la main)

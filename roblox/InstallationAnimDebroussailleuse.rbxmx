@@ -37,6 +37,7 @@ local achat = ReplicatedStorage:FindFirstChild("DebroussailleuseAchat") or Insta
 achat.Name = "DebroussailleuseAchat"
 achat:SetAttribute("Prix", REGLAGES.PRIX)
 achat:SetAttribute("Touffes", 1 + REGLAGES.TOUFFES_EN_PLUS)
+achat:SetAttribute("Rayon", REGLAGES.RAYON)
 achat.Parent = ReplicatedStorage
 
 ---------------------------------------------------------------- Le modèle (le même sur l'établi et dans la main)
@@ -495,9 +496,9 @@ end
 -- La boutique de l'établi :
 --  * au-dessus de chaque outil en vente : la pièce + le prix
 --  * la souris passe sur l'outil : il s'entoure de blanc
---  * clic (ou E / appui) sur l'outil : la caméra se rapproche et une fiche "Notes" s'ouvre
---    (nom, description, puissance), avec le prix à cliquer pour acheter, des flèches pour
---    passer à l'autre outil, ton argent et une croix pour fermer.
+--  * clic (ou E / appui) sur l'outil : la caméra se rapproche et la fiche de l'outil s'ouvre
+--    (nom, description, touffes par coup, portée), avec le bouton pour acheter (ou équiper),
+--    des flèches pour passer à l'autre outil, ton argent et une croix pour fermer.
 -- Et la tête de la débroussailleuse qui tourne.
 if not game:GetService("RunService"):IsClient() then
 	warn("[Boutique] BoutiqueClient doit être un LocalScript dans StarterPlayer > StarterPlayerScripts !")
@@ -508,12 +509,18 @@ end
 local ARTICLES = {
 	{
 		remote = "FaucilleAchat", vitrine = "FaucilleVitrine", attribut = "Faucille", nom = "Faucille", titre = "FAUCILLE",
+		outil = "Faucille", -- nom de l'outil dans le sac
 		desc = "Une lame en croissant bien affûtée. Fauche plusieurs touffes d'un seul coup.",
+		touffesMax = 5, -- avec toutes les améliorations
+		ameliorations = 3,
 		hauteur = 0.95, -- caméra : 0 = de face, 1 = bien au-dessus (la faucille est posée à plat)
 	},
 	{
 		remote = "DebroussailleuseAchat", vitrine = "DebroussailleuseVitrine", attribut = "Debroussailleuse", nom = "Débroussailleuse", titre = "DÉBROUSSAILLEUSE",
+		outil = "Debroussailleuse",
 		desc = "Un moteur qui rugit et un fil qui tourne à toute vitesse. Rien ne lui résiste !",
+		touffesMax = 10,
+		ameliorations = 3,
 		hauteur = 0.12, -- accrochée au mur : presque de face
 	},
 }
@@ -531,6 +538,7 @@ local UIS = game:GetService("UserInputService")
 local GuiService = game:GetService("GuiService")
 
 local COIN = "rbxassetid://103593634628600" -- l'icône des pièces
+local HERBE = "rbxassetid://90182525256912" -- l'image d'une touffe d'herbe
 local lp = Players.LocalPlayer
 local pgui = lp:WaitForChild("PlayerGui")
 local cam = workspace.CurrentCamera
@@ -655,6 +663,7 @@ local function majEtiquette(v)
 end
 
 ---------------------------------------------------------------- La fiche de l'outil (vue rapprochée)
+-- Même style que le menu BOOSTS : carte verte, lignes crème, textes blancs contournés, boutons en relief.
 local ecran = nouveau("ScreenGui", { Name = "Boutique", ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = 30, Enabled = false }, pgui)
 local echelles = {} -- tout est dessiné pour un écran de 1080 px de haut, puis mis à l'échelle
 local function echelle(o) table.insert(echelles, nouveau("UIScale", {}, o)) return o end
@@ -662,94 +671,171 @@ local function adapter()
 	local s = math.clamp(cam.ViewportSize.Y / 1080, 0.45, 1.25)
 	for _, u in echelles do u.Scale = s end
 end
+local function degrade(o, couleurs, rotation)
+	local k = {}
+	for i, c in couleurs do table.insert(k, ColorSequenceKeypoint.new((i - 1) / (#couleurs - 1), c)) end
+	return nouveau("UIGradient", { Rotation = rotation or 90, Color = ColorSequence.new(k) }, o)
+end
+local function titre(parent, texte, props)
+	local l = nouveau("TextLabel", {
+		BackgroundTransparency = 1, Font = Enum.Font.LuckiestGuy, TextColor3 = BLANC, Text = texte, TextScaled = false,
+	}, parent)
+	for k, v in props do if k ~= "epais" then l[k] = v end end
+	contour(l, props.epais or 4)
+	return l
+end
 -- libère la souris (même en vue 1re personne) tant que la fiche est ouverte
 nouveau("TextButton", { Text = "", BackgroundTransparency = 1, Size = UDim2.fromOffset(0, 0), Modal = true }, ecran)
 
--- la feuille "Notes"
-local notes = echelle(nouveau("Frame", {
-	Name = "Notes", AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 56, 0.48, 0), Size = UDim2.fromOffset(440, 640),
-	BackgroundColor3 = Color3.fromRGB(250, 246, 234),
-}, ecran))
-coin(notes, UDim.new(0, 14))
-contour(notes, 5, ENCRE, true)
-for i = 0, 8 do -- lignes du cahier
-	nouveau("Frame", { Position = UDim2.fromOffset(0, 150 + i * 56), Size = UDim2.new(1, 0, 0, 3), BackgroundColor3 = Color3.fromRGB(106, 166, 232), BorderSizePixel = 0, ZIndex = 2 }, notes)
-end
-nouveau("Frame", { Position = UDim2.fromOffset(64, 0), Size = UDim2.new(0, 4, 1, 0), BackgroundColor3 = Color3.fromRGB(224, 80, 106), BorderSizePixel = 0, ZIndex = 2 }, notes)
-for i = 0, 4 do -- les anneaux du carnet
-	local a = nouveau("Frame", { Position = UDim2.fromOffset(62 + i * 72, -30), Size = UDim2.fromOffset(38, 54), BackgroundTransparency = 1, ZIndex = 4 }, notes)
-	coin(a)
-	contour(a, 7, ENCRE, true)
-end
-local titreNotes = nouveau("TextLabel", {
-	BackgroundTransparency = 1, Position = UDim2.fromOffset(0, 44), Size = UDim2.new(1, 0, 0, 80), Font = Enum.Font.Cartoon, TextSize = 70,
-	TextColor3 = Color3.fromRGB(32, 36, 42), Text = "Notes", ZIndex = 3,
-}, notes)
-contour(titreNotes, 1.6, Color3.fromRGB(32, 36, 42))
-local nomOutil = nouveau("TextLabel", {
-	BackgroundTransparency = 1, Position = UDim2.fromOffset(20, 134), Size = UDim2.new(1, -40, 0, 64), Font = Enum.Font.FredokaOne, TextSize = 50,
-	TextScaled = false, TextColor3 = VERT, Text = "", ZIndex = 3,
-}, notes)
-contour(nomOutil, 5)
-nouveau("UITextSizeConstraint", { MaxTextSize = 50 }, nomOutil)
+-- fond assombri à gauche (la fiche se lit mieux, l'outil reste bien visible à droite)
+local voile = nouveau("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.fromRGB(8, 18, 10), BorderSizePixel = 0, BackgroundTransparency = 0 }, ecran)
+nouveau("UIGradient", {
+	Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.45), NumberSequenceKeypoint.new(0.35, 0.72), NumberSequenceKeypoint.new(0.58, 1), NumberSequenceKeypoint.new(1, 1),
+	}),
+}, voile)
+
+-- la carte
+local carte = echelle(nouveau("Frame", { Name = "Fiche", AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 50, 0.5, 0), Size = UDim2.fromOffset(510, 760) }, ecran))
+coin(carte, UDim.new(0, 32))
+contour(carte, 5, ENCRE, true)
+degrade(carte, { Color3.fromRGB(66, 124, 74), Color3.fromRGB(30, 66, 42) })
+local bordInt = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.new(1, -16, 1, -16), BackgroundTransparency = 1 }, carte)
+coin(bordInt, UDim.new(0, 26))
+contour(bordInt, 2, BLANC, true).Transparency = 0.7
+local reflet = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 9), Size = UDim2.new(1, -24, 0, 96), BackgroundColor3 = BLANC, BorderSizePixel = 0 }, carte)
+coin(reflet, UDim.new(0, 24))
+nouveau("UIGradient", { Rotation = 90, Transparency = NumberSequence.new(0.8, 1) }, reflet)
+-- petite étiquette "OUTIL"
+local etiq = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0, 2), Size = UDim2.fromOffset(150, 48), Rotation = -2, ZIndex = 3 }, carte)
+coin(etiq, UDim.new(0, 18))
+contour(etiq, 4, ENCRE, true)
+degrade(etiq, { Color3.fromRGB(255, 226, 112), Color3.fromRGB(240, 160, 32) })
+titre(etiq, "OUTIL", { Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 3), TextSize = 28, ZIndex = 4, epais = 3 })
+-- nom + description
+local nomOutil = titre(carte, "", { Position = UDim2.fromOffset(10, 42), Size = UDim2.new(1, -20, 0, 76), TextSize = 62, epais = 5 })
+nouveau("UITextSizeConstraint", { MaxTextSize = 62 }, nomOutil)
+nomOutil.TextScaled = true
+degrade(nomOutil, { BLANC, Color3.fromRGB(215, 255, 190) })
 local descOutil = nouveau("TextLabel", {
-	BackgroundTransparency = 1, Position = UDim2.fromOffset(82, 214), Size = UDim2.new(1, -100, 0, 250), Font = Enum.Font.PatrickHand, TextSize = 38,
-	LineHeight = 1.47, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top,
-	TextColor3 = Color3.fromRGB(42, 42, 48), Text = "", ZIndex = 3,
-}, notes)
-local puissance = nouveau("TextLabel", {
-	BackgroundTransparency = 1, Position = UDim2.fromOffset(0, 520), Size = UDim2.new(1, 0, 0, 70), Font = Enum.Font.LuckiestGuy, TextSize = 58,
-	TextColor3 = ROUGE, Text = "", ZIndex = 3,
-}, notes)
-contour(puissance, 6)
+	BackgroundTransparency = 1, Position = UDim2.fromOffset(34, 126), Size = UDim2.new(1, -68, 0, 96), Font = Enum.Font.FredokaOne, TextSize = 26,
+	TextWrapped = true, TextColor3 = Color3.fromRGB(226, 242, 216), Text = "",
+}, carte)
 
--- bouton du prix (cliquer = acheter)
-local boutonPrix = echelle(nouveau("TextButton", {
-	Name = "Prix", Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -40),
-	Size = UDim2.fromOffset(300, 104), BackgroundColor3 = BLANC,
-}, ecran))
-coin(boutonPrix, UDim.new(0, 28))
-contour(boutonPrix, 7, ENCRE, true)
-local fondPrix = nouveau("UIGradient", { Rotation = 90 }, boutonPrix)
-local textePrix = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 5), Font = Enum.Font.LuckiestGuy, TextSize = 70, TextColor3 = BLANC, Text = "" }, boutonPrix)
-contour(textePrix, 6)
-local popPrix = nouveau("UIScale", {}, textePrix)
+-- une ligne crème (comme dans BOOSTS)
+local function ligne(y, h)
+	local l = nouveau("Frame", { Position = UDim2.fromOffset(27, y), Size = UDim2.new(1, -54, 0, h) }, carte)
+	coin(l, UDim.new(0, 24))
+	contour(l, 4, ENCRE, true)
+	degrade(l, { Color3.fromRGB(252, 249, 240), Color3.fromRGB(236, 230, 212) })
+	return l, nouveau("UIScale", {}, l)
+end
+local VERT_FONCE = Color3.fromRGB(60, 90, 64)
+-- touffes par coup (avec des petites touffes dessinées)
+local ligneTouffes, popTouffes = ligne(230, 132)
+nouveau("TextLabel", { BackgroundTransparency = 1, Position = UDim2.fromOffset(20, 12), Size = UDim2.fromOffset(300, 32), Font = Enum.Font.LuckiestGuy, TextSize = 26, TextXAlignment = Enum.TextXAlignment.Left, TextColor3 = VERT_FONCE, Text = "TOUFFES PAR COUP" }, ligneTouffes)
+local valTouffes = titre(ligneTouffes, "3", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -18, 0, 4), Size = UDim2.fromOffset(90, 60), TextSize = 58, TextXAlignment = Enum.TextXAlignment.Right, epais = 5 })
+local rangee = nouveau("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(16, 64), Size = UDim2.new(1, -32, 0, 50) }, ligneTouffes)
+nouveau("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 2), VerticalAlignment = Enum.VerticalAlignment.Center, SortOrder = Enum.SortOrder.LayoutOrder }, rangee)
+local touffesMax = nouveau("TextLabel", {
+	BackgroundTransparency = 1, AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -18, 1, -10), Size = UDim2.fromOffset(250, 26),
+	Font = Enum.Font.FredokaOne, TextSize = 19, TextXAlignment = Enum.TextXAlignment.Right, TextColor3 = Color3.fromRGB(138, 130, 112), Text = "",
+}, ligneTouffes)
+-- portée (barre)
+local lignePortee, popPortee = ligne(378, 112)
+nouveau("TextLabel", { BackgroundTransparency = 1, Position = UDim2.fromOffset(20, 12), Size = UDim2.fromOffset(300, 32), Font = Enum.Font.LuckiestGuy, TextSize = 26, TextXAlignment = Enum.TextXAlignment.Left, TextColor3 = VERT_FONCE, Text = "PORTÉE" }, lignePortee)
+local valPortee = titre(lignePortee, "", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -18, 0, 6), Size = UDim2.fromOffset(110, 50), TextSize = 44, TextXAlignment = Enum.TextXAlignment.Right, epais = 4 })
+local barre = nouveau("Frame", { Position = UDim2.new(0, 20, 1, -44), Size = UDim2.new(1, -150, 0, 26), BackgroundColor3 = Color3.fromRGB(222, 214, 194), ClipsDescendants = true }, lignePortee)
+coin(barre)
+contour(barre, 2.5, Color3.fromRGB(122, 106, 86), true)
+local remplissage = nouveau("Frame", { Size = UDim2.fromScale(0.5, 1), BackgroundColor3 = BLANC, BorderSizePixel = 0 }, barre)
+coin(remplissage)
+degrade(remplissage, { Color3.fromRGB(168, 240, 122), Color3.fromRGB(60, 174, 68) })
+-- améliorations disponibles
+local pilule = nouveau("Frame", { Position = UDim2.fromOffset(27, 508), Size = UDim2.new(1, -54, 0, 60), BackgroundColor3 = Color3.fromRGB(14, 34, 20), BackgroundTransparency = 0.35 }, carte)
+coin(pilule)
+contour(pilule, 3, ENCRE, true)
+local texteAmelio = titre(pilule, "", { Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 3), TextSize = 25, epais = 3 })
 
--- flèches (outil précédent / suivant)
-local function fleche(txt, x)
-	local b = echelle(nouveau("TextButton", {
-		Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, x, 1, -48), Size = UDim2.fromOffset(130, 86),
-		BackgroundColor3 = BLANC, Rotation = x < 0 and -3 or 2,
-	}, ecran))
-	coin(b, UDim.new(0, 20))
-	contour(b, 3, Color3.fromRGB(210, 206, 196), true)
-	nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 4), Font = Enum.Font.LuckiestGuy, TextSize = 50, TextColor3 = ENCRE, Text = txt }, b)
+-- le gros bouton (acheter / équiper), en relief
+local bouton = nouveau("TextButton", { Name = "Acheter", Text = "", AutoButtonColor = false, BackgroundTransparency = 1, AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 27, 1, -30), Size = UDim2.new(1, -54, 0, 122) }, carte)
+local socle = nouveau("Frame", { Position = UDim2.fromOffset(0, 12), Size = UDim2.new(1, 0, 1, -12) }, bouton)
+coin(socle, UDim.new(0, 32))
+contour(socle, 4, ENCRE, true)
+local socleGrad = degrade(socle, { BLANC, BLANC })
+local face = nouveau("Frame", { Size = UDim2.new(1, 0, 1, -16) }, bouton)
+coin(face, UDim.new(0, 32))
+contour(face, 4, ENCRE, true)
+local faceGrad = degrade(face, { BLANC, BLANC })
+local brillance = nouveau("Frame", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 6), Size = UDim2.new(1, -20, 0.4, 0), BackgroundColor3 = BLANC, BorderSizePixel = 0 }, face)
+coin(brillance)
+nouveau("UIGradient", { Rotation = 90, Transparency = NumberSequence.new(0.5, 1) }, brillance)
+local contenu = nouveau("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) }, face)
+nouveau("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Center, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder }, contenu)
+local pieceBouton = nouveau("ImageLabel", { BackgroundTransparency = 1, Image = COIN, ScaleType = Enum.ScaleType.Fit, Size = UDim2.fromOffset(62, 62), LayoutOrder = 1 }, contenu)
+local texteBouton = nouveau("TextLabel", { BackgroundTransparency = 1, Font = Enum.Font.LuckiestGuy, TextSize = 62, TextColor3 = BLANC, Text = "", Size = UDim2.fromOffset(0, 70), AutomaticSize = Enum.AutomaticSize.X, LayoutOrder = 2 }, contenu)
+contour(texteBouton, 5)
+local popBouton = nouveau("UIScale", {}, bouton)
+local STYLES = {
+	vert = { { Color3.fromRGB(168, 244, 120), Color3.fromRGB(56, 170, 62) }, { Color3.fromRGB(36, 112, 42), Color3.fromRGB(20, 68, 26) } },
+	gris = { { Color3.fromRGB(214, 210, 198), Color3.fromRGB(160, 156, 144) }, { Color3.fromRGB(128, 124, 114), Color3.fromRGB(96, 92, 84) } },
+	or_ = { { Color3.fromRGB(255, 232, 120), Color3.fromRGB(240, 160, 30) }, { Color3.fromRGB(170, 100, 12), Color3.fromRGB(110, 62, 6) } },
+}
+local function peindre(style)
+	local s = STYLES[style]
+	faceGrad.Color = ColorSequence.new(s[1][1], s[1][2])
+	socleGrad.Color = ColorSequence.new(s[2][1], s[2][2])
+end
+bouton.MouseButton1Down:Connect(function() face.Position = UDim2.fromOffset(0, 8) end)
+bouton.MouseButton1Up:Connect(function() face.Position = UDim2.fromOffset(0, 0) end)
+
+-- navigation entre les outils : ‹ 1 / 2 ›
+local nav = echelle(nouveau("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.66, 0, 1, -36), Size = UDim2.fromOffset(340, 96) }, ecran))
+nouveau("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Center, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 18), SortOrder = Enum.SortOrder.LayoutOrder }, nav)
+local function rond(txt, ordre)
+	local b = nouveau("TextButton", { Text = "", AutoButtonColor = false, Size = UDim2.fromOffset(88, 88), LayoutOrder = ordre }, nav)
+	coin(b)
+	contour(b, 4, ENCRE, true)
+	degrade(b, { Color3.fromRGB(168, 244, 120), Color3.fromRGB(56, 170, 62) })
+	titre(b, txt, { Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 5), TextSize = 46, epais = 4 })
 	return b
 end
-local gauche, droite = fleche("<", -300), fleche(">", 300)
+local gauche = rond("<", 1)
+local compteurFond = nouveau("Frame", { Size = UDim2.fromOffset(120, 58), BackgroundColor3 = Color3.fromRGB(14, 34, 20), BackgroundTransparency = 0.1, LayoutOrder = 2 }, nav)
+coin(compteurFond)
+contour(compteurFond, 4, ENCRE, true)
+local compteur = titre(compteurFond, "1 / 2", { Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 3), TextSize = 34, epais = 3 })
+local droite = rond(">", 3)
 
--- ton argent (en haut à droite, sur un coup de pinceau jaune)
-local cadreArgent = echelle(nouveau("Frame", {
-	AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -150, 0, 40), Size = UDim2.fromOffset(350, 78),
-	BackgroundColor3 = Color3.fromRGB(247, 215, 32), Rotation = -1.5,
-}, ecran))
-coin(cadreArgent, UDim.new(0, 30))
-nouveau("ImageLabel", { BackgroundTransparency = 1, Image = COIN, ScaleType = Enum.ScaleType.Fit, Position = UDim2.fromOffset(12, 5), Size = UDim2.fromOffset(68, 68) }, cadreArgent)
-local texteArgent = nouveau("TextLabel", {
-	BackgroundTransparency = 1, Position = UDim2.fromOffset(90, 8), Size = UDim2.new(1, -100, 1, -8), Font = Enum.Font.LuckiestGuy, TextSize = 52,
-	TextXAlignment = Enum.TextXAlignment.Left, TextColor3 = BLANC, Text = "$0.00",
-}, cadreArgent)
-contour(texteArgent, 5)
+-- ton argent (en haut à droite)
+local cadreArgent = echelle(nouveau("Frame", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -130, 0, 34), Size = UDim2.fromOffset(300, 74), BackgroundColor3 = Color3.fromRGB(14, 34, 20), BackgroundTransparency = 0.05 }, ecran))
+coin(cadreArgent)
+contour(cadreArgent, 4, ENCRE, true)
+nouveau("ImageLabel", { BackgroundTransparency = 1, Image = COIN, ScaleType = Enum.ScaleType.Fit, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromOffset(18, 37), Size = UDim2.fromOffset(94, 94) }, cadreArgent)
+local texteArgent = titre(cadreArgent, "$0.00", { Position = UDim2.fromOffset(70, 6), Size = UDim2.new(1, -90, 1, -6), TextSize = 46, TextXAlignment = Enum.TextXAlignment.Right, epais = 4 })
+degrade(texteArgent, { BLANC, Color3.fromRGB(255, 228, 140) })
 
--- fermer
-local boutonX = echelle(nouveau("TextButton", {
-	Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -36, 0, 34), Size = UDim2.fromOffset(88, 78),
-	BackgroundColor3 = ROUGE, Rotation = 4,
-}, ecran))
-coin(boutonX, UDim.new(0, 12))
-contour(boutonX, 4, Color3.fromRGB(150, 24, 30), true)
-local xt = nouveau("TextLabel", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Position = UDim2.fromOffset(0, 4), Font = Enum.Font.LuckiestGuy, TextSize = 58, TextColor3 = BLANC, Text = "X" }, boutonX)
-contour(xt, 5)
+-- fermer (rond rouge avec une croix)
+local boutonX = echelle(nouveau("TextButton", { Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -30, 0, 28), Size = UDim2.fromOffset(86, 86) }, ecran))
+coin(boutonX)
+contour(boutonX, 4, ENCRE, true)
+degrade(boutonX, { Color3.fromRGB(255, 150, 140), Color3.fromRGB(235, 60, 55), Color3.fromRGB(160, 24, 30) })
+for couche = 1, 2 do
+	for _, rot in { 45, -45 } do
+		local b = nouveau("Frame", {
+			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Rotation = rot, BorderSizePixel = 0,
+			Size = couche == 1 and UDim2.fromScale(0.62, 0.22) or UDim2.fromScale(0.52, 0.12), BackgroundColor3 = couche == 1 and ENCRE or BLANC,
+		}, boutonX)
+		coin(b)
+	end
+end
+
+-- boutons qui grossissent un peu au survol
+for _, b in { gauche, droite, boutonX, bouton } do
+	local sc = b:FindFirstChildOfClass("UIScale") or nouveau("UIScale", {}, b)
+	b.MouseEnter:Connect(function() TweenService:Create(sc, TweenInfo.new(0.12), { Scale = 1.06 }):Play() end)
+	b.MouseLeave:Connect(function() TweenService:Create(sc, TweenInfo.new(0.12), { Scale = 1 }):Play() face.Position = UDim2.fromOffset(0, 0) end)
+end
 adapter()
 cam:GetPropertyChangedSignal("ViewportSize"):Connect(adapter)
 
@@ -825,28 +911,50 @@ local courant = 1 -- outil affiché
 local etat = {}
 local fermeture = false
 
+local function outilEnMain(v)
+	local ch = lp.Character
+	local t = ch and ch:FindFirstChildOfClass("Tool")
+	return t ~= nil and t.Name == v.article.outil
+end
 local function styleBouton(v)
-	local possede = lp:GetAttribute(v.article.attribut)
-	local assez = argent() + 1e-6 >= v.prix()
-	if possede then
-		fondPrix.Color = ColorSequence.new(Color3.fromRGB(255, 232, 120), Color3.fromRGB(240, 160, 30))
-		textePrix.Text = "✓ ACHETÉE"
-		textePrix.TextSize = 48
+	if lp:GetAttribute(v.article.attribut) then
+		-- déjà achetée : le bouton sert à la prendre en main
+		peindre("or_")
+		pieceBouton.Visible = false
+		texteBouton.Text = outilEnMain(v) and "✓ EN MAIN" or "ÉQUIPER"
+		texteBouton.TextSize = 54
 	else
-		fondPrix.Color = assez and ColorSequence.new(Color3.fromRGB(150, 236, 110), Color3.fromRGB(56, 170, 62))
-			or ColorSequence.new(Color3.fromRGB(150, 154, 160), Color3.fromRGB(98, 102, 108))
-		textePrix.Text = argentTexte(v.prix())
-		textePrix.TextSize = 70
+		peindre(argent() + 1e-6 >= v.prix() and "vert" or "gris")
+		pieceBouton.Visible = true
+		texteBouton.Text = argentTexte(v.prix())
+		texteBouton.TextSize = 62
 	end
 end
 
 local function remplir(v)
-	nomOutil.Text = v.article.nom
-	descOutil.Text = v.article.desc
-	puissance.Text = "PUISSANCE " .. tostring(v.achat:GetAttribute("Touffes") or "?")
+	local a = v.article
+	nomOutil.Text = a.titre
+	descOutil.Text = a.desc
+	local n = tonumber(v.achat:GetAttribute("Touffes")) or 1
+	valTouffes.Text = tostring(n)
+	touffesMax.Text = a.touffesMax and ("jusqu'à " .. a.touffesMax .. " avec les boosts") or ""
+	for _, c in rangee:GetChildren() do if c:IsA("ImageLabel") then c:Destroy() end end
+	local taille = math.min(46, math.floor(300 / math.max(n, 1)))
+	for i = 1, math.min(n, 12) do
+		local im = nouveau("ImageLabel", { BackgroundTransparency = 1, Image = HERBE, ScaleType = Enum.ScaleType.Fit, Size = UDim2.fromOffset(taille, taille), LayoutOrder = i }, rangee)
+		local sc = nouveau("UIScale", { Scale = 0 }, im)
+		task.delay(0.25 + i * 0.05, function()
+			TweenService:Create(sc, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+		end)
+	end
+	local rayon = tonumber(v.achat:GetAttribute("Rayon")) or 5
+	valPortee.Text = (rayon == math.floor(rayon)) and tostring(rayon) or string.format("%.1f", rayon)
+	remplissage.Size = UDim2.fromScale(0, 1)
+	TweenService:Create(remplissage, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Size = UDim2.fromScale(math.clamp(rayon / 10, 0.08, 1), 1) }):Play()
+	texteAmelio.Text = (a.ameliorations or 3) .. " AMÉLIORATIONS DANS BOOSTS"
+	compteur.Text = courant .. " / " .. #vitrines
+	nav.Visible = #vitrines > 1
 	styleBouton(v)
-	local multiple = #vitrines > 1
-	gauche.Visible, droite.Visible = multiple, multiple
 end
 
 local controles
@@ -883,18 +991,20 @@ local function ouvrir(v)
 	-- la fiche arrive
 	remplir(v)
 	ecran.Enabled = true
-	notes.Position = UDim2.new(0, -520, 0.48, 0)
-	boutonPrix.Position = UDim2.new(0.5, 0, 1, 180)
-	cadreArgent.Position = UDim2.new(1, -150, 0, -140)
-	boutonX.Position = UDim2.new(1, -36, 0, -140)
+	voile.BackgroundTransparency = 1
+	carte.Position = UDim2.new(0, -620, 0.5, 0)
+	nav.Position = UDim2.new(0.66, 0, 1, 200)
+	cadreArgent.Position = UDim2.new(1, -130, 0, -140)
+	boutonX.Position = UDim2.new(1, -30, 0, -140)
 	local info = TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-	task.delay(0.15, function()
-		TweenService:Create(notes, info, { Position = UDim2.new(0, 56, 0.48, 0) }):Play()
-		TweenService:Create(boutonPrix, info, { Position = UDim2.new(0.5, 0, 1, -40) }):Play()
-		TweenService:Create(cadreArgent, info, { Position = UDim2.new(1, -150, 0, 40) }):Play()
-		TweenService:Create(boutonX, info, { Position = UDim2.new(1, -36, 0, 34) }):Play()
+	TweenService:Create(voile, TweenInfo.new(0.4), { BackgroundTransparency = 0 }):Play()
+	task.delay(0.12, function()
+		TweenService:Create(carte, info, { Position = UDim2.new(0, 50, 0.5, 0) }):Play()
+		TweenService:Create(nav, info, { Position = UDim2.new(0.66, 0, 1, -36) }):Play()
+		TweenService:Create(cadreArgent, info, { Position = UDim2.new(1, -130, 0, 34) }):Play()
+		TweenService:Create(boutonX, info, { Position = UDim2.new(1, -30, 0, 28) }):Play()
 	end)
-	if UIS.GamepadEnabled then GuiService.SelectedObject = boutonPrix end
+	if UIS.GamepadEnabled then GuiService.SelectedObject = bouton end
 end
 
 local function fermer()
@@ -902,10 +1012,11 @@ local function fermer()
 	fermeture = true
 	GuiService.SelectedObject = nil
 	local info = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-	TweenService:Create(notes, info, { Position = UDim2.new(0, -520, 0.48, 0) }):Play()
-	TweenService:Create(boutonPrix, info, { Position = UDim2.new(0.5, 0, 1, 180) }):Play()
-	TweenService:Create(cadreArgent, info, { Position = UDim2.new(1, -150, 0, -140) }):Play()
-	TweenService:Create(boutonX, info, { Position = UDim2.new(1, -36, 0, -140) }):Play()
+	TweenService:Create(carte, info, { Position = UDim2.new(0, -620, 0.5, 0) }):Play()
+	TweenService:Create(nav, info, { Position = UDim2.new(0.66, 0, 1, 200) }):Play()
+	TweenService:Create(cadreArgent, info, { Position = UDim2.new(1, -130, 0, -140) }):Play()
+	TweenService:Create(boutonX, info, { Position = UDim2.new(1, -30, 0, -140) }):Play()
+	TweenService:Create(voile, TweenInfo.new(0.35), { BackgroundTransparency = 1 }):Play()
 	-- la caméra revient au joueur
 	bougerCamera(etat.cf, 0.45, function()
 		ecran.Enabled = false
@@ -924,34 +1035,38 @@ local function changer(delta)
 	courant = (courant - 1 + delta) % #vitrines + 1
 	local v = vitrines[courant]
 	bougerCamera(cadrage(v), 0.5)
-	-- la fiche "se tourne" vers le nouvel outil
-	TweenService:Create(notes, TweenInfo.new(0.12), { Rotation = delta * 3 }):Play()
-	task.delay(0.12, function()
+	-- la carte sort par la gauche et revient avec le nouvel outil
+	TweenService:Create(carte, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { Position = UDim2.new(0, -620, 0.5, 0) }):Play()
+	task.delay(0.15, function()
 		remplir(v)
-		TweenService:Create(notes, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Rotation = 0 }):Play()
+		TweenService:Create(carte, TweenInfo.new(0.38, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.new(0, 50, 0.5, 0) }):Play()
 	end)
 end
 
 local function acheter()
 	local v = vitrines[courant]
-	if not v or lp:GetAttribute(v.article.attribut) then return end
+	if not v then return end
+	if lp:GetAttribute(v.article.attribut) then
+		-- déjà achetée : on la prend en main et on retourne jouer
+		local sac = lp:FindFirstChildOfClass("Backpack")
+		local t = sac and sac:FindFirstChild(v.article.outil)
+		local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+		if t and h then h:EquipTool(t) end
+		fermer()
+		return
+	end
 	if argent() + 1e-6 < v.prix() then
-		trembler(boutonPrix)
+		trembler(bouton)
 		message("Il te manque " .. argentTexte(v.prix() - argent()), ROUGE, 1.6)
 		return
 	end
 	v.achat:FireServer("acheter")
 end
 
-boutonPrix.Activated:Connect(acheter)
+bouton.Activated:Connect(acheter)
 boutonX.Activated:Connect(fermer)
 gauche.Activated:Connect(function() changer(-1) end)
 droite.Activated:Connect(function() changer(1) end)
-for _, b in { boutonPrix, gauche, droite, boutonX } do
-	local s0 = b.Size
-	b.MouseEnter:Connect(function() b.Size = s0 + UDim2.fromOffset(8, 6) end)
-	b.MouseLeave:Connect(function() b.Size = s0 end)
-end
 
 UIS.InputBegan:Connect(function(input, gp)
 	if ouvert then
@@ -1030,14 +1145,18 @@ end)
 local function reponse(v, quoi, manque)
 	if quoi == "ok" then
 		son("rbxassetid://129348077985519", 0.7)
-		message("✨ " .. v.article.titre .. " ACHETÉE ! ✨", OR, 2.2)
+		message("✨ " .. string.upper(v.article.nom) .. " ACHETÉE ! ✨", OR, 2.2)
 		if ouvert and vitrines[courant] == v then
-			popPrix.Scale = 1.4
-			TweenService:Create(popPrix, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+			popBouton.Scale = 1.15
+			TweenService:Create(popBouton, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+			for _, p in { popTouffes, popPortee } do
+				p.Scale = 1.08
+				TweenService:Create(p, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+			end
 		end
 	elseif quoi == "manque" then
 		message("Il te manque " .. argentTexte(math.max(0, tonumber(manque) or 0)), ROUGE, 1.6)
-		if ouvert then trembler(boutonPrix) end
+		if ouvert then trembler(bouton) end
 	end
 end
 
