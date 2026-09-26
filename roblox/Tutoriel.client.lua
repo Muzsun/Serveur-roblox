@@ -294,6 +294,7 @@ end)
 local step,target=nil,nil
 local function decide()
 	if fini() then return "fin" end
+	if lp:GetAttribute("IntroEnCours") then return "rien" end -- on attend la fin de l'intro du chiot
 	if lp:GetAttribute("MenuOuvert") then return "menu" end
 	if anyAffordable() then return "acheter" end
 	if aVendu then return "rien" end
@@ -378,5 +379,6 @@ end)
 task.spawn(function()
 	if not lp.Character then lp.CharacterAdded:Wait() end
 	task.wait(1.5)
+	while lp:GetAttribute("IntroEnCours") do task.wait(0.25) end -- après l'intro du chiot
 	if not fini() then intro() end
 end)

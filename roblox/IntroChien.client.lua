@@ -1,0 +1,784 @@
+-- IntroChien (LocalScript dans StarterPlayer > StarterPlayerScripts)
+-- Cinématique d'intro : le chiot projette sa balle beaucoup trop loin... jusqu'à la dernière zone !
+-- Ensuite il suit le joueur, et une colonne de lumière montre où est tombée la balle.
+if not game:GetService("RunService"):IsClient() then
+	warn("[Intro] IntroChien doit être un LocalScript dans StarterPlayer > StarterPlayerScripts !")
+	return
+end
+
+local REGLAGES = {
+	TITRE = "RETROUVE LA BALLE !",
+	SOUS_TITRE = "Coupe l'herbe pour ouvrir les zones",
+	DERNIERE_ZONE = "", -- nom de la zone où tombe la balle ("" = la zone la plus loin du départ)
+	CHIEN_SUIT_LE_JOUEUR = true,
+	SONS = {
+		lancer = "rbxasset://sounds/swordlunge.wav", -- le "whoosh" de la balle
+		rebond = "rbxasset://sounds/action_jump.mp3", -- le coup de tête
+		atterrir = "rbxasset://sounds/action_jump_land.mp3",
+		pop = "rbxassetid://129348077985519", -- le "?" et le titre
+		aboiement = "", -- mets un son d'aboiement ici si tu en as un : "rbxassetid://..."
+	},
+}
+
+local Players = game:GetService("Players")
+local Run = game:GetService("RunService")
+local TS = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+local StarterGui = game:GetService("StarterGui")
+local RS = game:GetService("ReplicatedStorage")
+
+local lp = Players.LocalPlayer
+local cam = workspace.CurrentCamera
+local pgui = lp:WaitForChild("PlayerGui")
+lp:SetAttribute("IntroEnCours", true)
+
+local UP = Vector3.new(0, 1, 0)
+local WHITE = Color3.new(1, 1, 1)
+local INK = Color3.fromRGB(20, 22, 26)
+
+--[[CHIEN_DEBUT]]
+---------------------------------------------------------------- Le chiot (construit en pièces)
+local FUR = Color3.fromRGB(232, 150, 72)
+local CREAM = Color3.fromRGB(252, 240, 218)
+local DARK = Color3.fromRGB(46, 34, 30)
+local PINK = Color3.fromRGB(255, 150, 162)
+local RED = Color3.fromRGB(222, 48, 58)
+local GOLDC = Color3.fromRGB(252, 200, 64)
+local EYE = Color3.fromRGB(22, 20, 26)
+
+local function R(x, y, z) return CFrame.Angles(math.rad(x or 0), math.rad(y or 0), math.rad(z or 0)) end
+
+local function construireChien()
+	local model = Instance.new("Model")
+	model.Name = "Chiot"
+	local rig = {} -- { part, joint, offset }
+	local function piece(joint, nom, taille, offset, couleur, forme, classe)
+		local p = Instance.new(classe or "Part")
+		p.Name = nom
+		if forme then p.Shape = forme end
+		p.Size = taille
+		p.Color = couleur
+		p.Material = Enum.Material.SmoothPlastic
+		p.Anchored = true
+		p.CanCollide = false
+		p.CanQuery = false
+		p.CanTouch = false
+		p.TopSurface = Enum.SurfaceType.Smooth
+		p.BottomSurface = Enum.SurfaceType.Smooth
+		p.Parent = model
+		table.insert(rig, { part = p, joint = joint, offset = offset })
+		return p
+	end
+	local V = Vector3.new
+	local BALL, CYL = Enum.PartType.Ball, Enum.PartType.Cylinder
+	-- corps (forme de gélule) + poitrail crème
+	piece("root", "Corps", V(1.5, 1.3, 1.3), CFrame.new(0, 1.15, 0.1) * R(0, 90, 0), FUR, CYL)
+	piece("root", "Poitrine", V(1.3, 1.3, 1.3), CFrame.new(0, 1.15, -0.65), FUR, BALL)
+	piece("root", "Fesses", V(1.3, 1.3, 1.3), CFrame.new(0, 1.15, 0.85), FUR, BALL)
+	piece("root", "Poitrail", V(1.0, 1.0, 1.0), CFrame.new(0, 1.0, -0.92), CREAM, BALL)
+	-- collier + médaille
+	piece("root", "Collier", V(0.22, 1.26, 1.26), CFrame.new(0, 1.5, -0.72) * R(0, 0, 90), RED, CYL)
+	piece("root", "Medaille", V(0.06, 0.3, 0.3), CFrame.new(0, 1.3, -1.34) * R(0, 90, 0), GOLDC, CYL)
+	-- pattes
+	for _, h in { { "PatteAG", -0.38, -0.6 }, { "PatteAD", 0.38, -0.6 }, { "PatteArG", -0.4, 0.8 }, { "PatteArD", 0.4, 0.8 } } do
+		piece(h[1], "Patte", V(0.62, 0.42, 0.42), CFrame.new(0, -0.31, 0) * R(0, 0, 90), FUR, CYL)
+		piece(h[1], "Pied", V(0.5, 0.5, 0.5), CFrame.new(0, -0.6, -0.06), CREAM, BALL)
+	end
+	-- queue en boucle
+	piece("queue", "Queue1", V(0.5, 0.5, 0.5), CFrame.new(0, 0.18, 0.12), FUR, BALL)
+	piece("queue", "Queue2", V(0.45, 0.45, 0.45), CFrame.new(0, 0.45, 0.18), FUR, BALL)
+	piece("queue", "Queue3", V(0.4, 0.4, 0.4), CFrame.new(0, 0.7, 0.1), FUR, BALL)
+	piece("queue", "QueueBout", V(0.32, 0.32, 0.32), CFrame.new(0, 0.88, -0.02), CREAM, BALL)
+	-- tête (grosse, style chiot)
+	piece("cou", "Tete", V(1.5, 1.5, 1.5), CFrame.new(0, 0.45, -0.2), FUR, BALL)
+	piece("cou", "Museau", V(0.8, 0.8, 0.8), CFrame.new(0, 0.18, -0.8), CREAM, BALL)
+	piece("cou", "Truffe", V(0.3, 0.3, 0.3), CFrame.new(0, 0.36, -1.17), DARK, BALL)
+	piece("cou", "Langue", V(0.24, 0.05, 0.22), CFrame.new(0, -0.1, -1.02) * R(-25, 0, 0), PINK)
+	for s = -1, 1, 2 do
+		piece("cou", "Oeil", V(0.3, 0.3, 0.3), CFrame.new(0.33 * s, 0.62, -0.82), EYE, BALL)
+		piece("cou", "Reflet", V(0.1, 0.1, 0.1), CFrame.new(0.29 * s, 0.69, -0.95), WHITE, BALL)
+		local joue = piece("cou", "Joue", V(0.24, 0.24, 0.24), CFrame.new(0.52 * s, 0.33, -0.72), PINK, BALL)
+		joue.Transparency = 0.35
+		piece(s < 0 and "sourcilG" or "sourcilD", "Sourcil", V(0.3, 0.07, 0.07), CFrame.new(), DARK)
+		local oreille = s < 0 and "oreilleG" or "oreilleD"
+		-- oreille triangulaire (2 coins), intérieur rose
+		piece(oreille, "Oreille", V(0.1, 0.75, 0.28), CFrame.new(0, 0.35, 0.14) * R(0, 180, 0), FUR, nil, "WedgePart")
+		piece(oreille, "Oreille", V(0.1, 0.75, 0.28), CFrame.new(0, 0.35, -0.14), FUR, nil, "WedgePart")
+		piece(oreille, "OreilleIn", V(0.08, 0.5, 0.18), CFrame.new(0.03, 0.3, 0.09) * R(0, 180, 0), PINK, nil, "WedgePart")
+		piece(oreille, "OreilleIn", V(0.08, 0.5, 0.18), CFrame.new(0.03, 0.3, -0.09), PINK, nil, "WedgePart")
+	end
+	return model, rig
+end
+
+-- pose du chiot : position + expression
+local function nouvellePose(cf)
+	return {
+		cf = cf, -- position au sol, regarde vers LookVector
+		saut = 0, -- hauteur (saut / rebond)
+		tangage = 0, -- corps penché avant (+) / arrière (-), en degrés
+		accroupi = 0, -- 0..1 (se prépare à sauter)
+		couTangage = 0, couLacet = 0, couRoulis = 0, -- tête : haut/bas, gauche/droite, penchée
+		oreilles = 12, -- écartement des oreilles (12 = droites, 70 = tombantes)
+		triste = 0, -- 0 = content, 1 = triste (sourcils)
+		queueAmp = 35, queueVitesse = 9, queueTangage = 0,
+		marche = 0, pas = 0, -- amplitude et phase de marche
+		langue = 1, -- 1 = langue visible
+	}
+end
+
+local function calculerChien(rig, pose, t)
+	local base = pose.cf * CFrame.new(0, pose.saut - pose.accroupi * 0.25, 0) * R(-pose.tangage - pose.accroupi * 8, 0, 0)
+	local cou = base * CFrame.new(0, 1.75, -0.95) * R(pose.couTangage - pose.accroupi * 18, pose.couLacet, pose.couRoulis)
+	local wag = math.sin(t * pose.queueVitesse) * pose.queueAmp
+	local joints = {
+		root = base,
+		cou = cou,
+		queue = base * CFrame.new(0, 1.45, 1.35) * R(-15 + pose.queueTangage, wag, 0),
+		oreilleG = cou * CFrame.new(-0.45, 1.0, -0.1) * R(0, 0, pose.oreilles) * R(0, 90, 0),
+		oreilleD = cou * CFrame.new(0.45, 1.0, -0.1) * R(0, 0, -pose.oreilles) * R(0, 90, 0),
+		sourcilG = cou * CFrame.new(-0.33, 0.9 + 0.03 * (1 - pose.triste), -0.72) * R(0, 0, 30 * pose.triste),
+		sourcilD = cou * CFrame.new(0.33, 0.9 + 0.03 * (1 - pose.triste), -0.72) * R(0, 0, -30 * pose.triste),
+	}
+	local swing = math.sin(pose.pas) * 35 * pose.marche
+	joints.PatteAG = base * CFrame.new(-0.38, 0.8, -0.6) * R(swing, 0, 0)
+	joints.PatteArD = base * CFrame.new(0.4, 0.8, 0.8) * R(swing, 0, 0)
+	joints.PatteAD = base * CFrame.new(0.38, 0.8, -0.6) * R(-swing, 0, 0)
+	joints.PatteArG = base * CFrame.new(-0.4, 0.8, 0.8) * R(-swing, 0, 0)
+	local parts, cfs = {}, {}
+	for i, e in rig do
+		parts[i] = e.part
+		cfs[i] = joints[e.joint] * e.offset
+		local nom = e.part.Name
+		if nom == "Langue" then e.part.Transparency = 1 - pose.langue
+		elseif nom == "Oeil" then local d = 0.3 + 0.05 * pose.triste e.part.Size = Vector3.new(d, d, d) -- yeux de chiot
+		elseif nom == "Reflet" then local d = 0.1 + 0.05 * pose.triste e.part.Size = Vector3.new(d, d, d) end
+	end
+	return parts, cfs, cou
+end
+
+-- balle rouge avec une bande blanche
+local function construireBalle()
+	local m = Instance.new("Model")
+	m.Name = "BalleDuChien"
+	local b = Instance.new("Part")
+	b.Name = "Balle"
+	b.Shape = Enum.PartType.Ball
+	b.Size = Vector3.new(0.75, 0.75, 0.75)
+	b.Color = Color3.fromRGB(235, 58, 58)
+	b.Material = Enum.Material.SmoothPlastic
+	b.Anchored, b.CanCollide, b.CanQuery, b.CanTouch = true, false, false, false
+	b.Parent = m
+	local band = Instance.new("Part")
+	band.Name = "Bande"
+	band.Shape = Enum.PartType.Cylinder
+	band.Size = Vector3.new(0.14, 0.77, 0.77)
+	band.Color = WHITE
+	band.Material = Enum.Material.SmoothPlastic
+	band.Anchored, band.CanCollide, band.CanQuery, band.CanTouch = true, false, false, false
+	band.Parent = m
+	return m, b, band
+end
+--[[CHIEN_FIN]]
+
+---------------------------------------------------------------- Préparation
+local character = lp.Character or lp.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart", 10)
+local humanoid = character:WaitForChild("Humanoid", 10)
+local head = character:WaitForChild("Head", 10)
+if not (hrp and humanoid and head) then lp:SetAttribute("IntroEnCours", false) return end
+task.wait(1) -- laisse le monde et l'herbe apparaître
+
+-- zones d'herbe
+local function trouverZones()
+	local folderName = "ZonesHerbe"
+	local cfgModule = RS:FindFirstChild("GrassConfig")
+	if cfgModule then
+		local ok, cfg = pcall(require, cfgModule)
+		if ok and type(cfg) == "table" and cfg.ZONES_FOLDER then folderName = cfg.ZONES_FOLDER end
+	end
+	local list = {}
+	local zf = workspace:FindFirstChild(folderName)
+	if zf then for _, z in zf:GetDescendants() do if z:IsA("BasePart") then table.insert(list, z) end end end
+	if #list == 0 then
+		for _, z in workspace:GetDescendants() do
+			if z:IsA("BasePart") and z.Name:sub(1, 4) == "Zone" then table.insert(list, z) end
+		end
+	end
+	return list
+end
+local zones = trouverZones()
+local depart = hrp.Position
+
+local cible = nil
+for _, z in zones do if REGLAGES.DERNIERE_ZONE ~= "" and z.Name == REGLAGES.DERNIERE_ZONE then cible = z end end
+if not cible then
+	local best = -1
+	for _, z in zones do
+		local d = (Vector3.new(z.Position.X, 0, z.Position.Z) - Vector3.new(depart.X, 0, depart.Z)).Magnitude
+		if d > best then cible, best = z, d end
+	end
+end
+
+local exclus = { character }
+for _, n in { "GrassHit", "GrassFX", "GrassVisuals" } do
+	local f = workspace:FindFirstChild(n)
+	if f then table.insert(exclus, f) end
+end
+local rayParams = RaycastParams.new()
+rayParams.FilterType = Enum.RaycastFilterType.Exclude
+local function majExclus(extra)
+	local l = table.clone(exclus)
+	for _, e in extra or {} do table.insert(l, e) end
+	rayParams.FilterDescendantsInstances = l
+end
+majExclus()
+local function sol(p, depuisY)
+	local origine = depuisY and Vector3.new(p.X, depuisY, p.Z) or (p + UP * 12)
+	local hit = workspace:Raycast(origine, -UP * 60, rayParams)
+	return hit and hit.Position or nil
+end
+local function dansUneZone(p)
+	for _, z in zones do
+		local rel = z.CFrame:PointToObjectSpace(p)
+		if math.abs(rel.X) <= z.Size.X / 2 and math.abs(rel.Z) <= z.Size.Z / 2 then return true end
+	end
+	return false
+end
+
+-- point d'atterrissage de la balle
+local atterrissage
+if cible then
+	local top = cible.Position + UP * (cible.Size.Y / 2 + 40)
+	local hit = workspace:Raycast(top, -UP * (cible.Size.Y + 200), rayParams)
+	atterrissage = hit and hit.Position or (cible.Position - UP * cible.Size.Y / 2)
+else
+	atterrissage = sol(depart + hrp.CFrame.LookVector * 80) or (depart + hrp.CFrame.LookVector * 80 - UP * 3)
+end
+local vers = Vector3.new(atterrissage.X - depart.X, 0, atterrissage.Z - depart.Z)
+if vers.Magnitude < 1 then vers = Vector3.new(hrp.CFrame.LookVector.X, 0, hrp.CFrame.LookVector.Z) end
+vers = vers.Unit
+
+-- place du chiot : devant le joueur, hors de l'herbe si possible
+local solDepart = sol(depart) or (depart - UP * 3)
+local placeChien = nil
+for _, angle in { 0, 35, -35, 70, -70, 110, -110, 150, -150, 180 } do
+	local dir = CFrame.Angles(0, math.rad(angle), 0):VectorToWorldSpace(vers)
+	local p = sol(depart + dir * 6)
+	if p and math.abs(p.Y - solDepart.Y) < 3 and not dansUneZone(p) then placeChien = p break end
+end
+placeChien = placeChien or sol(depart + vers * 6) or (solDepart + vers * 6)
+local droite = vers:Cross(UP).Unit
+
+---------------------------------------------------------------- Construction
+local chienModel, rig = construireChien()
+local pose = nouvellePose(CFrame.lookAt(placeChien, placeChien + vers))
+chienModel.Parent = workspace
+local balleModel, balle, bande = construireBalle()
+balleModel.Parent = workspace
+majExclus({ chienModel, balleModel })
+
+local function sonJouer(id, volume, vitesse, position)
+	if not id or id == "" then return end
+	local s = Instance.new("Sound")
+	s.SoundId = id
+	s.Volume = volume or 0.6
+	s.PlaybackSpeed = vitesse or 1
+	if position then
+		local a = Instance.new("Attachment")
+		a.Parent = workspace.Terrain
+		a.WorldPosition = position
+		s.Parent = a
+		game:GetService("Debris"):AddItem(a, 4)
+	else
+		s.Parent = pgui
+		game:GetService("Debris"):AddItem(s, 4)
+	end
+	s:Play()
+end
+
+local balleCF = nil -- nil = dans la gueule
+local balleSpin = 0
+local horloge = 0
+local function majChien(dt)
+	horloge += dt
+	local parts, cfs, cou = calculerChien(rig, pose, horloge)
+	local bcf = balleCF or (cou * CFrame.new(0, -0.2, -1.45))
+	bcf = bcf * CFrame.Angles(balleSpin, 0, balleSpin * 0.4)
+	table.insert(parts, balle) table.insert(cfs, bcf)
+	table.insert(parts, bande) table.insert(cfs, bcf * CFrame.Angles(0, 0, math.rad(30)))
+	workspace:BulkMoveTo(parts, cfs, Enum.BulkMoveMode.FireCFrameChanged)
+	return cou
+end
+local function teteChien()
+	local _, _, cou = calculerChien(rig, pose, horloge)
+	return (cou * CFrame.new(0, 0.45, -0.2)).Position
+end
+
+-- traînée derrière la balle
+local a0 = Instance.new("Attachment") a0.Position = Vector3.new(0, 0.25, 0) a0.Parent = balle
+local a1 = Instance.new("Attachment") a1.Position = Vector3.new(0, -0.25, 0) a1.Parent = balle
+local trail = Instance.new("Trail")
+trail.Attachment0, trail.Attachment1 = a0, a1
+trail.Lifetime = 0.35
+trail.LightEmission = 0.6
+trail.FaceCamera = true
+trail.Color = ColorSequence.new(Color3.fromRGB(255, 240, 180), WHITE)
+trail.Transparency = NumberSequence.new(0.1, 1)
+trail.WidthScale = NumberSequence.new(1, 0)
+trail.Enabled = false
+trail.Parent = balle
+
+---------------------------------------------------------------- La balise (colonne de lumière) : reste toute la partie
+local balise = Instance.new("Part")
+balise.Name = "BaliseBalle"
+balise.Anchored, balise.CanCollide, balise.CanQuery, balise.CanTouch = true, false, false, false
+balise.Transparency = 1
+balise.Size = Vector3.new(0.2, 0.2, 0.2)
+balise.CFrame = CFrame.new(atterrissage)
+balise.Parent = workspace
+local b0 = Instance.new("Attachment") b0.Parent = balise
+local b1 = Instance.new("Attachment") b1.Position = Vector3.new(0, 0.1, 0) b1.Parent = balise
+local rayon = Instance.new("Beam")
+rayon.Attachment0, rayon.Attachment1 = b0, b1
+rayon.Width0, rayon.Width1 = 1.8, 0.5
+rayon.FaceCamera = true
+rayon.LightEmission = 1
+rayon.LightInfluence = 0
+rayon.Color = ColorSequence.new(Color3.fromRGB(255, 230, 120), WHITE)
+rayon.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.2), NumberSequenceKeypoint.new(0.7, 0.75), NumberSequenceKeypoint.new(1, 1) })
+rayon.Parent = balise
+local eclat = Instance.new("ParticleEmitter")
+eclat.Color = ColorSequence.new(Color3.fromRGB(255, 225, 110))
+eclat.LightEmission = 1 eclat.Size = NumberSequence.new(0.5, 0) eclat.Speed = NumberRange.new(1, 3)
+eclat.SpreadAngle = Vector2.new(180, 180) eclat.Lifetime = NumberRange.new(0.8, 1.4) eclat.Rate = 8
+eclat.Enabled = false -- s'allume quand la balle tombe
+eclat.Parent = b0
+local lumiere = Instance.new("PointLight")
+lumiere.Color = Color3.fromRGB(255, 220, 120) lumiere.Range = 12 lumiere.Brightness = 2 lumiere.Enabled = false
+lumiere.Parent = balise
+local function grandirBalise(duree)
+	eclat.Enabled = true
+	lumiere.Enabled = true
+	TS:Create(b1, TweenInfo.new(duree, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Position = Vector3.new(0, 70, 0) }):Play()
+end
+---------------------------------------------------------------- Interface de la cinématique
+local gui = Instance.new("ScreenGui")
+gui.Name = "IntroChien"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.DisplayOrder = 50
+gui.Parent = pgui
+
+local function cadre(props)
+	local f = Instance.new("Frame")
+	f.BorderSizePixel = 0
+	for k, v in props do f[k] = v end
+	f.Parent = props.Parent or gui
+	return f
+end
+local noir = cadre({ Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 0, ZIndex = 20 })
+local barreHaut = cadre({ AnchorPoint = Vector2.new(0, 1), Position = UDim2.fromScale(0, 0), Size = UDim2.fromScale(1, 0.11), BackgroundColor3 = Color3.new(0, 0, 0), ZIndex = 10 })
+local barreBas = cadre({ AnchorPoint = Vector2.new(0, 0), Position = UDim2.fromScale(0, 1), Size = UDim2.fromScale(1, 0.11), BackgroundColor3 = Color3.new(0, 0, 0), ZIndex = 10 })
+
+local passer = Instance.new("TextButton")
+passer.AnchorPoint = Vector2.new(1, 1)
+passer.Position = UDim2.new(1, -24, 1, -22)
+passer.Size = UDim2.fromOffset(150, 44)
+passer.BackgroundColor3 = Color3.fromRGB(20, 24, 22)
+passer.BackgroundTransparency = 0.25
+passer.Text = "PASSER  »"
+passer.Font = Enum.Font.FredokaOne
+passer.TextSize = 22
+passer.TextColor3 = WHITE
+passer.ZIndex = 30
+passer.AutoButtonColor = true
+passer.Parent = gui
+Instance.new("UICorner", passer).CornerRadius = UDim.new(1, 0)
+local ps = Instance.new("UIStroke", passer) ps.Color = WHITE ps.Transparency = 0.5 ps.Thickness = 2 ps.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+if UIS.TouchEnabled and not UIS.KeyboardEnabled then passer.Size = UDim2.fromOffset(120, 38) passer.TextSize = 18 end
+
+-- bulle "?" au-dessus du chiot
+local attTete = Instance.new("Attachment") attTete.Parent = workspace.Terrain
+local bulle = Instance.new("BillboardGui")
+bulle.Adornee = attTete
+bulle.Size = UDim2.fromOffset(70, 70)
+bulle.StudsOffsetWorldSpace = Vector3.new(0, 1.8, 0)
+bulle.AlwaysOnTop = true
+bulle.LightInfluence = 0
+bulle.Enabled = false
+bulle.Parent = pgui
+local rond = cadre({ Parent = bulle, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(1, 1), BackgroundColor3 = WHITE })
+Instance.new("UICorner", rond).CornerRadius = UDim.new(1, 0)
+local rs = Instance.new("UIStroke", rond) rs.Thickness = 4 rs.Color = INK
+local q = Instance.new("TextLabel")
+q.BackgroundTransparency = 1 q.Size = UDim2.fromScale(1, 1) q.Text = "?" q.Font = Enum.Font.LuckiestGuy
+q.TextScaled = true q.TextColor3 = INK q.Parent = rond
+Instance.new("UIPadding", q).PaddingTop = UDim.new(0.18, 0)
+local bulleScale = Instance.new("UIScale", rond) bulleScale.Scale = 0
+
+---------------------------------------------------------------- Mise en place (caméra, contrôles, interface)
+local passe = false
+passer.Activated:Connect(function() passe = true end)
+local connPasser = UIS.InputBegan:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.ButtonB or input.KeyCode == Enum.KeyCode.Return then passe = true end
+end)
+
+lp:SetAttribute("MenuOuvert", true) -- les ciseaux ne coupent pas pendant l'intro
+local controles = nil
+pcall(function()
+	controles = require(lp:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule", 5)):GetControls()
+	controles:Disable()
+end)
+local guisCaches = {}
+for _, g in pgui:GetChildren() do
+	if g:IsA("ScreenGui") and g ~= gui and g.Enabled then g.Enabled = false table.insert(guisCaches, g) end
+end
+local coreTypes = { Enum.CoreGuiType.PlayerList, Enum.CoreGuiType.Chat, Enum.CoreGuiType.EmotesMenu, Enum.CoreGuiType.Health }
+local coreAvant = {}
+for _, ct in coreTypes do
+	local ok, v = pcall(StarterGui.GetCoreGuiEnabled, StarterGui, ct)
+	coreAvant[ct] = ok and v
+	pcall(StarterGui.SetCoreGuiEnabled, StarterGui, ct, false)
+end
+local fovAvant = cam.FieldOfView
+cam.CameraType = Enum.CameraType.Scriptable
+
+local flou = Instance.new("DepthOfFieldEffect")
+flou.Name = "FlouIntro"
+flou.FarIntensity = 0.35
+flou.NearIntensity = 0
+flou.InFocusRadius = 10
+flou.FocusDistance = 10
+flou.Parent = Lighting
+
+-- caméra qui ne rentre pas dans les murs
+local function camSure(regard, voulu)
+	local d = voulu - regard
+	local hit = workspace:Raycast(regard, d, rayParams)
+	if hit then return hit.Position - d.Unit * 0.8 end
+	return voulu
+end
+
+local function ease(a) return a < 0.5 and 2 * a * a or 1 - (-2 * a + 2) ^ 2 / 2 end -- doux au début et à la fin
+local function jouer(duree, f)
+	local t0 = os.clock()
+	while not passe do
+		local a = math.min((os.clock() - t0) / duree, 1)
+		local dt = Run.RenderStepped:Wait()
+		f(a, dt)
+		if a >= 1 then break end
+	end
+end
+
+---------------------------------------------------------------- LA CINÉMATIQUE
+local sujet = placeChien + UP * 1.4
+local A0 = camSure(sujet, placeChien + droite * 7 + vers * 3.2 + UP * 2.8)
+local A1 = camSure(sujet, placeChien + droite * 4.8 + vers * 2.2 + UP * 2.0)
+local camCF = CFrame.lookAt(A0, sujet)
+cam.CFrame = camCF
+cam.FieldOfView = 55
+majChien(0)
+
+TS:Create(noir, TweenInfo.new(0.6), { BackgroundTransparency = 1 }):Play()
+TS:Create(barreHaut, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Position = UDim2.fromScale(0, 0.11) }):Play()
+TS:Create(barreBas, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Position = UDim2.fromScale(0, 0.89) }):Play()
+
+local ok, erreur = pcall(function()
+	-- 1) le chiot content, balle dans la gueule... il se prépare... et hop !
+	local lance = false
+	jouer(2.4, function(a, dt)
+		local t = a * 2.4
+		cam.CFrame = CFrame.lookAt(A0:Lerp(A1, ease(a)), sujet)
+		flou.FocusDistance = (cam.CFrame.Position - sujet).Magnitude
+		if t < 1.2 then -- petits sauts de joie
+			pose.saut = math.abs(math.sin(t * 7)) * 0.28
+			pose.couRoulis = math.sin(t * 3) * 8
+			pose.queueAmp, pose.queueVitesse = 38, 11
+		elseif t < 1.7 then -- se prépare
+			local k = (t - 1.2) / 0.5
+			pose.saut = 0 pose.couRoulis = 0
+			pose.accroupi = ease(k)
+		elseif t < 1.95 then -- coup de tête !
+			local k = (t - 1.7) / 0.25
+			pose.accroupi = 1 - k
+			pose.couTangage = 45 * k
+			pose.saut = math.sin(k * math.pi) * 0.6
+			if not lance and k > 0.55 then
+				lance = true
+				sonJouer(REGLAGES.SONS.rebond, 0.7, 1.3)
+				-- petit éclat blanc au moment du coup de tête
+				local _, _, c = calculerChien(rig, pose, horloge)
+				local att = Instance.new("Attachment") att.Parent = workspace.Terrain att.WorldPosition = (c * CFrame.new(0, 0, -1.3)).Position
+				local pe = Instance.new("ParticleEmitter")
+				pe.Color = ColorSequence.new(WHITE) pe.LightEmission = 1 pe.Size = NumberSequence.new(0.6, 0)
+				pe.Speed = NumberRange.new(6, 10) pe.SpreadAngle = Vector2.new(180, 180) pe.Lifetime = NumberRange.new(0.25, 0.4)
+				pe.Rate = 0 pe.Parent = att pe:Emit(14)
+				game:GetService("Debris"):AddItem(att, 1)
+			end
+		else
+			local k = (t - 1.95) / 0.45
+			pose.couTangage = 45 * (1 - k) + 20 * k
+			pose.saut = 0
+		end
+		majChien(dt)
+	end)
+
+	-- 2) la balle s'envole... beaucoup trop loin !
+	local _, _, cou = calculerChien(rig, pose, horloge)
+	local p0 = (cou * CFrame.new(0, -0.2, -1.45)).Position
+	local p1 = atterrissage + UP * 0.38
+	local distance = (p1 - p0).Magnitude
+	local hauteur = math.clamp(distance * 0.35, 25, 90)
+	local function vol(u) return p0:Lerp(p1, u) + UP * (4 * hauteur * u * (1 - u)) end
+	trail.Enabled = true
+	sonJouer(REGLAGES.SONS.lancer, 0.8, 0.9)
+	local camPos = cam.CFrame.Position
+	local teteDepart = teteChien()
+	jouer(2.0, function(a, dt)
+		local bp = vol(a)
+		balleCF = CFrame.new(bp)
+		balleSpin += dt * 14
+		pose.couTangage = 20 + math.min(a * 3, 1) * 5 -- le chiot regarde la balle partir
+		pose.queueAmp = 38
+		local voulu, regard
+		if a < 0.85 then
+			-- juste derrière la balle, à sa hauteur : on la voit filer au-dessus du jardin vers la zone d'arrivée
+			voulu = bp - vers * 6 + UP * 2 + droite * 1.2
+			regard = bp:Lerp(p1, math.clamp((a - 0.03) / 0.2, 0, 1) * 0.25)
+		else
+			-- la caméra ralentit et prend de la hauteur pour voir où la balle tombe
+			voulu = p1 + UP * 11 - vers * 8 + droite * 3
+			regard = bp
+		end
+		if a < 0.12 then regard = teteDepart:Lerp(regard, a / 0.12) end -- on quitte le chiot en douceur
+		camPos = camPos:Lerp(voulu, 1 - math.exp(-dt * (a < 0.15 and 6 or 14)))
+		local secousse = a < 0.12 and (Vector3.new(math.random() - 0.5, math.random() - 0.5, 0) * 0.3 * (1 - a / 0.12)) or Vector3.zero
+		cam.CFrame = CFrame.lookAt(camPos + secousse, regard)
+		cam.FieldOfView = 55 + 17 * math.sin(math.min(a * 2.5, 1) * math.pi / 2)
+		flou.FocusDistance = (camPos - bp).Magnitude
+		majChien(dt)
+	end)
+
+	-- 3) atterrissage dans la dernière zone
+	trail.Enabled = false
+	local vue = camSure(p1 + UP, p1 + UP * 11 - vers * 8 + droite * 3)
+	local vueProche = camSure(p1 + UP, p1 + UP * 8 - vers * 6 + droite * 2.2)
+	local camDepart = cam.CFrame.Position
+	local rebonds, colonne = false, false
+	jouer(1.5, function(a, dt)
+		local t = a * 1.5
+		if not colonne and t > 0.3 then
+			colonne = true
+			grandirBalise(0.7) -- la colonne de lumière s'élève : c'est ici !
+			eclat:Emit(25)
+		end
+		-- deux petits rebonds
+		local h = 0
+		if t < 0.3 then h = math.sin(t / 0.3 * math.pi) * 1.3
+		elseif t < 0.5 then h = math.sin((t - 0.3) / 0.2 * math.pi) * 0.4 end
+		balleCF = CFrame.new(p1 + UP * h)
+		balleSpin += dt * (1 - a) * 8
+		if not rebonds then
+			rebonds = true
+			sonJouer(REGLAGES.SONS.atterrir, 1, 1.1, p1)
+			local att = Instance.new("Attachment") att.Parent = workspace.Terrain att.WorldPosition = p1
+			local brins = Instance.new("ParticleEmitter")
+			brins.Color = ColorSequence.new(Color3.fromRGB(120, 210, 80), Color3.fromRGB(60, 150, 50))
+			brins.Size = NumberSequence.new(0.35, 0) brins.Speed = NumberRange.new(8, 15) brins.SpreadAngle = Vector2.new(70, 70)
+			brins.Lifetime = NumberRange.new(0.6, 1) brins.Acceleration = Vector3.new(0, -30, 0) brins.Rate = 0
+			brins.EmissionDirection = Enum.NormalId.Top brins.RotSpeed = NumberRange.new(-200, 200) brins.Parent = att
+			local poussiere = Instance.new("ParticleEmitter")
+			poussiere.Color = ColorSequence.new(Color3.fromRGB(230, 220, 190))
+			poussiere.Size = NumberSequence.new(1, 2.5) poussiere.Transparency = NumberSequence.new(0.4, 1)
+			poussiere.Speed = NumberRange.new(3, 5) poussiere.SpreadAngle = Vector2.new(80, 80) poussiere.Lifetime = NumberRange.new(0.8, 1)
+			poussiere.Rate = 0 poussiere.Parent = att
+			brins:Emit(22) poussiere:Emit(8)
+			game:GetService("Debris"):AddItem(att, 2)
+		end
+		local cp = camDepart:Lerp(vue:Lerp(vueProche, ease(a)), 1 - math.exp(-dt * 6) * (1 - a))
+		cam.CFrame = CFrame.lookAt(cp, p1 + UP * (0.5 + 4 * ease(math.clamp((t - 0.3) / 0.9, 0, 1))))
+		cam.FieldOfView = 72 - 10 * ease(a)
+		flou.FocusDistance = (cp - p1).Magnitude
+		majChien(dt)
+	end)
+end)
+if not ok then warn("[Intro] " .. tostring(erreur)) end
+
+balleCF = CFrame.new(atterrissage + UP * 0.38)
+
+---------------------------------------------------------------- 4) le chiot triste, puis 5) il se retourne vers toi
+local ok2, erreur2 = pcall(function()
+	if passe then return end
+	task.wait(0.05)
+	-- petit fondu noir entre les plans
+	TS:Create(noir, TweenInfo.new(0.1), { BackgroundTransparency = 0 }):Play()
+	task.wait(0.12)
+	local tete = teteChien()
+	local D0 = camSure(tete, tete + vers * 4.4 + UP * 0.5 + droite * 0.9)
+	local D1 = camSure(tete, tete + vers * 3.6 + UP * 0.35 + droite * 0.6)
+	cam.CFrame = CFrame.lookAt(D0, tete)
+	cam.FieldOfView = 45
+	pose.couTangage = 18 pose.couLacet = 0
+	TS:Create(noir, TweenInfo.new(0.18), { BackgroundTransparency = 1 }):Play()
+	attTete.WorldPosition = tete
+	local pop = false
+	jouer(1.8, function(a, dt)
+		local t = a * 1.8
+		cam.CFrame = CFrame.lookAt(D0:Lerp(D1, ease(a)), tete)
+		flou.FocusDistance = (cam.CFrame.Position - tete).Magnitude
+		if t > 0.35 then -- les oreilles tombent, sourcils tristes, queue basse
+			local k = ease(math.min((t - 0.35) / 0.5, 1))
+			pose.oreilles = 12 + 58 * k
+			pose.triste = k
+			pose.langue = 1 - k
+			pose.queueAmp = 38 - 30 * k
+			pose.queueVitesse = 11 - 8 * k
+			pose.queueTangage = -45 * k
+			pose.couTangage = 18 - 30 * k
+		end
+		if not pop and t > 0.75 then
+			pop = true
+			bulle.Enabled = true
+			sonJouer(REGLAGES.SONS.pop, 0.6, 1.2)
+			TS:Create(bulleScale, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+		end
+		if pop then rond.Rotation = math.sin(t * 6) * 8 end
+		majChien(dt)
+	end)
+
+	-- il se retourne vers toi (yeux de chiot) et la caméra revient dans tes yeux
+	local cfDepart = CFrame.lookAt(placeChien, placeChien + vers)
+	local oeil = head.Position + UP * 0.25
+	local teteFixe = placeChien + UP * 2.2
+	local offsetCam = cam.CFrame.Position - teteFixe -- la caméra tourne autour du chiot avec lui : on voit toujours son visage
+	jouer(1.4, function(a, dt)
+		local t = a * 1.4
+		local k = ease(math.min(t / 0.5, 1))
+		local orbite = teteFixe + CFrame.Angles(0, math.pi * k, 0):VectorToWorldSpace(offsetCam)
+		local vers_oeil = ease(math.clamp((t - 0.45) / 0.95, 0, 1))
+		pose.cf = cfDepart * CFrame.Angles(0, math.pi * k, 0) -- demi-tour vers le joueur
+		pose.saut = math.sin(math.min(t / 0.5, 1) * math.pi) * 0.4
+		pose.couTangage = -12 + 4 * k
+		pose.couRoulis = 16 * ease(math.clamp((t - 0.5) / 0.4, 0, 1)) -- tête penchée
+		bulleScale.Scale = 1 - ease(math.clamp((t - 0.2) / 0.3, 0, 1))
+		attTete.WorldPosition = teteChien()
+		cam.CFrame = CFrame.lookAt(orbite:Lerp(oeil, vers_oeil), teteFixe:Lerp(placeChien + UP * 1.6, vers_oeil))
+		cam.FieldOfView = 45 + (fovAvant - 45) * vers_oeil
+		flou.FocusDistance = (cam.CFrame.Position - placeChien).Magnitude
+		majChien(dt)
+	end)
+end)
+if not ok2 then warn("[Intro] " .. tostring(erreur2)) end
+
+---------------------------------------------------------------- Fin : on rend la main au joueur
+if passe then -- intro passée : on met tout à sa place d'un coup
+	b1.Position = Vector3.new(0, 70, 0)
+	eclat.Enabled = true
+	lumiere.Enabled = true
+	pose = nouvellePose(CFrame.lookAt(placeChien, placeChien - vers))
+end
+bulle:Destroy()
+attTete:Destroy()
+trail.Enabled = false
+connPasser:Disconnect()
+passer:Destroy()
+flou:Destroy()
+cam.FieldOfView = fovAvant
+cam.CameraType = Enum.CameraType.Custom
+cam.CameraSubject = humanoid
+TS:Create(barreHaut, TweenInfo.new(0.4), { Position = UDim2.fromScale(0, 0) }):Play()
+TS:Create(barreBas, TweenInfo.new(0.4), { Position = UDim2.fromScale(0, 1) }):Play()
+noir.BackgroundTransparency = 0.3
+TS:Create(noir, TweenInfo.new(0.35), { BackgroundTransparency = 1 }):Play()
+for _, g in guisCaches do if g.Parent then g.Enabled = true end end
+for ct, v in coreAvant do pcall(StarterGui.SetCoreGuiEnabled, StarterGui, ct, v) end
+if controles then pcall(function() controles:Enable() end) end
+lp:SetAttribute("MenuOuvert", false)
+
+-- le chiot reprend espoir : la queue repart, la langue ressort
+pose.triste, pose.oreilles, pose.langue = 0.3, 25, 1
+pose.queueAmp, pose.queueVitesse, pose.queueTangage = 38, 11, 0
+pose.couRoulis, pose.couTangage = 0, 0
+sonJouer(REGLAGES.SONS.aboiement, 0.8, 1)
+
+---------------------------------------------------------------- Titre "RETROUVE LA BALLE !"
+task.spawn(function()
+	local titre = Instance.new("Frame")
+	titre.BackgroundTransparency = 1
+	titre.AnchorPoint = Vector2.new(0.5, 0.5)
+	titre.Position = UDim2.fromScale(0.5, 0.24)
+	titre.Size = UDim2.fromScale(0.7, 0.16)
+	titre.Parent = gui
+	local sc = Instance.new("UIScale", titre) sc.Scale = 0
+	local grand = Instance.new("TextLabel")
+	grand.BackgroundTransparency = 1 grand.Size = UDim2.fromScale(1, 0.68) grand.Text = REGLAGES.TITRE
+	grand.Font = Enum.Font.LuckiestGuy grand.TextScaled = true grand.TextColor3 = WHITE grand.Parent = titre
+	local gs = Instance.new("UIStroke", grand) gs.Thickness = 5 gs.Color = INK gs.LineJoinMode = Enum.LineJoinMode.Round
+	local gg = Instance.new("UIGradient", grand) gg.Rotation = 90 gg.Color = ColorSequence.new(WHITE, Color3.fromRGB(255, 214, 90))
+	local petit = Instance.new("TextLabel")
+	petit.BackgroundTransparency = 1 petit.Position = UDim2.fromScale(0.1, 0.7) petit.Size = UDim2.fromScale(0.8, 0.3)
+	petit.Text = REGLAGES.SOUS_TITRE petit.Font = Enum.Font.FredokaOne petit.TextScaled = true petit.TextColor3 = WHITE petit.Parent = titre
+	local pst = Instance.new("UIStroke", petit) pst.Thickness = 3 pst.Color = INK
+	sonJouer(REGLAGES.SONS.pop, 0.6, 1)
+	TS:Create(sc, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+	task.wait(2.6)
+	TS:Create(titre, TweenInfo.new(0.35), { Position = UDim2.fromScale(0.5, 0.18) }):Play()
+	TS:Create(grand, TweenInfo.new(0.35), { TextTransparency = 1 }):Play()
+	TS:Create(gs, TweenInfo.new(0.35), { Transparency = 1 }):Play()
+	TS:Create(petit, TweenInfo.new(0.35), { TextTransparency = 1 }):Play()
+	TS:Create(pst, TweenInfo.new(0.35), { Transparency = 1 }):Play()
+	task.wait(0.4)
+	gui:Destroy()
+	lp:SetAttribute("IntroEnCours", false)
+end)
+
+---------------------------------------------------------------- Le chiot te suit
+local dernierPerso = nil
+local function suivre(dt)
+	local c = lp.Character
+	local r = c and c:FindFirstChild("HumanoidRootPart")
+	if not r then majChien(dt) return end
+	if c ~= dernierPerso then
+		dernierPerso = c
+		exclus[1] = c
+		majExclus({ chienModel, balleModel })
+	end
+	local cur = pose.cf.Position
+	local but = (r.CFrame * CFrame.new(3, 0, 3.5)).Position
+	local vec = Vector3.new(but.X - cur.X, 0, but.Z - cur.Z)
+	local dist = vec.Magnitude
+	if dist > 45 then -- trop loin : il te rattrape d'un coup
+		local p = sol(but, r.Position.Y + 2) or (but - UP * 3)
+		pose.cf = CFrame.lookAt(p, p + r.CFrame.LookVector)
+		return
+	end
+	local vitesse = dist > 2.5 and math.min(dist * 3, 26) or 0
+	local dir = pose.cf.LookVector
+	if vitesse > 0 then
+		local pas = vec.Unit * math.min(vitesse * dt, dist)
+		cur += pas
+		dir = dir:Lerp(vec.Unit, math.min(dt * 10, 1))
+	else
+		local versJoueur = Vector3.new(r.Position.X - cur.X, 0, r.Position.Z - cur.Z)
+		if versJoueur.Magnitude > 0.1 then dir = dir:Lerp(versJoueur.Unit, math.min(dt * 3, 1)) end
+	end
+	local p = sol(cur, r.Position.Y + 2) or cur -- au niveau du joueur (pas sur les toits)
+	local y = pose.cf.Position.Y + (p.Y - pose.cf.Position.Y) * math.min(dt * 12, 1)
+	local flat = Vector3.new(dir.X, 0, dir.Z)
+	if flat.Magnitude < 0.01 then flat = pose.cf.LookVector end
+	local pos = Vector3.new(cur.X, y, cur.Z)
+	pose.cf = CFrame.lookAt(pos, pos + flat.Unit)
+	pose.marche = pose.marche + ((vitesse > 0 and 1 or 0) - pose.marche) * math.min(dt * 8, 1)
+	pose.pas += dt * (6 + vitesse * 0.5)
+	pose.saut = math.abs(math.sin(pose.pas)) * 0.15 * pose.marche
+	pose.triste = math.max(pose.triste - dt * 0.2, 0)
+	majChien(dt)
+end
+
+local attendre = 0
+Run.RenderStepped:Connect(function(dt)
+	if not chienModel.Parent then return end
+	attendre += dt
+	if REGLAGES.CHIEN_SUIT_LE_JOUEUR and attendre > 0.8 then suivre(dt) else majChien(dt) end
+end)
