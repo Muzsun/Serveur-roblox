@@ -24,6 +24,12 @@ local REGLAGES = {
 		aboiement = "", -- mets un son d'aboiement ici si tu en as un : "rbxassetid://..."
 		victoire = "", -- musique / son de victoire pour la fin (optionnel) : "rbxassetid://..."
 	},
+	-- LOBBY : où on est renvoyé quand on appuie sur CONTINUER à la fin
+	--  * si ton lobby est un AUTRE jeu (autre "place") : mets son numéro ici (PlaceId), sinon laisse 0
+	LOBBY_PLACE_ID = 0,
+	--  * si ton lobby est dans CETTE map : une pièce qui s'appelle "Lobby" (ou "SpawnLobby") dans Workspace.
+	--    Sans elle, on prend le SpawnLocation (le point de départ).
+	LOBBY_NOM = "Lobby",
 }
 
 local Players = game:GetService("Players")
@@ -1829,6 +1835,29 @@ task.spawn(function()
 		connK:Disconnect()
 		TS:Create(voileNoir, TweenInfo.new(0.3), { BackgroundTransparency = 0 }):Play()
 		task.wait(0.32)
+		-- retour au lobby
+		local msgLobby = nouveau("TextLabel", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(0.6, 0.08), Text = "RETOUR AU LOBBY...", Font = Enum.Font.LuckiestGuy, TextScaled = true, TextColor3 = WHITE, ZIndex = 21 }, fg)
+		trait(msgLobby, 4)
+		local teleporte = false
+		if (tonumber(REGLAGES.LOBBY_PLACE_ID) or 0) > 0 then
+			teleporte = pcall(function() game:GetService("TeleportService"):Teleport(REGLAGES.LOBBY_PLACE_ID, lp) end)
+			if teleporte then task.wait(6) end -- l'écran reste noir pendant le voyage
+		end
+		if not teleporte or lp.Parent then
+			-- lobby dans cette map : on y place le joueur (et le chiot à côté)
+			local cible = workspace:FindFirstChild(REGLAGES.LOBBY_NOM or "Lobby", true) or workspace:FindFirstChild("SpawnLobby", true)
+			if cible and cible:IsA("Model") then cible = cible.PrimaryPart or cible:FindFirstChildWhichIsA("BasePart", true) end
+			if not (cible and cible:IsA("BasePart")) then cible = workspace:FindFirstChildOfClass("SpawnLocation") end
+			if not cible then for _, d in workspace:GetDescendants() do if d:IsA("SpawnLocation") then cible = d break end end end
+			if cible and cible:IsA("BasePart") then
+				local dest = cible.Position + UP * (cible.Size.Y / 2 + hauteurHanches + 0.2)
+				r.CFrame = CFrame.new(dest) * (cible.CFrame - cible.CFrame.Position)
+				local pc = sol(dest + r.CFrame.RightVector * 3, dest.Y + 2) or (dest + r.CFrame.RightVector * 3)
+				pose.cf = CFrame.lookAt(pc, pc + aPlat(r.CFrame.LookVector))
+				majChien(0)
+			end
+		end
+		msgLobby:Destroy()
 		connCam:Disconnect()
 		connC:Disconnect()
 		dossierC:Destroy()
