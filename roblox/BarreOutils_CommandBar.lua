@@ -1,0 +1,1 @@
+local b=game.ServerStorage:FindFirstChild("AnciensScripts") or Instance.new("Folder",game.ServerStorage) b.Name="AnciensScripts" local p=game.StarterPlayer.StarterPlayerScripts local v=p:FindFirstChild("BarreOutils") while v do v.Enabled=false v.Name="BarreOutils_ANCIEN" v.Parent=b v=p:FindFirstChild("BarreOutils") end workspace.BarreOutils.Parent=p print("Installation OK !")

@@ -12,6 +12,7 @@ print("[Outils] BarreOutils démarré")
 -- Sans image, la bulle montre l'outil en 3D. (Un outil avec une TextureId l'utilise aussi.)
 local IMAGES = {
 	Ciseaux = { image = "rbxassetid://98821470151953", rotation = -20, taille = 0.85 },
+	Faucille = { image = "rbxassetid://138905055767473", rotation = 0, taille = 0.85 },
 }
 
 local Players = game:GetService("Players")
@@ -21,6 +22,14 @@ local TweenService = game:GetService("TweenService")
 
 local joueur = Players.LocalPlayer
 local camera = workspace.CurrentCamera
+
+-- plateformes : téléphone / tablette (pas de clavier) et manette (PlayStation / Xbox)
+local TOUCH = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+local PADS = {
+	[Enum.UserInputType.Gamepad1] = true, [Enum.UserInputType.Gamepad2] = true,
+	[Enum.UserInputType.Gamepad3] = true, [Enum.UserInputType.Gamepad4] = true,
+}
+local function usingGamepad() return PADS[UserInputService:GetLastInputType()] == true end
 
 local TAILLE_BULLE = 78
 local BLANC = Color3.new(1, 1, 1)
@@ -44,7 +53,7 @@ end)
 local gui = Instance.new("ScreenGui")
 gui.Name = "BarreOutils"
 gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = true
+pcall(function() gui.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets end) -- évite l'encoche et les bords de télé
 gui.DisplayOrder = 5
 gui.Parent = joueur:WaitForChild("PlayerGui")
 
@@ -66,8 +75,8 @@ liste.Parent = barre
 local echelle = Instance.new("UIScale")
 echelle.Parent = barre
 local function adapter()
-	local s = math.clamp(camera.ViewportSize.Y / 950, 0.6, 1)
-	if UserInputService.TouchEnabled then s *= 0.85 end
+	local s = math.clamp(camera.ViewportSize.Y / 950, 0.55, 1)
+	if TOUCH then s = math.max(s * 0.9, 0.6) end -- assez grand pour le doigt
 	echelle.Scale = s
 end
 adapter()
@@ -253,6 +262,7 @@ local function rafraichir()
 		if not b then creerBulle(outil) b = bulles[outil] end
 		b.slot.LayoutOrder = i
 		b.numero.Text = if i <= 9 then tostring(i) else ""
+		b.numero.Visible = not TOUCH and not usingGamepad() -- numéros seulement avec un clavier
 		-- l'outil tenu : bulle plus claire, plus nette et un peu plus grande
 		local tenu = outil.Parent == perso
 		if tenu and not b.tenu and b.icone then
@@ -298,8 +308,80 @@ joueur.ChildAdded:Connect(function(c)
 	if c:IsA("Backpack") then surveiller(c, connexionsSac) end
 end)
 
--- touches 1 à 9
+-- manette : L1 / R1 (LB / RB) pour changer d'outil, avec les icônes de la manette à côté de la barre
+local function indiceManette(touche, texte, ordreAffichage)
+	local cadre = Instance.new("Frame")
+	cadre.BackgroundTransparency = 1
+	cadre.Size = UDim2.fromOffset(44, TAILLE_BULLE)
+	cadre.LayoutOrder = ordreAffichage
+	cadre.Visible = false
+	cadre.Parent = barre
+	local image = ""
+	pcall(function() image = UserInputService:GetImageForKeyCode(touche) end)
+	if image ~= "" then
+		local i = Instance.new("ImageLabel")
+		i.BackgroundTransparency = 1
+		i.Image = image
+		i.ScaleType = Enum.ScaleType.Fit
+		i.AnchorPoint = Vector2.new(0.5, 0.5)
+		i.Position = UDim2.fromScale(0.5, 0.5)
+		i.Size = UDim2.fromOffset(40, 40)
+		i.Parent = cadre
+	else
+		local t = Instance.new("TextLabel")
+		t.BackgroundTransparency = 1
+		t.Text = texte
+		t.Font = Enum.Font.FredokaOne
+		t.TextScaled = true
+		t.TextColor3 = BLANC
+		t.AnchorPoint = Vector2.new(0.5, 0.5)
+		t.Position = UDim2.fromScale(0.5, 0.5)
+		t.Size = UDim2.fromOffset(40, 30)
+		t.Parent = cadre
+		local c = Instance.new("UIStroke")
+		c.Thickness = 3
+		c.Color = ENCRE
+		c.Parent = t
+	end
+	return cadre
+end
+local indiceGauche = indiceManette(Enum.KeyCode.ButtonL1, "LB", -1)
+local indiceDroite = indiceManette(Enum.KeyCode.ButtonR1, "RB", 1000)
+local function majIndices()
+	local pad = usingGamepad() and #ordre > 0
+	indiceGauche.Visible = pad
+	indiceDroite.Visible = pad
+end
+UserInputService.LastInputTypeChanged:Connect(function()
+	majIndices()
+	rafraichir()
+end)
+barre.ChildAdded:Connect(majIndices)
+barre.ChildRemoved:Connect(majIndices)
+majIndices()
+
+local function changerOutil(sens)
+	if #ordre == 0 then return end
+	local perso = personnage()
+	local actuel = 0
+	for i, outil in ordre do
+		if outil.Parent == perso then actuel = i end
+	end
+	local suivant
+	if actuel == 0 then
+		suivant = if sens > 0 then 1 else #ordre
+	else
+		suivant = (actuel - 1 + sens) % #ordre + 1
+	end
+	local h = humain()
+	if h and h.Health > 0 then h:EquipTool(ordre[suivant]) end
+end
+
+-- touches 1 à 9 (clavier) et L1 / R1 (manette)
 UserInputService.InputBegan:Connect(function(entree, occupe)
+	if UserInputService:GetFocusedTextBox() or joueur:GetAttribute("MenuOuvert") then return end
+	if entree.KeyCode == Enum.KeyCode.ButtonL1 then changerOutil(-1) return end
+	if entree.KeyCode == Enum.KeyCode.ButtonR1 then changerOutil(1) return end
 	if occupe then return end
 	local n = TOUCHES[entree.KeyCode]
 	if n and ordre[n] then basculer(ordre[n]) end

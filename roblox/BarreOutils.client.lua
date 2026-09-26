@@ -12,6 +12,7 @@ print("[Outils] BarreOutils démarré")
 -- Sans image, la bulle montre l'outil en 3D. (Un outil avec une TextureId l'utilise aussi.)
 local IMAGES = {
 	Ciseaux = { image = "rbxassetid://98821470151953", rotation = -20, taille = 0.85 },
+	Faucille = { image = "rbxassetid://138905055767473", rotation = 0, taille = 0.85 },
 }
 
 local Players = game:GetService("Players")
